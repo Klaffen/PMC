@@ -12,10 +12,14 @@
 
 class squadIO {
 public:
-    static std::vector<unitBase::unitClass> readFile(std::string fPath);
-    static std::vector<unitBase> makeUnits(std::string fPath, Network* net, Board &gameBoard);
+    static std::vector<unitBase::unitClass> readFile(const std::string &fPath);
+
+    static std::vector<unitBase> makeUnits(const std::string &fPath, Network *net, Board &gameBoard);
+
     static void writeSquad(std::vector<unitBase::unitClass> units);
+
+    static std::vector<unitBase::unitClass> defaultUnitList();
+
+    static bool validUnitFile(const std::string &fPath);
 };
-
-
 #endif //DAT220_PROJECT_SQUADREADER_H

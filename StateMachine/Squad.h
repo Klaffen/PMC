@@ -16,15 +16,13 @@
 #define PRICE_ACTIONPOINT 10
 #define PRICE_WEAPON 20
 #define PRICE_UNIT 50
+#define MAX_BUILD_POINTS 600
 
 struct baseUnit {
     int vision = 1;
-    int health = 15;
+    int health = 10;
     int actionPoints = 1;
-
     int weaponId = 0;
-
-    int unitCost = 0;
 };
 
 class Squad: public State {
@@ -110,6 +108,7 @@ private:
      */
     void selectUnit(sf::Vector2i &mouse);
     std::vector<baseUnit> unitList;
+    std::vector<int> unitCost;
     int selectedUnitId;
     sf::Text unitListTitle;
     std::vector<sf::Text> unitTexts;
@@ -130,14 +129,14 @@ private:
      * @param window Reference to units read from file
      * @return Returns a converted unit list
      */
-    std::vector<unitBase::unitClass> unitConversion(std::vector<baseUnit>);
+    static std::vector<unitBase::unitClass> unitConversion(const std::vector<baseUnit>&);
 
     /**
      * Add units to visible unit list
      * @param window Reference to unit list
      * @return Returns nothing
      */
-    void getSquad(std::vector<unitBase::unitClass>);
+    void getSquad(const std::vector<unitBase::unitClass>&);
 };
 
 typedef std::shared_ptr<Squad> SquadPtr;

@@ -431,10 +431,10 @@ void Lobby::process(sf::RenderWindow &window) {
         position = 0;
         for (int element = startIntervall; (position * 50 + 60) <= (int) window.getView().getSize().y - 50 && element != (int) messageVector.size(); element++) {
             textElement.setString(messageVector.at(element));
-            textElement.setPosition(60, position * 50 + 60);
+            textElement.setPosition(60, float(position) * 50 + 60);
             window.draw(textElement);
             position++;
-            if ((position * 50 + 60) > window.getView().getSize().y - 50) {
+            if ((float(position) * 50 + 60) > window.getView().getSize().y - 50) {
                 if (!manualScroll)
                     startIntervall++;
             }

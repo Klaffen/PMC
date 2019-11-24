@@ -17,7 +17,7 @@ int Squad::enter(sf::RenderWindow &window) {
         selectedColor = sf::Color::White;
         textColor = sf::Color::White;
 
-        buildPoints = 650;
+        buildPoints = MAX_BUILD_POINTS;
         getSquad(squadIO::readFile("squadBuilder/squad.txt"));
 
         selectedUnitId = 0;
@@ -36,14 +36,14 @@ int Squad::enter(sf::RenderWindow &window) {
             minus.setFont(font);
             minus.setCharacterSize(textSize + 32);
             minus.setFillColor(textColor);
-            minus.setPosition(health.getPosition().x+ health.getGlobalBounds().width + 50, vision.getPosition().y + (100*i) - 24);
+            minus.setPosition(health.getPosition().x+ health.getGlobalBounds().width + 50, vision.getPosition().y + (100*float(i)) - 24);
             minus.setString("-");
 
             sf::Text pluss;
             pluss.setFont(font);
             pluss.setCharacterSize(textSize + 32);
             pluss.setFillColor(textColor);
-            pluss.setPosition(health.getPosition().x+ health.getGlobalBounds().width + 110, vision.getPosition().y + (100*i) - 24);
+            pluss.setPosition(health.getPosition().x+ health.getGlobalBounds().width + 110, vision.getPosition().y + (100*float(i)) - 24);
             pluss.setString("+");
 
             plussMinus.push_back(pluss);
@@ -228,7 +228,7 @@ void Squad::updatePositions(sf::RenderWindow &window) {
 
 int Squad::buttonCollission(sf::Vector2i &mouse) {
     hitbox.setSize(sf::Vector2f(55, 55));
-    hitbox.setPosition(mouse.x - 28, mouse.y - 28);
+    hitbox.setPosition(float(mouse.x) - 28, float(mouse.y - 28));
     for (auto &plussMinu : plussMinus) {
         if (plussMinu.getGlobalBounds().intersects(hitbox.getGlobalBounds())) {
             plussMinu.setFillColor(highlighColor);
@@ -286,12 +286,13 @@ void Squad::addUnit(baseUnit unit /*= baseUnit()*/) {
     unitText.setFont(font);
     unitText.setCharacterSize(textSize - 10);
     unitText.setFillColor(sf::Color::White);
-    unitText.setPosition(50, unitTexts.size() * 75 + 150);
+    unitText.setPosition(50, float(unitTexts.size()) * 75 + 150);
     unitText.setString("Unit: " + std::to_string(unitTexts.size() + 1));
 
-    buildPoints -= unit.unitCost;
+    buildPoints -= PRICE_UNIT;
     unitTexts.emplace_back(unitText);
     unitList.emplace_back(unit);
+    unitCost.emplace_back(0);
 }
 
 /* Collision value list
@@ -305,18 +306,18 @@ void Squad::addUnit(baseUnit unit /*= baseUnit()*/) {
  */
 void Squad::mouseClick() {
     hitbox.setSize(sf::Vector2f(1000, 55));
-    hitbox.setPosition(mousePosition.x - 500, mousePosition.y);
+    hitbox.setPosition(float(mousePosition.x) - 500, float(mousePosition.y));
 
     if (hitbox.getGlobalBounds().intersects(vision.getGlobalBounds())) {
         if (collision == 1 && buildPoints >= PRICE_VISION) {
             unitList.at(selectedUnitId).vision++;
             buildPoints -= PRICE_VISION;
-            unitList.at(selectedUnitId).unitCost += PRICE_VISION;
+            unitCost.at(selectedUnitId) += PRICE_VISION;
         }
         else if (collision == 2 && unitList.at(selectedUnitId).vision != 1) {
             unitList.at(selectedUnitId).vision--;
             buildPoints += PRICE_VISION;
-            unitList.at(selectedUnitId).unitCost -= PRICE_VISION;
+            unitCost.at(selectedUnitId) -= PRICE_VISION;
         }
     }
 
@@ -324,12 +325,12 @@ void Squad::mouseClick() {
         if (collision == 1 && buildPoints >= PRICE_HEALTH) {
             unitList.at(selectedUnitId).health += 15;
             buildPoints -= PRICE_HEALTH;
-            unitList.at(selectedUnitId).unitCost += PRICE_HEALTH;
+            unitCost.at(selectedUnitId) += PRICE_HEALTH;
         }
         else if (collision == 2 && unitList.at(selectedUnitId).health != 15){
             unitList.at(selectedUnitId).health -= 15;
             buildPoints += PRICE_HEALTH;
-            unitList.at(selectedUnitId).unitCost -= PRICE_HEALTH;
+            unitCost.at(selectedUnitId) -= PRICE_HEALTH;
         }
     }
 
@@ -337,19 +338,19 @@ void Squad::mouseClick() {
         if (collision == 1 && buildPoints >= PRICE_ACTIONPOINT) {
             unitList.at(selectedUnitId).actionPoints++;
             buildPoints -= PRICE_ACTIONPOINT;
-            unitList.at(selectedUnitId).unitCost += PRICE_ACTIONPOINT;
+            unitCost.at(selectedUnitId) += PRICE_ACTIONPOINT;
         }
         else if (collision == 2 && unitList.at(selectedUnitId).actionPoints != 1){
             unitList.at(selectedUnitId).actionPoints--;
             buildPoints += PRICE_ACTIONPOINT;
-            unitList.at(selectedUnitId).unitCost -= PRICE_ACTIONPOINT;
+            unitCost.at(selectedUnitId) -= PRICE_ACTIONPOINT;
         }
     }
     else if (hitbox.getGlobalBounds().intersects(weapon.getGlobalBounds())) {
         if (collision == 1 && unitList.at(selectedUnitId).weaponId != 2 && (buildPoints >= PRICE_WEAPON || unitList.at(selectedUnitId).weaponId != 0)) {
             if (unitList.at(selectedUnitId).weaponId == 0) {
                 buildPoints -= PRICE_WEAPON;
-                unitList.at(selectedUnitId).unitCost += PRICE_WEAPON;
+                unitCost.at(selectedUnitId) += PRICE_WEAPON;
             }
 
             unitList.at(selectedUnitId).weaponId++;
@@ -357,7 +358,7 @@ void Squad::mouseClick() {
         else if (collision == 2 && unitList.at(selectedUnitId).weaponId != 0) {
             if (unitList.at(selectedUnitId).weaponId == 1) {
                 buildPoints += PRICE_WEAPON;
-                unitList.at(selectedUnitId).unitCost -= PRICE_WEAPON;
+                unitCost.at(selectedUnitId) -= PRICE_WEAPON;
             }
 
             unitList.at(selectedUnitId).weaponId--;
@@ -398,7 +399,7 @@ void Squad::selectUnit(sf::Vector2i &mouse) {
             unitTexts.at(unit).setFillColor(sf::Color::Red);
             selectedUnit.setString(unitTexts.at(unit).getString());
             unitTexts.at(selectedUnitId).setFillColor(sf::Color::White);
-            selectedUnitId = unit;
+            selectedUnitId = int(unit);
             break;
         }
     }
@@ -406,9 +407,10 @@ void Squad::selectUnit(sf::Vector2i &mouse) {
 
 void Squad::removeUnit() {
     buildPoints += PRICE_UNIT;
-    buildPoints += unitList.at(selectedUnitId).unitCost;
+    buildPoints += unitCost.at(selectedUnitId);
 
     unitList.erase(unitList.begin() + selectedUnitId);
+    unitCost.erase(unitCost.begin() + selectedUnitId);
     unitTexts.erase(unitTexts.begin() + selectedUnitId);
 
     if (unsigned(selectedUnitId) >= unitList.size())
@@ -418,18 +420,17 @@ void Squad::removeUnit() {
 
     for (unsigned long unit = 0; unit < unitTexts.size(); unit++) {
         unitTexts.at(unit).setString("Unit: " + std::to_string(unit + 1));
-        unitTexts.at(unit).setPosition(50, unit * 75 + 150);
+        unitTexts.at(unit).setPosition(50, float(unit) * 75 + 150);
     }
 }
 
-std::vector<unitBase::unitClass> Squad::unitConversion(std::vector<baseUnit> units) {
+std::vector<unitBase::unitClass> Squad::unitConversion(const std::vector<baseUnit>& units) {
     unitBase::unitClass convertedUnit;
     std::vector<unitBase::unitClass> convertedList;
     for (auto unit : units){
         convertedUnit.health = unit.health;
         convertedUnit.actionPoints = unit.actionPoints;
         convertedUnit.sightRange = unit.vision;
-        convertedUnit.builderCost = unit.unitCost;
         switch (unit.weaponId){
             case 0:
                 convertedUnit.weapon = weaponBase::noType;
@@ -447,7 +448,7 @@ std::vector<unitBase::unitClass> Squad::unitConversion(std::vector<baseUnit> uni
     return convertedList;
 }
 
-void Squad::getSquad(std::vector<unitBase::unitClass> units) {
+void Squad::getSquad(const std::vector<unitBase::unitClass>& units) {
     baseUnit convertedUnit;
     std::vector<baseUnit> convertedList;
     for (auto unit : units){
@@ -455,7 +456,6 @@ void Squad::getSquad(std::vector<unitBase::unitClass> units) {
         convertedUnit.actionPoints = unit.actionPoints;
         convertedUnit.vision = unit.sightRange;
         convertedUnit.weaponId = (int)unit.weapon;
-        convertedUnit.unitCost = unit.builderCost;
         addUnit(convertedUnit);
     }
 }

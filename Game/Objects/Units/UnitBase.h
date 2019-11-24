@@ -29,10 +29,10 @@ class unitBase {
 public:
     unitBase();
     struct unitClass {
-        weaponBase::weaponType weapon = weaponBase::weaponType::noType;
+        weaponBase::weaponType weapon = weaponBase::weaponType::rifleType;
         int sightRange = 1;
-        int health = 15;
-        int maxHealth = 15;
+        int maxHealth = 10;
+        int health = maxHealth;
         int actionPoints = 1;
         int builderCost = 0;
 
