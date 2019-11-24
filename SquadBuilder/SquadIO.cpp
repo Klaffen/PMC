@@ -70,7 +70,7 @@ std::vector<unitBase> squadIO::makeUnits(std::string fPath, Network *net, Board 
 void squadIO::writeSquad(std::vector<unitBase::unitClass> units) {
     std::ofstream stream;
     stream.open("SquadBuilder/squad.txt", std::ofstream::out | std::ofstream::trunc);
-    for (int i = 0; i < units.size(); i++) {
+    for (unsigned long i = 0; i < units.size(); i++) {
         auto unit = units.at(i);
         stream << unit.health << ' ' << unit.sightRange << ' ' << unit.actionPoints << ' ' << unit.builderCost << ' ' << i << ' ';
         if (unit.weapon == weaponBase::noType)

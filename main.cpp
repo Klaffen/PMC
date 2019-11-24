@@ -17,7 +17,7 @@ int main() {
     window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
 
-    Network *network = new Network();
+    auto *network = new Network();
     MenuPtr menu = std::make_shared<Menu>();
     GamePtr game = std::make_shared<Game>(network);
     LobbyPtr lobby = std::make_shared<Lobby>(network);

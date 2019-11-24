@@ -22,8 +22,8 @@ const std::vector<sf::VideoMode> & GameSettings::getVideoModes() {
 }
 
 bool GameSettings::setResolution(sf::RenderWindow &window, int change, bool isFullscreen) {
-    int width = window.getSize().x;
-    int height = window.getSize().y;
+    unsigned int width = window.getSize().x;
+    unsigned int height = window.getSize().y;
 
     std::vector<sf::VideoMode> resolutions = getVideoModes();
     int index = 0;
@@ -33,7 +33,7 @@ bool GameSettings::setResolution(sf::RenderWindow &window, int change, bool isFu
     }
 
 
-    int resIndex = index + change;
+    unsigned int resIndex = index + change;
     if (resIndex>= 0 || resIndex <= (resolutions.size() - 1)){
         if (isFullscreen) {
             window.create(resolutions.at(resIndex), "Shape Shooter", sf::Style::Fullscreen);

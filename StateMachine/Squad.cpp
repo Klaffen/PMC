@@ -122,8 +122,8 @@ void Squad::draw(sf::RenderWindow &window) {
         window.draw(unitText);
     }
 
-    for (int i = 0; i < plussMinus.size(); i++)
-        window.draw(plussMinus.at(i));
+    for (const auto & plussMinu : plussMinus)
+        window.draw(plussMinu);
 
     if (saveDrawTime > 0) {
         window.draw(saved);
@@ -253,12 +253,12 @@ int Squad::buttonCollission(sf::Vector2i &mouse) {
         removeUnitButton->setTextColor(sf::Color::White);
     }
 
-    for (int unit = 0; unit < unitList.size(); unit++) {
-        if (unitTexts.at(unit).getGlobalBounds().contains(mouse.x, mouse.y) && unit != selectedUnitId) {
+    for (unsigned long unit = 0; unit < unitList.size(); unit++) {
+        if (unitTexts.at(unit).getGlobalBounds().contains(mouse.x, mouse.y) && unit != unsigned(selectedUnitId)) {
             unitTexts.at(unit).setFillColor(sf::Color::Cyan);
             return 5;
         }
-        else if (unit != selectedUnitId)
+        else if (unit != unsigned(selectedUnitId))
             unitTexts.at(unit).setFillColor(sf::Color::White);
     }
 
@@ -393,7 +393,7 @@ void Squad::updateValues() {
 }
 
 void Squad::selectUnit(sf::Vector2i &mouse) {
-    for (int unit = 0; unit < unitList.size(); unit++) {
+    for (unsigned long unit = 0; unit < unitList.size(); unit++) {
         if (unitTexts.at(unit).getGlobalBounds().contains(mouse.x, mouse.y)) {
             unitTexts.at(unit).setFillColor(sf::Color::Red);
             selectedUnit.setString(unitTexts.at(unit).getString());
@@ -411,12 +411,12 @@ void Squad::removeUnit() {
     unitList.erase(unitList.begin() + selectedUnitId);
     unitTexts.erase(unitTexts.begin() + selectedUnitId);
 
-    if (selectedUnitId >= unitList.size())
+    if (unsigned(selectedUnitId) >= unitList.size())
         selectedUnitId--;
 
     unitTexts.at(selectedUnitId).setFillColor(sf::Color::Red);
 
-    for (int unit = 0; unit < unitTexts.size(); unit++) {
+    for (unsigned long unit = 0; unit < unitTexts.size(); unit++) {
         unitTexts.at(unit).setString("Unit: " + std::to_string(unit + 1));
         unitTexts.at(unit).setPosition(50, unit * 75 + 150);
     }
