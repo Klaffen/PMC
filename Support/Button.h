@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <iostream>
+#include <optional>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Font.hpp>
@@ -145,7 +146,7 @@ private:
     bool buttonHighlight;
 
     sf::Font font;
-    sf::Text text;
+    std::optional<sf::Text> text;
     std::string textString;
     uint8_t textSize;
     sf::Color textColor;

@@ -51,77 +51,77 @@ void Board::drawObstacles(sf::RenderWindow &window) {
 
 //todo: why do we need view here?
 void Board::moveUp(sf::RenderWindow &window, sf::View &view) {
-    view.move(Game::viewMoveStep * sin(view.getRotation() * M_PI / 180), -Game::viewMoveStep * cos(view.getRotation() * M_PI / 180));
+    view.move({Game::viewMoveStep * std::sin(view.getRotation().asRadians()), -Game::viewMoveStep * std::cos(view.getRotation().asRadians())});
     window.setView(view);
 
     // reset view if it goes outside upper window bound
     if (view.getCenter().y < view.getSize().y/10) {
-    view.setCenter(view.getCenter().x, view.getSize().y/10);
+    view.setCenter({view.getCenter().x, view.getSize().y/10});
     window.setView(view);
     }
 }
 
 void Board::moveDown(sf::RenderWindow &window, sf::View &view) {
-    view.move(-Game::viewMoveStep * sin(view.getRotation() * M_PI / 180.0f), Game::viewMoveStep * cos(view.getRotation() * M_PI / 180.0f));
+    view.move({-Game::viewMoveStep * std::sin(view.getRotation().asRadians()), Game::viewMoveStep * std::cos(view.getRotation().asRadians())});
     window.setView(view);
 
 
     // reset view if it goes outside lower window bound
     if (view.getCenter().y > window.getSize().y - view.getSize().y/10) {
-    view.setCenter(view.getCenter().x, window.getSize().y - view.getSize().y/10);
+    view.setCenter({view.getCenter().x, (float)(window.getSize().y) - view.getSize().y/10});
     window.setView(view);
     }
 }
 
 void Board::moveLeft(sf::RenderWindow &window, sf::View &view) {
-    view.move(-Game::viewMoveStep * cos(view.getRotation() * M_PI / 180), -Game::viewMoveStep * sin(view.getRotation() * M_PI / 180));
+    view.move({-Game::viewMoveStep * std::cos(view.getRotation().asRadians()), -Game::viewMoveStep * std::sin(view.getRotation().asRadians())});
     window.setView(view);
 
 
     // reset view if it goes outside left window bound
     if (view.getCenter().x < view.getSize().x/4) {
-    view.setCenter(view.getSize().x/4, view.getCenter().y);
+    view.setCenter({view.getSize().x/4, view.getCenter().y});
     window.setView(view);
     }
 }
 
 void Board::moveRight(sf::RenderWindow &window, sf::View &view) {
-    view.move(Game::viewMoveStep * cos(view.getRotation() * M_PI / 180), Game::viewMoveStep * sin(view.getRotation() * M_PI / 180));
+    view.move({Game::viewMoveStep * std::cos(view.getRotation().asRadians()), Game::viewMoveStep * std::sin(view.getRotation().asRadians())});
     window.setView(view);
 
 
     // reset view if it goes outside right window bound
     if (view.getCenter().x > window.getSize().x - view.getSize().x/4) {
-    view.setCenter(window.getSize().x - view.getSize().x/4, view.getCenter().y);
+    view.setCenter({(float)(window.getSize().x) - view.getSize().x/4, view.getCenter().y});
     window.setView(view);
     }
 }
 
 void Board::Process(sf::RenderWindow &window, sf::View &view) {
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
         moveUp(window, view);
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
         moveDown(window, view);
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
         moveLeft(window, view);
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
         moveRight(window, view);
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
-        view.rotate(-0.9f);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::E)) {
+        view.rotate(sf::degrees(-0.9f));
         window.setView(view);
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
-        view.rotate(0.9f);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
+        view.rotate(sf::degrees(0.9f));
         window.setView(view);
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F)) {
         // zoom will not be always > minZoom, very small deviation
         if (Game::viewStartingSize.x / view.getSize().x > Game::minZoom) {
             view.zoom(1.01);
@@ -129,7 +129,7 @@ void Board::Process(sf::RenderWindow &window, sf::View &view) {
         }
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R)) {
         // zoom will not be always < maxZoom very small deviation
         if (Game::viewStartingSize.x / view.getSize().x < Game::maxZoom) {
             view.zoom(0.99);

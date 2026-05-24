@@ -18,7 +18,7 @@ shotgun::shotgun() {
     builderCost = 0;
 
     buffer.loadFromFile("Data/Audio/shotgun.wav");
-    sound.setBuffer(buffer);
+    sound.emplace(buffer);
 }
 
 std::vector<sf::RectangleShape> shotgun::Shoot(sf::Vector2f position, sf::Vector2f target) {
@@ -35,7 +35,7 @@ std::vector<sf::RectangleShape> shotgun::Shoot(sf::Vector2f position, sf::Vector
         shot.setSize(shotSize);
         float randomAngle = (rand() % 22 - 11 + angle);
         std::cout << "angle. " << angle << " randomAngle: " << randomAngle << std::endl;
-        shot.setRotation(randomAngle);
+        shot.setRotation(sf::degrees(randomAngle));
         bullets.push_back(shot);
     }
 

@@ -2,7 +2,7 @@
 
 void Network::host() {
     // bind the listener to the tcp port
-    if (listener.listen(TCPPORT) != sf::Socket::Done)
+    if (listener.listen(TCPPORT) != sf::Socket::Status::Done)
         std::cout << "Failed to bind TCP listener to TCPPort" << std::endl;
     else
         std::cout << "TCP listener bound to port " << TCPPORT << std::endl;
@@ -16,7 +16,7 @@ bool Network::listen() {
     UdpSocket.send(namePacket, sf::IpAddress::Broadcast, UDPPORT);
 
     listener.setBlocking(false);
-    if (listener.accept(nextClient->socket) == sf::Socket::Done) {
+    if (listener.accept(nextClient->socket) == sf::Socket::Status::Done) {
         sf::Packet packet;
         nextClient->socket.receive(packet);
         packet >> nextClient->playerName;
@@ -83,7 +83,7 @@ sf::Packet Network::receivePacket(bool blocking) {
     else {
         clientSocket.setBlocking(false);
         clientSocket.receive(packet);
-        if (!packet.endOfPacket())
+        if (packet.getDataSize() > 0)
             std::cout << "Received packet from host" << std::endl;
         return packet;
     }
@@ -108,7 +108,7 @@ void Network::sendFunction() {
                 for (auto &client : clients) {
                     client->socket.setBlocking(true);
                     status = client->socket.send(payload);
-                    if (status == sf::Socket::Done)
+                    if (status == sf::Socket::Status::Done)
                         std::cout << "Packet sent to player: " << client->playerName << std::endl;
                     else
                         std::cout << "Failed to send packet to player: " << client->playerName << std::endl;
@@ -116,7 +116,7 @@ void Network::sendFunction() {
             }
             else {
                 clientSocket.setBlocking(true);
-                if (clientSocket.send(payload) == sf::Socket::Done)
+                if (clientSocket.send(payload) == sf::Socket::Status::Done)
                     std::cout << "Packet sent to host" << std::endl;
                 else
                     std::cout << "Failed to send packet to host" << std::endl;

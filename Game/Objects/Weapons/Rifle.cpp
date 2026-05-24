@@ -18,7 +18,7 @@ rifle::rifle() {
     type = rifleType;
     builderCost = 0;
     buffer.loadFromFile("Data/Audio/laser.wav");
-    sound.setBuffer(buffer);
+    sound.emplace(buffer);
 }
 
 std::vector<sf::RectangleShape> rifle::Shoot(sf::Vector2f position, sf::Vector2f target){
@@ -33,7 +33,7 @@ std::vector<sf::RectangleShape> rifle::Shoot(sf::Vector2f position, sf::Vector2f
     shot.setPosition(position);
     //shot.setOrigin(position);
     shot.setSize(shotSize);
-    shot.setRotation(angle);
+    shot.setRotation(sf::degrees(angle));
     shot.setFillColor(sf::Color::Red);
     this->shape = shot;
     shots.push_back(shot);

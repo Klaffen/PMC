@@ -15,7 +15,7 @@ grenade::grenade() {
     builderCost = 0;
     area = 4;
     buffer.loadFromFile("Data/Audio/grenade.wav");
-    sound.setBuffer(buffer);
+    sound.emplace(buffer);
 }
 
 std::vector<sf::RectangleShape> grenade::Shoot(sf::Vector2f position, sf::Vector2f target) {
@@ -23,7 +23,7 @@ std::vector<sf::RectangleShape> grenade::Shoot(sf::Vector2f position, sf::Vector
     for (int i = 1; i <= 4; i++) {
         sf::Vector2f explosionSize(i * Board::TILE_SIZE,i * Board::TILE_SIZE);
         sf::RectangleShape bang(explosionSize);
-        bang.setOrigin(explosionSize.x/2, explosionSize.y/2);
+        bang.setOrigin({explosionSize.x/2, explosionSize.y/2});
         bang.setPosition(target);
         shape = bang;
         explosions.push_back(bang);

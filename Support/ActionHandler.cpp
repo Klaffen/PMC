@@ -77,7 +77,7 @@ void actionHandler::GetRemoteAction(sf::Packet packet, std::vector<unitBase> *un
             if (unit != nullptr) {
                 target = sf::Vector2f(xPos, yPos);
                 unit->getWeapon()->Shoot(unit->shape.getPosition(), target);
-                unit->getWeapon()->sound.play();
+                if (unit->getWeapon()->sound) unit->getWeapon()->sound->play();
             }
             break;
         }
@@ -126,8 +126,8 @@ void actionHandler::GetRemoteAction(sf::Packet packet, std::vector<unitBase> *un
 
         case FUNCTION_YOUR_TURN: {
             network->turn = true;
-            network->title.setString("Your turn");
-            network->title.setFillColor(sf::Color::White);
+            network->titleString = "Your turn";
+            network->titleColor = sf::Color::White;
             for (auto &i : *unitList) {
                 i.turn = i.player == network->playerNumber;
                 i.restoreAP();
@@ -140,12 +140,12 @@ void actionHandler::GetRemoteAction(sf::Packet packet, std::vector<unitBase> *un
             packet >> status;
 
             if (status == 3) {
-                network->title.setString("You lost!");
-                network->title.setFillColor(sf::Color::Red);
+                network->titleString = "You lost!";
+                network->titleColor = sf::Color::Red;
             }
             else if (status == 4) {
-                network->title.setString("You won!");
-                network->title.setFillColor(sf::Color::Green);
+                network->titleString = "You won!";
+                network->titleColor = sf::Color::Green;
             }
             break;
         }
@@ -223,8 +223,8 @@ void actionHandler::victory(std::vector<unitBase> &units, Network *network) {
         if (player == 0) {
             if (!playerMap[0] && network->alive) {
                 network->alive = false;
-                network->title.setString("You lost!");
-                network->title.setFillColor(sf::Color::Red);
+                network->titleString = "You lost!";
+                network->titleColor = sf::Color::Red;
                 playerMap.erase(0);
                 std::cout << "Host Defeated!" << std::endl;
                 if (network->turn)
@@ -261,13 +261,13 @@ void actionHandler::victory(std::vector<unitBase> &units, Network *network) {
         }
 
     if (winner == network->playerNumber) {
-        network->title.setString("You won!");
-        network->title.setFillColor(sf::Color::Green);
+        network->titleString = "You won!";
+        network->titleColor = sf::Color::Green;
         return;
     }
     else {
-        network->title.setString("You lost!");
-        network->title.setFillColor(sf::Color::Red);
+        network->titleString = "You lost!";
+        network->titleColor = sf::Color::Red;
 
         winner--;
         network->clients.at(winner)->status = network->clients.at(winner)->victory;
@@ -277,7 +277,7 @@ void actionHandler::victory(std::vector<unitBase> &units, Network *network) {
 }
 
 bool actionHandler::ShootingCollision(sf::CircleShape unit, sf::RectangleShape bullet) {
-    float rotation = bullet.getRotation();
+    float rotation = bullet.getRotation().asDegrees();
     if (rotation != 0){
         //Find angle between unit and shooter
         float deltaX = -unit.getPosition().x + bullet.getPosition().x;
@@ -297,7 +297,7 @@ bool actionHandler::ShootingCollision(sf::CircleShape unit, sf::RectangleShape b
         return false;
     }
     else
-        return (bullet.getGlobalBounds().intersects(unit.getGlobalBounds()));
+        return (bullet.getGlobalBounds().findIntersection(unit.getGlobalBounds()).has_value());
 }
 
 std::vector<sf::Packet>actionHandler::weaponSwap(unitBase *unit, weaponBase::weaponType type) {
@@ -339,8 +339,8 @@ void actionHandler::nextTurn(int player, Network &network, std::vector<unitBase>
                 i.restoreAP();
             }
             network.turn = true;
-            network.title.setString("Your turn");
-            network.title.setFillColor(sf::Color::White);
+            network.titleString = "Your turn";
+            network.titleColor = sf::Color::White;
             found = true;
         }
         else if (checkPlayer + 1 > (int) network.clients.size() && !network.alive) {

@@ -27,7 +27,7 @@ Shape3D::Shape3D(sf::Vector2f size, sf::Vector2f position, float height) {
 
     transparentRect.setFillColor(topColor);
 
-    rear.setPrimitiveType(sf::Quads);
+    rear.setPrimitiveType(sf::PrimitiveType::TriangleFan);
     rear.resize(4);
     rear[0].position = sf::Vector2f(top.getPosition());
     rear[1].position = sf::Vector2f(top.getPosition().x + top.getSize().x, top.getPosition().y);
@@ -38,7 +38,7 @@ Shape3D::Shape3D(sf::Vector2f size, sf::Vector2f position, float height) {
     rear[2].color = wallBaseColor; // base point
     rear[3].color = wallBaseColor; // base point
 
-    right.setPrimitiveType(sf::Quads);
+    right.setPrimitiveType(sf::PrimitiveType::TriangleFan);
     right.resize(4);
     right[0].position = sf::Vector2f(base.getPosition().x + base.getSize().x, base.getPosition().y);
     right[1].position = sf::Vector2f(top.getPosition().x + top.getSize().x, top.getPosition().y);
@@ -49,7 +49,7 @@ Shape3D::Shape3D(sf::Vector2f size, sf::Vector2f position, float height) {
     right[2].color = wallTopColor;
     right[3].color = wallBaseColor; // base point
 
-    front.setPrimitiveType(sf::Quads);
+    front.setPrimitiveType(sf::PrimitiveType::TriangleFan);
     front.resize(4);
     front[0].position = sf::Vector2f(top.getPosition().x, top.getPosition().y + top.getSize().y);
     front[1].position = sf::Vector2f(base.getPosition().x, base.getPosition().y + base.getSize().y);
@@ -60,7 +60,7 @@ Shape3D::Shape3D(sf::Vector2f size, sf::Vector2f position, float height) {
     front[2].color = wallBaseColor; // base point
     front[3].color = wallTopColor;
 
-    left.setPrimitiveType(sf::Quads);
+    left.setPrimitiveType(sf::PrimitiveType::TriangleFan);
     left.resize(4);
     left[0].position = sf::Vector2f(top.getPosition());
     left[1].position = sf::Vector2f(base.getPosition());
@@ -98,7 +98,7 @@ void Shape3D::draw(sf::RenderWindow &window) {
 
     // assign new size and new position to the top rect
     top.setSize(sf::Vector2f(topNewSizeX, topMewSizeY));
-    top.setPosition(base.getPosition().x + base1X*delta, base.getPosition().y + base1Y*delta);
+    top.setPosition({base.getPosition().x + base1X*delta, base.getPosition().y + base1Y*delta});
 
     transparentRect.setSize(sf::Vector2f(top.getSize().x + 2*outlineThickness, top.getSize().y + 2*outlineThickness));
     transparentRect.setPosition(sf::Vector2f(top.getPosition().x - outlineThickness, top.getPosition().y - outlineThickness));

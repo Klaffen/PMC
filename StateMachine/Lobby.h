@@ -1,6 +1,7 @@
 #ifndef DAT220_PROJECT_HOST_H
 #define DAT220_PROJECT_HOST_H
 
+#include <optional>
 #include <vector>
 
 #include "SFML/Graphics.hpp"
@@ -41,7 +42,7 @@ public:
     void lobbySetup(sf::RenderWindow &window);
 
     sf::Texture backgroundTexture;
-    sf::Sprite background;
+    std::optional<sf::Sprite> background;
     sf::Vector2f backgroundScale;
     float backgroundScaleX;
     float backgroundScaleY;
@@ -52,7 +53,7 @@ public:
     ButtonPtr joinButton;
     ButtonPtr joinManuallyButton;
     ButtonPtr startGameButton;
-    sf::Text inputTag, titlebar, gameNameText, userInput, textElement;
+    std::optional<sf::Text> inputTag, titlebar, gameNameText, userInput, textElement;
 
     sf::RectangleShape chatBox;
 
@@ -65,7 +66,6 @@ public:
     std::string hostGlobalIP = "";
     std::string hostLocalIP = "";
 private:
-    sf::Event event{};
 };
 
 typedef std::shared_ptr<Lobby> LobbyPtr;

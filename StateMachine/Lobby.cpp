@@ -14,37 +14,37 @@ int Lobby::enter(sf::RenderWindow &window) {
     backgroundTexture.loadFromFile("Data/Images/background_blurred.png");
     backgroundScaleX = (float)(window.getSize().x) / (float)(backgroundTexture.getSize().x);
     backgroundScaleY = (float)(window.getSize().y) / (float)(backgroundTexture.getSize().y);
-    background.setScale(backgroundScaleX, backgroundScaleY);
-    background.setTexture(backgroundTexture);
+    background.emplace(backgroundTexture);
+    background->setScale({backgroundScaleX, backgroundScaleY});
 
+    font.openFromFile("Data/Fonts/Inconsolata-Regular.ttf");
 
-    font.loadFromFile("Data/Fonts/Inconsolata-Regular.ttf");
-    userInput.setFont(font);
-    userInput.setCharacterSize(40);
-    userInput.setPosition(230, window.getView().getSize().y / 2 + 100);
-    userInput.setFillColor(sf::Color::White);
-    userInput.setString("");
+    userInput.emplace(font);
+    userInput->setCharacterSize(40);
+    userInput->setPosition({230, window.getView().getSize().y / 2 + 100});
+    userInput->setFillColor(sf::Color::White);
+    userInput->setString("");
 
-    textElement.setFont(font);
-    textElement.setCharacterSize(28);
-    textElement.setFillColor(sf::Color::White);
+    textElement.emplace(font);
+    textElement->setCharacterSize(28);
+    textElement->setFillColor(sf::Color::White);
 
-    inputTag.setFont(font);
-    inputTag.setCharacterSize(40);
-    inputTag.setPosition(100, window.getView().getSize().y / 2 + 100);
-    inputTag.setFillColor(sf::Color::White);
-    inputTag.setString("input: ");
+    inputTag.emplace(font);
+    inputTag->setCharacterSize(40);
+    inputTag->setPosition({100, window.getView().getSize().y / 2 + 100});
+    inputTag->setFillColor(sf::Color::White);
+    inputTag->setString("input: ");
 
     chatBox.setOutlineColor(sf::Color::White);
     chatBox.setOutlineThickness(2);
     chatBox.setFillColor(sf::Color(0,0,0,150));
-    chatBox.setPosition(50,50);
+    chatBox.setPosition({50,50});
     chatBox.setSize(sf::Vector2f(window.getView().getSize().x - 100, window.getView().getSize().y - 100));
 
-    titlebar.setFont(font);
-    titlebar.setCharacterSize(32);
-    titlebar.setFillColor(sf::Color::White);
-    titlebar.setPosition(50, 10);
+    titlebar.emplace(font);
+    titlebar->setCharacterSize(32);
+    titlebar->setFillColor(sf::Color::White);
+    titlebar->setPosition({50, 10});
 
     hostButton = std::make_shared<Button>();
     hostButton->setFont("Data/Fonts/ethnocentric rg.ttf");
@@ -53,7 +53,7 @@ int Lobby::enter(sf::RenderWindow &window) {
     hostButton->setTextOutlineColor(sf::Color(213, 0, 0));
     hostButton->setTextOutlineSize(2);
     hostButton->setTextSize(78);
-    hostButton->setPosition({window.getSize().x / 2.0f - (hostButton->getButtonLocalBounds().width / 2.0f), window.getSize().y / 3.0f});
+    hostButton->setPosition({window.getSize().x / 2.0f - (hostButton->getButtonLocalBounds().size.x / 2.0f), window.getSize().y / 3.0f});
     hostButton->setOnlyText(true);
 
     joinButton = std::make_shared<Button>();
@@ -63,7 +63,7 @@ int Lobby::enter(sf::RenderWindow &window) {
     joinButton->setTextOutlineColor(sf::Color(213, 0, 0));
     joinButton->setTextOutlineSize(2);
     joinButton->setTextSize(78);
-    joinButton->setPosition({window.getSize().x / 2.0f - (joinButton->getButtonLocalBounds().width / 2.0f), hostButton->getPosition().y + (78*1.5f)});
+    joinButton->setPosition({window.getSize().x / 2.0f - (joinButton->getButtonLocalBounds().size.x / 2.0f), hostButton->getPosition().y + (78*1.5f)});
     joinButton->setOnlyText(true);
 
     joinManuallyButton = std::make_shared<Button>();
@@ -73,14 +73,14 @@ int Lobby::enter(sf::RenderWindow &window) {
     joinManuallyButton->setTextOutlineColor(sf::Color(213, 0, 0));
     joinManuallyButton->setTextOutlineSize(2);
     joinManuallyButton->setTextSize(78);
-    joinManuallyButton->setPosition({window.getSize().x / 2.0f - (joinManuallyButton->getButtonLocalBounds().width / 2.0f), joinButton->getPosition().y + (78*1.5f)});
+    joinManuallyButton->setPosition({window.getSize().x / 2.0f - (joinManuallyButton->getButtonLocalBounds().size.x / 2.0f), joinButton->getPosition().y + (78*1.5f)});
     joinManuallyButton->setOnlyText(true);
 
-    gameNameText.setFont(font);
-    gameNameText.setCharacterSize(52);
-    gameNameText.setFillColor(sf::Color::White);
-    gameNameText.setPosition({window.getSize().x / 2.0f - (gameNameText.getGlobalBounds().width / 2.0f), window.getSize().y / 10.0f});
-    gameNameText.setString("");
+    gameNameText.emplace(font);
+    gameNameText->setCharacterSize(52);
+    gameNameText->setFillColor(sf::Color::White);
+    gameNameText->setPosition({window.getSize().x / 2.0f - (gameNameText->getGlobalBounds().size.x / 2.0f), window.getSize().y / 10.0f});
+    gameNameText->setString("");
 
     startGameButton = std::make_shared<Button>();
     startGameButton->setTextColor(sf::Color::White);
@@ -104,23 +104,25 @@ void Lobby::lobbySetup(sf::RenderWindow &window) {
     stages stage = setup;
     while (window.isOpen()) {
 
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
+        while (const auto event = window.pollEvent()) {
+            if (event->is<sf::Event::Closed>()) {
                 window.close();
                 currentScreenState = screenState::TERMINATE;
                 return;
             }
-            if (event.type == sf::Event::TextEntered && stage != setup) {
-                if (event.text.unicode < 128 && event.text.unicode != 8)
-                {
-                    string += static_cast<char>(event.text.unicode);
-                    string.erase(std::remove(string.begin(), string.end(), '\n'), string.end());
-                    string.erase(std::remove(string.begin(), string.end(), '\r'), string.end());
-                    userInput.setString(string);
-                }
-                else if (event.text.unicode == 8 && !string.empty()){
-                    string.pop_back();
-                    userInput.setString(string);
+            if (const auto* textEntered = event->getIf<sf::Event::TextEntered>()) {
+                if (stage != setup) {
+                    if (textEntered->unicode < 128 && textEntered->unicode != 8)
+                    {
+                        string += static_cast<char>(textEntered->unicode);
+                        string.erase(std::remove(string.begin(), string.end(), '\n'), string.end());
+                        string.erase(std::remove(string.begin(), string.end(), '\r'), string.end());
+                        userInput->setString(string);
+                    }
+                    else if (textEntered->unicode == 8 && !string.empty()){
+                        string.pop_back();
+                        userInput->setString(string);
+                    }
                 }
             }
 
@@ -128,17 +130,18 @@ void Lobby::lobbySetup(sf::RenderWindow &window) {
                 case complete: return;
 
                 case setup: {
-                    if (hostButton->getButtonGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y)) {
+                    sf::Vector2f mousePos(sf::Mouse::getPosition(window));
+                    if (hostButton->getButtonGlobalBounds().contains(mousePos)) {
                         hostButton->setTextColor(sf::Color::White);
                         joinButton->setTextColor(sf::Color(253, 216, 53));
                         joinManuallyButton->setTextColor(sf::Color(253, 216, 53));
                     }
-                    else if (joinButton->getButtonGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y)) {
+                    else if (joinButton->getButtonGlobalBounds().contains(mousePos)) {
                         hostButton->setTextColor(sf::Color(253, 216, 53));
                         joinButton->setTextColor(sf::Color::White);
                         joinManuallyButton->setTextColor(sf::Color(253, 216, 53));
                     }
-                    else if (joinManuallyButton->getButtonGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y)) {
+                    else if (joinManuallyButton->getButtonGlobalBounds().contains(mousePos)) {
                         joinButton->setTextColor(sf::Color(253, 216, 53));
                         hostButton->setTextColor(sf::Color(253, 216, 53));
                         joinManuallyButton->setTextColor(sf::Color::White);
@@ -149,50 +152,56 @@ void Lobby::lobbySetup(sf::RenderWindow &window) {
                         joinManuallyButton->setTextColor(sf::Color(253, 216, 53));
                     }
 
-                    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && hostButton->getButtonGlobalBounds().contains(sf::Mouse::getPosition(window).x,sf::Mouse::getPosition(window).y)) {
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && hostButton->getButtonGlobalBounds().contains(mousePos)) {
                         std::cout << "Host selected" << std::endl;
-                        gameNameText.setString("Enter a game name");
-                        gameNameText.setPosition({window.getSize().x / 2.0f - (gameNameText.getGlobalBounds().width / 2.0f), window.getSize().y / 10.0f});
+                        gameNameText->setString("Enter a game name");
+                        gameNameText->setPosition({window.getSize().x / 2.0f - (gameNameText->getGlobalBounds().size.x / 2.0f), window.getSize().y / 10.0f});
                         network->HOST = true;
-                        network->title.setString("Your turn");
-                        network->title.setFillColor(sf::Color::White);
+                        network->titleString = "Your turn";
+                        network->titleColor = sf::Color::White;
                         network->host();
-                        hostGlobalIP = sf::IpAddress::getPublicAddress(sf::Time::Zero).toString();
-                        hostLocalIP = sf::IpAddress::getLocalAddress().toString();
+                        hostGlobalIP = "";
+                        if (auto addr = sf::IpAddress::getLocalAddress())
+                            hostLocalIP = addr->toString();
 
                         stage = nameInput;
-                        inputTag.setString("Input:");
+                        inputTag->setString("Input:");
                         string = "";
-                        userInput.setString(string);
+                        userInput->setString(string);
                     }
-                    else if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && joinManuallyButton->getButtonGlobalBounds().contains(sf::Mouse::getPosition(window).x,sf::Mouse::getPosition(window).y)) {
+                    else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && joinManuallyButton->getButtonGlobalBounds().contains(mousePos)) {
                         stage = ipInput;
                         network->HOST = false;
-                        network->title.setString("Opponent's turn");
-                        network->title.setFillColor(sf::Color::Blue);
+                        network->titleString = "Opponent's turn";
+                        network->titleColor = sf::Color::Blue;
                         break;
                     }
-                    else if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && joinButton->getButtonGlobalBounds().contains(sf::Mouse::getPosition(window).x,sf::Mouse::getPosition(window).y)) {
+                    else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && joinButton->getButtonGlobalBounds().contains(mousePos)) {
                         std::cout << "Join selected" << std::endl;
                         network->HOST = false;
-                        network->title.setString("Opponent's turn");
-                        network->title.setFillColor(sf::Color::Blue);
+                        network->titleString = "Opponent's turn";
+                        network->titleColor = sf::Color::Blue;
                         sf::Packet packet;
-                        sf::IpAddress throwaway;
+                        std::optional<sf::IpAddress> throwaway;
+                        unsigned short senderPort = 0;
                         network->UdpSocket.setBlocking(false);
-                        network->UdpSocket.receive(packet, throwaway, network->UDPPORT);
+                        network->UdpSocket.receive(packet, throwaway, senderPort);
 
                         packet >> network->gameName >> hostLocalIP >> hostGlobalIP;
 
                         if (!hostGlobalIP.empty()) {
                             std::cout << "Found game with name: " << network->gameName << " And IP: " << hostGlobalIP << std::endl;
-                            gameNameText.setString("Found a game with name: " + network->gameName + "\nEnter your name");
-                            gameNameText.setPosition({window.getSize().x / 2.0f - (gameNameText.getGlobalBounds().width / 2.0f), window.getSize().y / 10.0f});
-                            sf::Socket::Status status = network->clientSocket.connect(hostLocalIP, network->TCPPORT);
-                            if (status != sf::Socket::Done) {
+                            gameNameText->setString("Found a game with name: " + network->gameName + "\nEnter your name");
+                            gameNameText->setPosition({window.getSize().x / 2.0f - (gameNameText->getGlobalBounds().size.x / 2.0f), window.getSize().y / 10.0f});
+
+                            sf::Socket::Status status = sf::Socket::Status::Error;
+                            if (auto addr = sf::IpAddress::resolve(hostLocalIP))
+                                status = network->clientSocket.connect(*addr, network->TCPPORT);
+                            if (status != sf::Socket::Status::Done) {
                                 std::cout << "Failed to establish a tcp connection using the local IP. Trying the global ip instead" << std::endl;
-                                status = network->clientSocket.connect(hostGlobalIP, network->TCPPORT);
-                                if (status != sf::Socket::Done) {
+                                if (auto addr = sf::IpAddress::resolve(hostGlobalIP))
+                                    status = network->clientSocket.connect(*addr, network->TCPPORT);
+                                if (status != sf::Socket::Status::Done) {
                                     std::cout << "Failed to establish a tcp connection." << std::endl;
                                     break;
                                 }
@@ -200,18 +209,14 @@ void Lobby::lobbySetup(sf::RenderWindow &window) {
                             else {
                                 std::cout << "TCP Connection established. Ready to roll" << std::endl;
                             };
-                            inputTag.setString("Input:");
+                            inputTag->setString("Input:");
                             string = "";
-                            userInput.setString(string);
+                            userInput->setString(string);
                             stage = nameInput;
                         }
                         else {
-                            gameNameText.setString("No game found");
-                            gameNameText.setPosition({window.getSize().x / 2.0f - (gameNameText.getGlobalBounds().width / 2.0f), window.getSize().y / 10.0f});
-                            /*if (gameNameText.getFillColor() == sf::Color::Red)
-                                gameNameText.setFillColor(sf::Color::White);
-                            else
-                                gameNameText.setFillColor(sf::Color::Red);*/
+                            gameNameText->setString("No game found");
+                            gameNameText->setPosition({window.getSize().x / 2.0f - (gameNameText->getGlobalBounds().size.x / 2.0f), window.getSize().y / 10.0f});
                             std::cout << "No game found. Please try again, or host your own game." << std::endl;
                         }
                     }
@@ -219,26 +224,26 @@ void Lobby::lobbySetup(sf::RenderWindow &window) {
                 }
 
                 case nameInput: {
-                    if (sf::Keyboard::isKeyPressed((sf::Keyboard::Return))) {
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
                         if (network->HOST && !string.empty()) {
                             network->gameName = string;
                             network->namePacket << string << hostLocalIP << hostGlobalIP;
                             string = "";
-                            userInput.setString(string);
+                            userInput->setString(string);
                             stage = complete;
                             std::cout << "Done with the input" << std::endl;
                             playerCount = 1;
-                            titlebar.setString("Chat room for game: " + network->gameName +
+                            titlebar->setString("Chat room for game: " + network->gameName +
                                                "          Players: " + std::to_string(playerCount) +
                                                "             Global IP: " + hostGlobalIP + " Local IP: " + hostLocalIP);
                             startGameButton->setText("Start");
-                            gameNameText.setString("");
+                            gameNameText->setString("");
                         }
                         else if (!string.empty()) {
                             sf::Packet playerNamePacket;
                             playerNamePacket << string;
                             string = "";
-                            userInput.setString(string);
+                            userInput->setString(string);
                             stage = complete;
                             network->packetQMutex.lock();
                             network->clientSocket.setBlocking(true);
@@ -251,24 +256,26 @@ void Lobby::lobbySetup(sf::RenderWindow &window) {
                 }
 
                 case ipInput: {
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
-                        sf::IpAddress test(string);
-                        std::cout << "Trying to join: " << test.toString() << std::endl;
-                        network->clientSocket.setBlocking(true);
-                        sf::Socket::Status status = network->clientSocket.connect(test, network->TCPPORT);
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
+                        sf::Socket::Status status = sf::Socket::Status::Error;
+                        if (auto addr = sf::IpAddress::resolve(string)) {
+                            std::cout << "Trying to join: " << addr->toString() << std::endl;
+                            network->clientSocket.setBlocking(true);
+                            status = network->clientSocket.connect(*addr, network->TCPPORT);
+                        }
 
-                        if (status == sf::Socket::Done) {
+                        if (status == sf::Socket::Status::Done) {
                             std::cout << "TCP Connection established!" << std::endl;
-                            gameNameText.setString("Found a game with name: " + network->gameName + "\nEnter your name");
-                            gameNameText.setPosition({window.getSize().x / 2.0f - (gameNameText.getGlobalBounds().width / 2.0f), window.getSize().y / 10.0f});
+                            gameNameText->setString("Found a game with name: " + network->gameName + "\nEnter your name");
+                            gameNameText->setPosition({window.getSize().x / 2.0f - (gameNameText->getGlobalBounds().size.x / 2.0f), window.getSize().y / 10.0f});
                             string = "";
-                            userInput.setString(string);
+                            userInput->setString(string);
                             stage = nameInput;
                         }
                         else {
                             std::cout << "Failed to join game" << std::endl;
                             string = "";
-                            userInput.setString(string);
+                            userInput->setString(string);
                             stage = setup;
                         }
                     }
@@ -278,27 +285,27 @@ void Lobby::lobbySetup(sf::RenderWindow &window) {
         }
 
         window.clear(sf::Color::Black);
-        window.draw(background);
+        window.draw(*background);
         if (stage == setup) {
             joinButton->draw(window);
             joinManuallyButton->draw(window);
             hostButton->draw(window);
         }
         else
-            window.draw(inputTag);
+            window.draw(*inputTag);
 
-        window.draw(gameNameText);
-        window.draw(userInput);
+        window.draw(*gameNameText);
+        window.draw(*userInput);
         window.display();
     }
 }
 
 void Lobby::process(sf::RenderWindow &window) {
-    userInput.setCharacterSize(32);
-    userInput.setPosition(120, window.getView().getSize().y - 40);
+    userInput->setCharacterSize(32);
+    userInput->setPosition({120, window.getView().getSize().y - 40});
 
-    inputTag.setCharacterSize(32);
-    inputTag.setPosition(0, window.getView().getSize().y - 40);
+    inputTag->setCharacterSize(32);
+    inputTag->setPosition({0, window.getView().getSize().y - 40});
 
     std::string string;
     sf::Packet payload;
@@ -306,19 +313,20 @@ void Lobby::process(sf::RenderWindow &window) {
     int packetType;
     while (window.isOpen()) {
         packetType = 0;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
+        while (const auto event = window.pollEvent()) {
+            if (event->is<sf::Event::Closed>()) {
                 window.close();
                 currentScreenState = screenState::TERMINATE;
                 return;
             }
 
-            if (startGameButton->getButtonGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))
+            sf::Vector2f mousePos(sf::Mouse::getPosition(window));
+            if (startGameButton->getButtonGlobalBounds().contains(mousePos))
                 startGameButton->setTextColor(sf::Color::Yellow);
             else
                 startGameButton->setTextColor(sf::Color::White);
 
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
                 string.erase(std::remove(string.begin(), string.end(), '\n'), string.end());
                 string.erase(std::remove(string.begin(), string.end(), '\r'), string.end());
                 if (!network->HOST && !string.empty()) {
@@ -327,7 +335,7 @@ void Lobby::process(sf::RenderWindow &window) {
                     network->sendPacket(payload, false);
                     messageVector.push_back("You: " + string);
                     string = "";
-                    userInput.setString("");
+                    userInput->setString("");
                 }
                 else if (!string.empty()) {
                     payload.clear();
@@ -335,15 +343,15 @@ void Lobby::process(sf::RenderWindow &window) {
                     network->sendPacket(payload, false);
                     messageVector.push_back("You: " + string);
                     string = "";
-                    userInput.setString("");
+                    userInput->setString("");
                 }
             }
 
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && startIntervall > 0) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && startIntervall > 0) {
                 startIntervall--;
                 manualScroll = true;
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) {
                 if ((int) messageVector.size() - startIntervall >= endIntervall)
                     manualScroll = false;
                 else if ((int) messageVector.size() < startIntervall) {
@@ -353,21 +361,20 @@ void Lobby::process(sf::RenderWindow &window) {
 
             }
 
-            if (event.type == sf::Event::TextEntered) {
-                // Handle ASCII characters only
-                if (event.text.unicode < 128 && event.text.unicode != 8)
+            if (const auto* textEntered = event->getIf<sf::Event::TextEntered>()) {
+                if (textEntered->unicode < 128 && textEntered->unicode != 8)
                 {
-                    string += static_cast<char>(event.text.unicode);
+                    string += static_cast<char>(textEntered->unicode);
                     string.erase(std::remove(string.begin(), string.end(), '\n'), string.end());
-                    userInput.setString(string);
+                    userInput->setString(string);
                 }
-                else if (event.text.unicode == 8 && !string.empty()){
+                else if (textEntered->unicode == 8 && !string.empty()){
                     string.pop_back();
-                    userInput.setString(string);
+                    userInput->setString(string);
                 }
             }
 
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && startGameButton->getButtonGlobalBounds().contains(sf::Mouse::getPosition(window).x,sf::Mouse::getPosition(window).y) && network->HOST) {
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && startGameButton->getButtonGlobalBounds().contains(mousePos) && network->HOST) {
                 std::cout << "Start game pressed" << std::endl;
                 sf::Packet packet;
                 network->packetQMutex.lock();
@@ -388,7 +395,7 @@ void Lobby::process(sf::RenderWindow &window) {
         if (network->HOST) {
             if (network->listen()) {
                 playerCount++;
-                titlebar.setString("Chat room for game: " + network->gameName +
+                titlebar->setString("Chat room for game: " + network->gameName +
                                    "          Players: " + std::to_string(playerCount) +
                                    "             Global IP: " + hostGlobalIP + " Local IP: " + hostLocalIP);
                 payload.clear();
@@ -412,7 +419,7 @@ void Lobby::process(sf::RenderWindow &window) {
                     messageVector.push_back(fullMessage);
                 } else if (packetType == PACKET_UPDATE) {
                     payload >> playerCount >> hostLocalIP >> hostGlobalIP;
-                    titlebar.setString("Chat room for game: " + network->gameName +
+                    titlebar->setString("Chat room for game: " + network->gameName +
                                        "          Players: " + std::to_string(playerCount) +
                                        "             Global IP: " + hostGlobalIP + "   Local IP: " + hostLocalIP);
                 } else if (packetType == PACKET_START) {
@@ -423,26 +430,25 @@ void Lobby::process(sf::RenderWindow &window) {
             }
         }
         window.clear(sf::Color::Black);
-        window.draw(background);
+        window.draw(*background);
         window.draw(chatBox);
-        window.draw(titlebar);
-        window.draw(inputTag);
+        window.draw(*titlebar);
+        window.draw(*inputTag);
 
         position = 0;
         for (int element = startIntervall; (position * 50 + 60) <= (int) window.getView().getSize().y - 50 && element != (int) messageVector.size(); element++) {
-            textElement.setString(messageVector.at(element));
-            textElement.setPosition(60, float(position) * 50 + 60);
-            window.draw(textElement);
+            textElement->setString(messageVector.at(element));
+            textElement->setPosition({60, float(position) * 50 + 60});
+            window.draw(*textElement);
             position++;
             if ((float(position) * 50 + 60) > window.getView().getSize().y - 50) {
                 if (!manualScroll)
                     startIntervall++;
             }
         }
-        window.draw(userInput);
+        window.draw(*userInput);
         if (network->HOST)
             startGameButton->draw(window);
         window.display();
     }
 }
-

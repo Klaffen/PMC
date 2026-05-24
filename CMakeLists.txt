@@ -14,7 +14,7 @@ set(SFML_DEPENDENCIES_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE STRING "" FORCE
 FetchContent_Declare(
         SFML
         GIT_REPOSITORY https://github.com/SFML/SFML.git
-        GIT_TAG 2.6.2
+        GIT_TAG 3.1.0
 )
 
 FetchContent_MakeAvailable(SFML)
@@ -55,3 +55,11 @@ add_custom_command(TARGET DAT220_project POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/SquadBuilder" "$<TARGET_FILE_DIR:DAT220_project>/SquadBuilder"
 )
+
+if(WIN32)
+    add_custom_command(TARGET DAT220_project POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${sfml_BINARY_DIR}/bin"
+            "$<TARGET_FILE_DIR:DAT220_project>"
+    )
+endif()

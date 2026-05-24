@@ -1,6 +1,7 @@
 #ifndef DAT220_PROJECT_GAME_STATE_SETTINGS_H
 #define DAT220_PROJECT_GAME_STATE_SETTINGS_H
 
+#include <optional>
 #include "../Support/Button.h"
 #include "SFML/Graphics.hpp"
 #include "State.h"
@@ -21,17 +22,16 @@ public:
     void process(sf::RenderWindow &window);
 
 private:
-    sf::Event event{};
     bool settingsInit = false;
 
     sf::Texture backgroundTexture;
-    sf::Sprite background;
+    std::optional<sf::Sprite> background;
     sf::Vector2f backgroundScale;
     float backgroundScaleX;
     float backgroundScaleY;
 
     sf::Texture keybindTexture;
-    sf::Sprite keybind;
+    std::optional<sf::Sprite> keybind;
     float keybindScaleX;
     float keybindScaleY;
     /**
@@ -49,18 +49,18 @@ private:
 
     float textSpaceFactor = 1.5f;
 
-    sf::Text fullscreen;
-    sf::Text toggleWindowedFullscreen;
+    std::optional<sf::Text> fullscreen;
+    std::optional<sf::Text> toggleWindowedFullscreen;
     bool isFullscreen;
 
-    sf::Text resolution;
-    sf::Text resNumbers;
+    std::optional<sf::Text> resolution;
+    std::optional<sf::Text> resNumbers;
     bool resolutionChanged;
 
-    sf::Text sound;
-    sf::Text toggleSoundOffOn;
+    std::optional<sf::Text> sound;
+    std::optional<sf::Text> toggleSoundOffOn;
 
-    sf::Text keybinds;
+    std::optional<sf::Text> keybinds;
 
     sf::RectangleShape lineKeybind;
 

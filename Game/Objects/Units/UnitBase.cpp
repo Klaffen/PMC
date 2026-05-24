@@ -71,8 +71,8 @@ unitBase::unitBase(Network *network, unitClass unitClass, Board &gameBoard) {
         turn = false;
     }
     shape.setFillColor(color);
-    shape.setOrigin(shape.getRadius(), shape.getRadius());
-    shape.setPosition(position.x * Board::TILE_SIZE + Board::TILE_SIZE/2, position.y * Board::TILE_SIZE + Board::TILE_SIZE/2);
+    shape.setOrigin({shape.getRadius(), shape.getRadius()});
+    shape.setPosition({position.x * Board::TILE_SIZE + Board::TILE_SIZE/2, position.y * Board::TILE_SIZE + Board::TILE_SIZE/2});
     this->network = network;
 }
 

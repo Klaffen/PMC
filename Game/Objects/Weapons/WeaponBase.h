@@ -7,6 +7,7 @@
 
 
 #include <memory>
+#include <optional>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Audio.hpp>
@@ -29,8 +30,8 @@ public:
 
     int drawTime;
 
-    sf::Sound sound;
     sf::SoundBuffer buffer;
+    std::optional<sf::Sound> sound;
     int volume;
 private:
 protected:

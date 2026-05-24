@@ -4,17 +4,16 @@
 int Menu::enter(sf::RenderWindow &window) {
     //Reset view
     menuView = window.getView();
-    menuView.setSize(window.getSize().x, window.getSize().y);
-    menuView.setCenter(window.getSize().x/2, window.getSize().y/2);
-    menuView.setRotation(0);
+    menuView.setSize({(float)window.getSize().x, (float)window.getSize().y});
+    menuView.setCenter({window.getSize().x/2.f, window.getSize().y/2.f});
+    menuView.setRotation(sf::degrees(0));
     window.setView(menuView);
-
 
     backgroundTexture.loadFromFile("Data/Images/background_title.png");
     backgroundScaleX = (float)(window.getSize().x) / (float)(backgroundTexture.getSize().x);
     backgroundScaleY = (float)(window.getSize().y) / (float)(backgroundTexture.getSize().y);
-    background.setScale(backgroundScaleX, backgroundScaleY);
-    background.setTexture(backgroundTexture);
+    background.emplace(backgroundTexture);
+    background->setScale({backgroundScaleX, backgroundScaleY});
 
     mousePointer.setSize({1, 1});
 
@@ -33,9 +32,9 @@ int Menu::enter(sf::RenderWindow &window) {
 void Menu::process(sf::RenderWindow &window) {
 
     while (window.isOpen()) {
-        while (window.pollEvent(event)) {
+        while (const auto event = window.pollEvent()) {
 
-            if (event.type == sf::Event::Closed) {
+            if (event->is<sf::Event::Closed>()) {
                 window.close();
                 currentScreenState = screenState::TERMINATE;
                 return;
@@ -45,7 +44,7 @@ void Menu::process(sf::RenderWindow &window) {
         if (mouseInput(mousePointer, window)) return;
 
         window.clear(sf::Color(22, 21, 64));
-        window.draw(background);
+        window.draw(*background);
 
         playButton->draw(window);
         squadButton->draw(window);
@@ -76,7 +75,7 @@ void Menu::buttonInit(const sf::RenderWindow &window) {
     squadButton->setTextOutlineColor(sf::Color(213, 0, 0));
     squadButton->setTextOutlineSize(2);
     squadButton->setPosition({(window.getSize().x / 16.0f),
-                             playButton->getPosition().y + squadButton->getButtonGlobalBounds().height * 1.8f});
+                             playButton->getPosition().y + squadButton->getButtonGlobalBounds().size.y * 1.8f});
     squadButton->setOnlyText(true);
 
     settingsButton = std::make_shared<Button>();
@@ -87,7 +86,7 @@ void Menu::buttonInit(const sf::RenderWindow &window) {
     settingsButton->setTextOutlineColor(sf::Color(213, 0, 0));
     settingsButton->setTextOutlineSize(2);
     settingsButton->setPosition({(window.getSize().x / 16.0f),
-                                 (squadButton->getPosition().y + settingsButton->getButtonGlobalBounds().height * 1.8f)});
+                                 (squadButton->getPosition().y + settingsButton->getButtonGlobalBounds().size.y * 1.8f)});
     settingsButton->setOnlyText(true);
 
     exitButton = std::make_shared<Button>();
@@ -98,16 +97,16 @@ void Menu::buttonInit(const sf::RenderWindow &window) {
     exitButton->setTextOutlineColor(sf::Color(213, 0, 0));
     exitButton->setTextOutlineSize(2);
     exitButton->setPosition({(window.getSize().x / 16.0f),
-                             (settingsButton->getPosition().y + exitButton->getButtonGlobalBounds().height * 1.8f)});
+                             (settingsButton->getPosition().y + exitButton->getButtonGlobalBounds().size.y * 1.8f)});
     exitButton->setOnlyText(true);
 }
 
 bool Menu::mouseInput(sf::RectangleShape &mousePointer, const sf::RenderWindow &window) {
-    mousePointer.setPosition(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y);
-    if (mousePointer.getGlobalBounds().intersects(playButton->getButtonGlobalBounds())) {
+    mousePointer.setPosition(sf::Vector2f(sf::Mouse::getPosition(window)));
+    if (mousePointer.getGlobalBounds().findIntersection(playButton->getButtonGlobalBounds())) {
         playButton->setButtonHighlight(true);
         playButton->setTextHighlight(true);
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
             currentScreenState = screenState::LOBBY;
             return true;
         }
@@ -117,11 +116,11 @@ bool Menu::mouseInput(sf::RectangleShape &mousePointer, const sf::RenderWindow &
         playButton->setTextHighlight(false);
     }
 
-    mousePointer.setPosition(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y);
-    if (mousePointer.getGlobalBounds().intersects(squadButton->getButtonGlobalBounds())) {
+    mousePointer.setPosition(sf::Vector2f(sf::Mouse::getPosition(window)));
+    if (mousePointer.getGlobalBounds().findIntersection(squadButton->getButtonGlobalBounds())) {
         squadButton->setButtonHighlight(true);
         squadButton->setTextHighlight(true);
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
             currentScreenState = screenState::SQUAD;
             return true;
         }
@@ -131,10 +130,10 @@ bool Menu::mouseInput(sf::RectangleShape &mousePointer, const sf::RenderWindow &
         squadButton->setTextHighlight(false);
     }
 
-    if (mousePointer.getGlobalBounds().intersects(settingsButton->getButtonGlobalBounds())) {
+    if (mousePointer.getGlobalBounds().findIntersection(settingsButton->getButtonGlobalBounds())) {
         settingsButton->setButtonHighlight(true);
         settingsButton->setTextHighlight(true);
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
             currentScreenState = screenState::SETTINGS;
             return true;
         }
@@ -144,10 +143,10 @@ bool Menu::mouseInput(sf::RectangleShape &mousePointer, const sf::RenderWindow &
         settingsButton->setTextHighlight(false);
     }
 
-    if (mousePointer.getGlobalBounds().intersects(exitButton->getButtonGlobalBounds())) {
+    if (mousePointer.getGlobalBounds().findIntersection(exitButton->getButtonGlobalBounds())) {
         exitButton->setButtonHighlight(true);
         exitButton->setTextHighlight(true);
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
             currentScreenState = screenState::TERMINATE;
             return true;
         }
