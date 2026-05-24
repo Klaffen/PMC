@@ -1,8 +1,7 @@
 #ifndef DAT220_PROJECT_GAME_STATE_SETTINGS_H
 #define DAT220_PROJECT_GAME_STATE_SETTINGS_H
 
-#include <iostream>
-#include <Support/Button.h>
+#include "../Support/Button.h"
 #include "SFML/Graphics.hpp"
 #include "State.h"
 

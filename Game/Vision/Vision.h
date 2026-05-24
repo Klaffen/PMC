@@ -6,9 +6,9 @@
 #define DAT220_PROJECT_VISION_H
 
 
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <Game/Board/Board.h>
-#include <algorithm>
+#include "../Board/Board.h"
+
+#include <math.h>
 
 class Vision {
 

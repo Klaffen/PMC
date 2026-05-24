@@ -7,13 +7,12 @@
 
 #include "SFML/Graphics.hpp"
 
-#include "Support/Button.h"
-#include "Game/Objects/Units/UnitBase.h"
-#include "Networking/Network.h"
-#include <Game/Board/Board.h>
-#include <Game/Input.h>
-#include <Game/Pathfinding/Pathfinding.h>
-#include "Support/ActionHandler.h"
+#include "../Support/Button.h"
+#include "../Support/ActionHandler.h"
+#include "Objects/Units/UnitBase.h"
+#include "../Networking/Network.h"
+#include "Board/Board.h"
+#include "Pathfinding/Pathfinding.h"
 
 
 class userInterface {

@@ -1,15 +1,13 @@
 #ifndef DAT220_PROJECT_GAME_STATE_GAME_H
 #define DAT220_PROJECT_GAME_STATE_GAME_H
 
-#include <iostream>
 #include "SFML/Graphics.hpp"
-#include "SFML/Audio.hpp"
-#include <Game/Board/Board.h>
-#include <Networking/Network.h>
-#include <Game/Vision/Vision.h>
+
+#include "../Game/Board/Board.h"
+#include "../Networking/Network.h"
 #include "State.h"
-#include "Game/Objects/Units/UnitBase.h"
-#include "Game/UserInterface.h"
+#include "../Game/Objects/Units/UnitBase.h"
+#include "../Game/UserInterface.h"
 
 class Game : public State {
 

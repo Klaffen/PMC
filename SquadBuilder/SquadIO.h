@@ -7,8 +7,9 @@
 
 #include <sstream>
 #include <fstream>
-#include "Support/ActionHandler.h"
-#include "Game/Objects/Units/UnitBase.h"
+
+#include "../Support/ActionHandler.h"
+#include "../Game/Objects/Units/UnitBase.h"
 
 class squadIO {
 public:

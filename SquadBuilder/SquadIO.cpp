@@ -3,7 +3,7 @@
 //
 
 
-#include <StateMachine/Squad.h>
+#include "../StateMachine/Squad.h"
 #include "SquadIO.h"
 
 std::vector<unitBase::unitClass> squadIO::readFile(const std::string& fPath) {
@@ -71,10 +71,10 @@ std::vector<unitBase> squadIO::makeUnits(const std::string& fPath, Network *net,
     for (auto &unitClass : unitList) {
         unitClass.playerId = net->playerNumber;
         unitClass.health = unitClass.maxHealth;
+        unitClass.unitId = id++;
         unit = unitBase(net, unitClass, gameBoard);
         units.push_back(unit);
         actionHandler::sendUnit(unit, net, unitClass);
-        id++;
     }
     return units;
 }
@@ -103,7 +103,7 @@ void squadIO::writeSquad(std::vector<unitBase::unitClass> units) {
     stream.open("SquadBuilder/squad.txt", std::ofstream::out | std::ofstream::trunc);
     for (unsigned long i = 0; i < units.size(); i++) {
         auto unit = units.at(i);
-        stream << unit.health << ' ' << unit.sightRange << ' ' << unit.actionPoints;
+        stream << unit.health << ' ' << unit.sightRange << ' ' << unit.actionPoints << ' ';
         if (unit.weapon == weaponBase::noType)
             stream << 0;
         else if (unit.weapon == weaponBase::rifleType)

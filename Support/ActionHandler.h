@@ -7,11 +7,9 @@
 
 
 #include <SFML/Network/Packet.hpp>
-#include <iostream>
-#include <cmath>
-#include <Game/Vision/Vision.h>
-#include "MathHelper.h"
-#include "Game/Objects/Units/UnitBase.h"
+
+#include "../Game/Vision/Vision.h"
+#include "../Game/Objects/Units/UnitBase.h"
 
 class actionHandler {
 public:

@@ -3,9 +3,8 @@
 //
 
 #include <SFML/Window.hpp>
-#include <Game/Board/Tile.h>
-#include <Game/Board/Board.h>
-#include <iostream>
+#include "Board/Tile.h"
+#include "Board/Board.h"
 #include "Input.h"
 
 Tile *input::getMouseOverTile(std::vector<std::vector<Tile>> &tileList, sf::RenderWindow &window) {

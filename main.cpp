@@ -1,11 +1,10 @@
-#include <iostream>
-#include <Game/GameSettings.h>
-#include <StateMachine/Menu.h>
-#include <StateMachine/Game.h>
-#include <StateMachine/Lobby.h>
-#include <StateMachine/Settings.h>
-#include <StateMachine/Squad.h>
 
+#include "Game/GameSettings.h"
+#include "StateMachine/Game.h"
+#include "StateMachine/Lobby.h"
+#include "StateMachine/Menu.h"
+#include "StateMachine/Settings.h"
+#include "StateMachine/Squad.h"
 
 int main() {
     sf::ContextSettings windowSettings;

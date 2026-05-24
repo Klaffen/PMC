@@ -3,8 +3,11 @@
 //
 
 
-#include <Game/GameSettings.h>
+#include "../Game/GameSettings.h"
 #include "ActionHandler.h"
+
+#include "MathHelper.h"
+
 #define FUNCTION_MOVE 1001
 #define FUNCTION_SHOOT 1002
 #define FUNCTION_HURT 1003

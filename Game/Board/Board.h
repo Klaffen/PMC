@@ -5,13 +5,12 @@
 #ifndef DAT220_PROJECT_BOARD_H
 #define DAT220_PROJECT_BOARD_H
 
-#include <cmath>
 #include <memory>
 #include <SFML/Graphics.hpp>
 
-#include "Game/Board/Levels/Level.h"
-#include "Game/Board/Tile.h"
-#include "Game/Board/Shape3D.h"
+#include "Levels/Level.h"
+#include "Tile.h"
+#include "Shape3D.h"
 
 class Board {
 
