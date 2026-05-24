@@ -20,8 +20,7 @@ std::vector<unitBase::unitClass> squadIO::readFile(const std::string& fPath) {
     unitBase::unitClass unitClass;
     std::fstream stream;
     stream.open(fPath);
-    while (!stream.eof()) {
-        std::getline(stream, unitInfo);
+    while (std::getline(stream, unitInfo)) {
         std::stringstream splitStream(unitInfo);
 
         std::getline(splitStream, currentInfo, ' ');
@@ -81,7 +80,6 @@ std::vector<unitBase> squadIO::makeUnits(const std::string& fPath, Network *net,
 
 std::vector<unitBase::unitClass> squadIO::defaultUnitList() {
     unitBase::unitClass unit;
-    unit.actionPoints = 11;
     unit.sightRange = 7;
     unit.actionPoints = 11;
     unit.maxHealth = 120;
@@ -98,11 +96,10 @@ std::vector<unitBase::unitClass> squadIO::defaultUnitList() {
     return units;
 }
 
-void squadIO::writeSquad(std::vector<unitBase::unitClass> units) {
+void squadIO::writeSquad(const std::vector<unitBase::unitClass> &units) {
     std::ofstream stream;
     stream.open("SquadBuilder/squad.txt", std::ofstream::out | std::ofstream::trunc);
-    for (unsigned long i = 0; i < units.size(); i++) {
-        auto unit = units.at(i);
+    for (const auto &unit: units) {
         stream << unit.health << ' ' << unit.sightRange << ' ' << unit.actionPoints << ' ';
         if (unit.weapon == weaponBase::noType)
             stream << 0;
@@ -113,8 +110,7 @@ void squadIO::writeSquad(std::vector<unitBase::unitClass> units) {
         else if (unit.weapon == weaponBase::grenadeType)
             stream << 3;
 
-        if (i != units.size() - 1)
-            stream << std::endl;
+        stream << std::endl;
     }
     stream.close();
 }
@@ -123,10 +119,10 @@ bool squadIO::validUnitFile(const std::string &fPath) {
     std::string unitInfo, currentInfo;
     std::fstream stream;
     stream.open(fPath);
+    if (!stream.is_open())
+        return false;
     std::cout << "Validating file" << std::endl;
-    while (!stream.eof()) {
-        std::getline(stream, unitInfo);
-
+    while (std::getline(stream, unitInfo)) {
         if (unitInfo.empty()) {
             return false;
         }

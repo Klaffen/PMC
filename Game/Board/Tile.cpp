@@ -31,6 +31,6 @@ void Tile::setNotHighlighted() {
     this->setFillColor(notHighlighted);
 }
 
-bool operator==(Tile &tile1, const Tile &tile2){
+bool operator==(const Tile &tile1, const Tile &tile2){
     return tile1.id == tile2.id;
 }

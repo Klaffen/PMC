@@ -77,6 +77,6 @@ private:
 
 };
 
-bool operator==(Tile &tile1, const Tile &tile2);
+bool operator==(const Tile &tile1, const Tile &tile2);
 
 #endif //DAT220_PROJECT_TILE_H

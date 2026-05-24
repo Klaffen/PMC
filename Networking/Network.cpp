@@ -97,7 +97,7 @@ void Network::sendPacket(sf::Packet &packet, bool blocking) {
 }
 
 void Network::sendFunction() {
-    while (1) {
+    while (running) {
         if (!packetQ.empty()) {
             packetQMutex.lock();
             payload = packetQ.at(0);

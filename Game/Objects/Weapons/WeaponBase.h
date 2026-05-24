@@ -28,7 +28,7 @@ public:
     weaponType type;
     sf::RectangleShape shape;
 
-    int drawTime;
+    int drawTime = 0;
 
     sf::SoundBuffer buffer;
     std::optional<sf::Sound> sound;

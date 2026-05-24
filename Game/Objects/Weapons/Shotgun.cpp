@@ -9,7 +9,7 @@
 #include <cmath>
 
 shotgun::shotgun() {
-    type = grenadeType;
+    type = shotgunType;
     damage = 10;
     maxRange = 10 * Board::TILE_SIZE;
     distanceReduction = 0.005;

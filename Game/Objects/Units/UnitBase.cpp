@@ -36,15 +36,19 @@ unitBase::unitBase(Network *network, unitClass unitClass, Board &gameBoard) {
         case weaponBase::rifleType:
             weapons.push_back(std::make_shared<rifle>());
             break;
+
         case weaponBase::shotgunType:
             weapons.push_back(std::make_shared<shotgun>());
+            break;
 
         case weaponBase::grenadeType:
             weapons.push_back(std::make_shared<grenade>());
+            break;
 
         case weaponBase::noType:
             break;
     }
+
     Tile &startTile = gameBoard.tileMap.at(position.x).at(position.y);
     startTile.hasUnit = true;
     if (player == network->playerNumber) {
@@ -52,6 +56,7 @@ unitBase::unitBase(Network *network, unitClass unitClass, Board &gameBoard) {
         for (auto &tile : visibleTiles)
             gameBoard.tileMap.at(Pathfinding::getTileIndex(tile).x).at(Pathfinding::getTileIndex(tile).y).isVisible++;
     }
+
     actionPoints = maxAP;
     shape.setRadius(Board::TILE_SIZE/5 *2);
     shape.setOutlineColor(sf::Color::White);

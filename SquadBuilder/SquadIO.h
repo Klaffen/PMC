@@ -17,7 +17,7 @@ public:
 
     static std::vector<unitBase> makeUnits(const std::string &fPath, Network *net, Board &gameBoard);
 
-    static void writeSquad(std::vector<unitBase::unitClass> units);
+    static void writeSquad(const std::vector<unitBase::unitClass> &units);
 
     static std::vector<unitBase::unitClass> defaultUnitList();
 

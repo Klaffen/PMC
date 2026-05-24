@@ -4,14 +4,16 @@
 int Menu::enter(sf::RenderWindow &window) {
     //Reset view
     menuView = window.getView();
-    menuView.setSize({(float)window.getSize().x, (float)window.getSize().y});
-    menuView.setCenter({window.getSize().x/2.f, window.getSize().y/2.f});
+    menuView.setSize({static_cast<float>(window.getSize().x), static_cast<float>(window.getSize().y)});
+    menuView.setCenter({window.getSize().x / 2.f, window.getSize().y / 2.f});
     menuView.setRotation(sf::degrees(0));
     window.setView(menuView);
 
-    backgroundTexture.loadFromFile("Data/Images/background_title.png");
-    backgroundScaleX = (float)(window.getSize().x) / (float)(backgroundTexture.getSize().x);
-    backgroundScaleY = (float)(window.getSize().y) / (float)(backgroundTexture.getSize().y);
+    if (const bool loadedBGTexture = backgroundTexture.loadFromFile("Data/Images/background_title.png"); !loadedBGTexture) {
+        throw std::runtime_error("Could not load background texture!");
+    }
+    backgroundScaleX = static_cast<float>(window.getSize().x) / static_cast<float>(backgroundTexture.getSize().x);
+    backgroundScaleY = static_cast<float>(window.getSize().y) / static_cast<float>(backgroundTexture.getSize().y);
     background.emplace(backgroundTexture);
     background->setScale({backgroundScaleX, backgroundScaleY});
 
@@ -30,10 +32,8 @@ int Menu::enter(sf::RenderWindow &window) {
 }
 
 void Menu::process(sf::RenderWindow &window) {
-
     while (window.isOpen()) {
         while (const auto event = window.pollEvent()) {
-
             if (event->is<sf::Event::Closed>()) {
                 window.close();
                 currentScreenState = screenState::TERMINATE;
@@ -63,8 +63,10 @@ void Menu::buttonInit(const sf::RenderWindow &window) {
     playButton->setTextColor(sf::Color(253, 216, 53));
     playButton->setTextOutlineColor(sf::Color(213, 0, 0));
     playButton->setTextOutlineSize(2);
-    playButton->setPosition({(window.getSize().x / 16.0f),
-                             window.getSize().y / 2.0f});
+    playButton->setPosition({
+        (window.getSize().x / 16.0f),
+        window.getSize().y / 2.0f
+    });
     playButton->setOnlyText(true);
 
     squadButton = std::make_shared<Button>();
@@ -74,8 +76,10 @@ void Menu::buttonInit(const sf::RenderWindow &window) {
     squadButton->setTextColor(sf::Color(253, 216, 53));
     squadButton->setTextOutlineColor(sf::Color(213, 0, 0));
     squadButton->setTextOutlineSize(2);
-    squadButton->setPosition({(window.getSize().x / 16.0f),
-                             playButton->getPosition().y + squadButton->getButtonGlobalBounds().size.y * 1.8f});
+    squadButton->setPosition({
+        (window.getSize().x / 16.0f),
+        playButton->getPosition().y + squadButton->getButtonGlobalBounds().size.y * 1.8f
+    });
     squadButton->setOnlyText(true);
 
     settingsButton = std::make_shared<Button>();
@@ -85,8 +89,10 @@ void Menu::buttonInit(const sf::RenderWindow &window) {
     settingsButton->setTextColor(sf::Color(253, 216, 53));
     settingsButton->setTextOutlineColor(sf::Color(213, 0, 0));
     settingsButton->setTextOutlineSize(2);
-    settingsButton->setPosition({(window.getSize().x / 16.0f),
-                                 (squadButton->getPosition().y + settingsButton->getButtonGlobalBounds().size.y * 1.8f)});
+    settingsButton->setPosition({
+        (window.getSize().x / 16.0f),
+        (squadButton->getPosition().y + settingsButton->getButtonGlobalBounds().size.y * 1.8f)
+    });
     settingsButton->setOnlyText(true);
 
     exitButton = std::make_shared<Button>();
@@ -96,8 +102,10 @@ void Menu::buttonInit(const sf::RenderWindow &window) {
     exitButton->setTextColor(sf::Color(253, 216, 53));
     exitButton->setTextOutlineColor(sf::Color(213, 0, 0));
     exitButton->setTextOutlineSize(2);
-    exitButton->setPosition({(window.getSize().x / 16.0f),
-                             (settingsButton->getPosition().y + exitButton->getButtonGlobalBounds().size.y * 1.8f)});
+    exitButton->setPosition({
+        (window.getSize().x / 16.0f),
+        (settingsButton->getPosition().y + exitButton->getButtonGlobalBounds().size.y * 1.8f)
+    });
     exitButton->setOnlyText(true);
 }
 
@@ -110,8 +118,7 @@ bool Menu::mouseInput(sf::RectangleShape &mousePointer, const sf::RenderWindow &
             currentScreenState = screenState::LOBBY;
             return true;
         }
-    }
-    else {
+    } else {
         playButton->setButtonHighlight(false);
         playButton->setTextHighlight(false);
     }
@@ -124,8 +131,7 @@ bool Menu::mouseInput(sf::RectangleShape &mousePointer, const sf::RenderWindow &
             currentScreenState = screenState::SQUAD;
             return true;
         }
-    }
-    else {
+    } else {
         squadButton->setButtonHighlight(false);
         squadButton->setTextHighlight(false);
     }
@@ -137,8 +143,7 @@ bool Menu::mouseInput(sf::RectangleShape &mousePointer, const sf::RenderWindow &
             currentScreenState = screenState::SETTINGS;
             return true;
         }
-    }
-    else {
+    } else {
         settingsButton->setButtonHighlight(false);
         settingsButton->setTextHighlight(false);
     }
@@ -150,8 +155,7 @@ bool Menu::mouseInput(sf::RectangleShape &mousePointer, const sf::RenderWindow &
             currentScreenState = screenState::TERMINATE;
             return true;
         }
-    }
-    else {
+    } else {
         exitButton->setButtonHighlight(false);
         exitButton->setTextHighlight(false);
     }

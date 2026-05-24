@@ -232,8 +232,8 @@ void actionHandler::victory(std::vector<unitBase> &units, Network *network) {
             }
         }
         else {
-            if (!playerMap[player] && network->clients.at(player - 1)->status != network->clients.at(player - 1)->defeat) {
-                network->clients.at(player - 1)->status = network->clients.at(player - 1)->defeat;
+            if (!playerMap[player] && network->clients.at(player - 1)->status != Client::defeat) {
+                network->clients.at(player - 1)->status = Client::defeat;
                 network->clients.at(player - 1)->alive = false;
                 winnerPacket << FUNCTION_END_OF_GAME << 3;
                 network->clients.at(player - 1)->socket.send(winnerPacket);

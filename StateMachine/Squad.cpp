@@ -1,16 +1,20 @@
 #include "Squad.h"
 
 int Squad::enter(sf::RenderWindow &window) {
+    if (!squadInit) {
+        if (const bool loadedBGTexture = backgroundTexture.loadFromFile("Data/Images/background_blurred.png"); !loadedBGTexture) {
+            throw std::runtime_error("Could not load background texture!");
+        }
 
-    if(!squadInit){
-
-        backgroundTexture.loadFromFile("Data/Images/background_blurred.png");
-        backgroundScaleX = (float)(window.getSize().x) / (float)(backgroundTexture.getSize().x);
-        backgroundScaleY = (float)(window.getSize().y) / (float)(backgroundTexture.getSize().y);
+        backgroundScaleX = (float) (window.getSize().x) / (float) (backgroundTexture.getSize().x);
+        backgroundScaleY = (float) (window.getSize().y) / (float) (backgroundTexture.getSize().y);
         background.emplace(backgroundTexture);
         background->setScale({backgroundScaleX, backgroundScaleY});
 
-        font.openFromFile("Data/Fonts/Inconsolata-Regular.ttf");
+        if (const bool loadedFont = font.openFromFile("Data/Fonts/Inconsolata-Regular.ttf"); !loadedFont) {
+            throw std::runtime_error("Could not load font!");
+        }
+
         textSize = 68;
 
         highlighColor = sf::Color::Cyan;
@@ -35,13 +39,19 @@ int Squad::enter(sf::RenderWindow &window) {
             sf::Text minus(font);
             minus.setCharacterSize(textSize + 32);
             minus.setFillColor(textColor);
-            minus.setPosition({health->getPosition().x + health->getGlobalBounds().size.x + 50, vision->getPosition().y + (100*float(i)) - 24});
+            minus.setPosition({
+                health->getPosition().x + health->getGlobalBounds().size.x + 50,
+                vision->getPosition().y + (100 * float(i)) - 24
+            });
             minus.setString("-");
 
             sf::Text pluss(font);
             pluss.setCharacterSize(textSize + 32);
             pluss.setFillColor(textColor);
-            pluss.setPosition({health->getPosition().x + health->getGlobalBounds().size.x + 110, vision->getPosition().y + (100*float(i)) - 24});
+            pluss.setPosition({
+                health->getPosition().x + health->getGlobalBounds().size.x + 110,
+                vision->getPosition().y + (100 * float(i)) - 24
+            });
             pluss.setString("+");
 
             plussMinus.push_back(pluss);
@@ -59,9 +69,7 @@ int Squad::enter(sf::RenderWindow &window) {
 
 void Squad::process(sf::RenderWindow &window) {
     while (window.isOpen()) {
-
         while (const auto event = window.pollEvent()) {
-
             if (event->is<sf::Event::Closed>()) {
                 window.close();
                 currentScreenState = screenState::TERMINATE;
@@ -84,8 +92,7 @@ void Squad::process(sf::RenderWindow &window) {
                 else if (collision == 7) {
                     currentScreenState = screenState::MENU;
                     return;
-                }
-                else
+                } else
                     mouseClick();
 
                 updateValues();
@@ -115,11 +122,11 @@ void Squad::draw(sf::RenderWindow &window) {
     backButton->draw(window);
     saveButton->draw(window);
 
-    for (const auto &unitText : unitTexts) {
+    for (const auto &unitText: unitTexts) {
         window.draw(unitText);
     }
 
-    for (const auto & plussMinu : plussMinus)
+    for (const auto &plussMinu: plussMinus)
         window.draw(plussMinu);
 
     if (saveDrawTime > 0) {
@@ -182,7 +189,8 @@ void Squad::buttonInit(sf::RenderWindow &window) {
     removeUnitButton->setButtonColor(sf::Color(202, 46, 85));
     removeUnitButton->setButtonOutlineColor(sf::Color::White);
     removeUnitButton->setText("Delete Unit");
-    removeUnitButton->setPosition(sf::Vector2f(selectedUnit->getPosition().x + selectedUnit->getGlobalBounds().size.x * 2, 120));
+    removeUnitButton->setPosition(
+        sf::Vector2f(selectedUnit->getPosition().x + selectedUnit->getGlobalBounds().size.x * 2, 120));
 
     backButton = std::make_shared<Button>();
     backButton->setTextColor(sf::Color::White);
@@ -201,7 +209,9 @@ void Squad::buttonInit(sf::RenderWindow &window) {
     saved->setCharacterSize(textSize / 2);
     saved->setStyle(sf::Text::Style::Bold);
     saved->setFillColor(sf::Color::Green);
-    saved->setPosition({saveButton->getPosition().x + saveButton->getButtonGlobalBounds().size.x / 3, saveButton->getPosition().y - 50});
+    saved->setPosition({
+        saveButton->getPosition().x + saveButton->getButtonGlobalBounds().size.x / 3, saveButton->getPosition().y - 50
+    });
     saved->setString("Saved!");
     saveDrawTime = 0;
 }
@@ -220,49 +230,43 @@ void Squad::updatePositions(sf::RenderWindow &window) {
 int Squad::buttonCollission(sf::Vector2i &mouse) {
     hitbox.setSize(sf::Vector2f(55, 55));
     hitbox.setPosition({float(mouse.x) - 28, float(mouse.y - 28)});
-    for (auto &plussMinu : plussMinus) {
+    for (auto &plussMinu: plussMinus) {
         if (plussMinu.getGlobalBounds().findIntersection(hitbox.getGlobalBounds())) {
             plussMinu.setFillColor(highlighColor);
             if (plussMinu.getString() == "+")
                 return 1;
             else
                 return 2;
-        }
-        else
+        } else
             plussMinu.setFillColor(textColor);
     }
     if (addUnitButton->getButtonGlobalBounds().findIntersection(hitbox.getGlobalBounds())) {
         addUnitButton->setTextColor(sf::Color::Yellow);
         return 3;
-    }
-    else if (removeUnitButton->getButtonGlobalBounds().findIntersection(hitbox.getGlobalBounds())) {
+    } else if (removeUnitButton->getButtonGlobalBounds().findIntersection(hitbox.getGlobalBounds())) {
         removeUnitButton->setTextColor(sf::Color::Yellow);
         return 4;
-    }
-    else {
+    } else {
         addUnitButton->setTextColor(sf::Color::White);
         removeUnitButton->setTextColor(sf::Color::White);
     }
 
     for (unsigned long unit = 0; unit < unitList.size(); unit++) {
-        if (unitTexts.at(unit).getGlobalBounds().contains(sf::Vector2f{(float)mouse.x, (float)mouse.y}) && unit != unsigned(selectedUnitId)) {
+        if (unitTexts.at(unit).getGlobalBounds().contains(sf::Vector2f{(float) mouse.x, (float) mouse.y}) && unit !=
+            unsigned(selectedUnitId)) {
             unitTexts.at(unit).setFillColor(sf::Color::Cyan);
             return 5;
-        }
-        else if (unit != unsigned(selectedUnitId))
+        } else if (unit != unsigned(selectedUnitId))
             unitTexts.at(unit).setFillColor(sf::Color::White);
     }
 
     if (saveButton->getButtonGlobalBounds().findIntersection(hitbox.getGlobalBounds())) {
         saveButton->setTextColor(sf::Color::Yellow);
         return 6;
-    }
-
-    else if (backButton->getButtonGlobalBounds().findIntersection(hitbox.getGlobalBounds())) {
+    } else if (backButton->getButtonGlobalBounds().findIntersection(hitbox.getGlobalBounds())) {
         backButton->setTextColor(sf::Color::Yellow);
         return 7;
-    }
-    else {
+    } else {
         saveButton->setTextColor(sf::Color::White);
         backButton->setTextColor(sf::Color::White);
     }
@@ -303,49 +307,41 @@ void Squad::mouseClick() {
             unitList.at(selectedUnitId).vision++;
             buildPoints -= PRICE_VISION;
             unitCost.at(selectedUnitId) += PRICE_VISION;
-        }
-        else if (collision == 2 && unitList.at(selectedUnitId).vision != 1) {
+        } else if (collision == 2 && unitList.at(selectedUnitId).vision != 1) {
             unitList.at(selectedUnitId).vision--;
             buildPoints += PRICE_VISION;
             unitCost.at(selectedUnitId) -= PRICE_VISION;
         }
-    }
-
-    else if (hitbox.getGlobalBounds().findIntersection(health->getGlobalBounds())) {
+    } else if (hitbox.getGlobalBounds().findIntersection(health->getGlobalBounds())) {
         if (collision == 1 && buildPoints >= PRICE_HEALTH) {
             unitList.at(selectedUnitId).health += 15;
             buildPoints -= PRICE_HEALTH;
             unitCost.at(selectedUnitId) += PRICE_HEALTH;
-        }
-        else if (collision == 2 && unitList.at(selectedUnitId).health != 15){
+        } else if (collision == 2 && unitList.at(selectedUnitId).health != 15) {
             unitList.at(selectedUnitId).health -= 15;
             buildPoints += PRICE_HEALTH;
             unitCost.at(selectedUnitId) -= PRICE_HEALTH;
         }
-    }
-
-    else if (hitbox.getGlobalBounds().findIntersection(actionPoints->getGlobalBounds())) {
+    } else if (hitbox.getGlobalBounds().findIntersection(actionPoints->getGlobalBounds())) {
         if (collision == 1 && buildPoints >= PRICE_ACTIONPOINT) {
             unitList.at(selectedUnitId).actionPoints++;
             buildPoints -= PRICE_ACTIONPOINT;
             unitCost.at(selectedUnitId) += PRICE_ACTIONPOINT;
-        }
-        else if (collision == 2 && unitList.at(selectedUnitId).actionPoints != 1){
+        } else if (collision == 2 && unitList.at(selectedUnitId).actionPoints != 1) {
             unitList.at(selectedUnitId).actionPoints--;
             buildPoints += PRICE_ACTIONPOINT;
             unitCost.at(selectedUnitId) -= PRICE_ACTIONPOINT;
         }
-    }
-    else if (hitbox.getGlobalBounds().findIntersection(weapon->getGlobalBounds())) {
-        if (collision == 1 && unitList.at(selectedUnitId).weaponId != 2 && (buildPoints >= PRICE_WEAPON || unitList.at(selectedUnitId).weaponId != 0)) {
+    } else if (hitbox.getGlobalBounds().findIntersection(weapon->getGlobalBounds())) {
+        if (collision == 1 && unitList.at(selectedUnitId).weaponId != 2 && (
+                buildPoints >= PRICE_WEAPON || unitList.at(selectedUnitId).weaponId != 0)) {
             if (unitList.at(selectedUnitId).weaponId == 0) {
                 buildPoints -= PRICE_WEAPON;
                 unitCost.at(selectedUnitId) += PRICE_WEAPON;
             }
 
             unitList.at(selectedUnitId).weaponId++;
-        }
-        else if (collision == 2 && unitList.at(selectedUnitId).weaponId != 0) {
+        } else if (collision == 2 && unitList.at(selectedUnitId).weaponId != 0) {
             if (unitList.at(selectedUnitId).weaponId == 1) {
                 buildPoints += PRICE_WEAPON;
                 unitCost.at(selectedUnitId) -= PRICE_WEAPON;
@@ -362,7 +358,7 @@ void Squad::mouseClick() {
     else if (collision == 4 && unitList.size() != 1)
         removeUnit();
 
-    //Save button pressed
+        //Save button pressed
     else if (collision == 6) {
         saveDrawTime += 60;
         squadIO::writeSquad(unitConversion(unitList));
@@ -385,7 +381,7 @@ void Squad::updateValues() {
 
 void Squad::selectUnit(sf::Vector2i &mouse) {
     for (unsigned long unit = 0; unit < unitList.size(); unit++) {
-        if (unitTexts.at(unit).getGlobalBounds().contains(sf::Vector2f{(float)mouse.x, (float)mouse.y})) {
+        if (unitTexts.at(unit).getGlobalBounds().contains(sf::Vector2f{(float) mouse.x, (float) mouse.y})) {
             unitTexts.at(unit).setFillColor(sf::Color::Red);
             selectedUnit->setString(unitTexts.at(unit).getString());
             unitTexts.at(selectedUnitId).setFillColor(sf::Color::White);
@@ -414,14 +410,14 @@ void Squad::removeUnit() {
     }
 }
 
-std::vector<unitBase::unitClass> Squad::unitConversion(const std::vector<baseUnit>& units) {
+std::vector<unitBase::unitClass> Squad::unitConversion(const std::vector<baseUnit> &units) {
     unitBase::unitClass convertedUnit;
     std::vector<unitBase::unitClass> convertedList;
-    for (auto unit : units){
+    for (auto unit: units) {
         convertedUnit.health = unit.health;
         convertedUnit.actionPoints = unit.actionPoints;
         convertedUnit.sightRange = unit.vision;
-        switch (unit.weaponId){
+        switch (unit.weaponId) {
             case 0:
                 convertedUnit.weapon = weaponBase::noType;
                 break;
@@ -438,14 +434,14 @@ std::vector<unitBase::unitClass> Squad::unitConversion(const std::vector<baseUni
     return convertedList;
 }
 
-void Squad::getSquad(const std::vector<unitBase::unitClass>& units) {
+void Squad::getSquad(const std::vector<unitBase::unitClass> &units) {
     baseUnit convertedUnit;
     std::vector<baseUnit> convertedList;
-    for (auto unit : units){
+    for (auto unit: units) {
         convertedUnit.health = unit.health;
         convertedUnit.actionPoints = unit.actionPoints;
         convertedUnit.vision = unit.sightRange;
-        convertedUnit.weaponId = (int)unit.weapon;
+        convertedUnit.weaponId = (int) unit.weapon;
         addUnit(convertedUnit);
     }
 }

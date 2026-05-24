@@ -52,8 +52,8 @@ target_link_libraries(DAT220_project
 add_custom_command(TARGET DAT220_project POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/Data" "$<TARGET_FILE_DIR:DAT220_project>/Data"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/SquadBuilder" "$<TARGET_FILE_DIR:DAT220_project>/SquadBuilder"
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "$<TARGET_FILE_DIR:DAT220_project>/SquadBuilder"
 )
 
 if(WIN32)
