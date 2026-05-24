@@ -1,4 +1,4 @@
-#include <Game/GameSettings.h>
+#include "../Game/GameSettings.h"
 #include "Settings.h"
 
 int Settings::enter(sf::RenderWindow &window) {

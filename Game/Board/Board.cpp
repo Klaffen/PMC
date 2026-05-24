@@ -3,8 +3,10 @@
 //
 
 
-#include <StateMachine/Game.h>
+#include "../../StateMachine/Game.h"
 #include "Board.h"
+
+#include <cmath>
 
 const float Board::TILE_SIZE = 32;
 

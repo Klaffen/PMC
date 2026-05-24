@@ -1,7 +1,7 @@
-#include <Support/ActionHandler.h>
-#include <Game/Input.h>
-#include <Game/Pathfinding/Pathfinding.h>
-#include <SquadBuilder/SquadIO.h>
+#include "../Support/ActionHandler.h"
+#include "../Game/Input.h"
+#include "../Game/Pathfinding/Pathfinding.h"
+#include "../SquadBuilder/SquadIO.h"
 #include "Game.h"
 
 Game::Game(Network *network) {

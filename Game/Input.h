@@ -6,8 +6,7 @@
 #define DAT220_PROJECT_INPUT_H
 
 
-#include <SFML/Window.hpp>
-#include "Game/Board/Tile.h"
+#include "Board/Tile.h"
 
 class input {
 public:

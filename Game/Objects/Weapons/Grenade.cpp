@@ -2,7 +2,7 @@
 // Created by VegarK on 26.10.2017.
 //
 
-#include <Game/Board/Board.h>
+#include "../../Board/Board.h"
 #include "Grenade.h"
 
 grenade::grenade() {

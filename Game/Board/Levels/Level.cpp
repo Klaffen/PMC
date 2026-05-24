@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "Level.h"
-#include <Game/Board/Board.h>
+#include "../Board.h"
 
 
 Level::Level() {

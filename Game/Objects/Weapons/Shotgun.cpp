@@ -6,6 +6,8 @@
 #include <iostream>
 #include "Shotgun.h"
 
+#include <cmath>
+
 shotgun::shotgun() {
     type = grenadeType;
     damage = 10;

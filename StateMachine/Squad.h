@@ -4,12 +4,10 @@
 #include "SFML/Graphics.hpp"
 
 #include "State.h"
-#include "SquadBuilder/SquadIO.h"
-#include "Support/Button.h"
+#include "../SquadBuilder/SquadIO.h"
+#include "../Support/Button.h"
 
-#include <iostream>
 #include <vector>
-#include <string>
 
 #define PRICE_VISION 10
 #define PRICE_HEALTH 10

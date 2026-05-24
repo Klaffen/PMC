@@ -3,7 +3,7 @@
 //
 
 
-#include <StateMachine/Squad.h>
+#include "../StateMachine/Squad.h"
 #include "SquadIO.h"
 
 std::vector<unitBase::unitClass> squadIO::readFile(const std::string& fPath) {

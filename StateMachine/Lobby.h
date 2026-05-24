@@ -1,14 +1,13 @@
 #ifndef DAT220_PROJECT_HOST_H
 #define DAT220_PROJECT_HOST_H
 
-#include <iostream>
 #include <vector>
 
 #include "SFML/Graphics.hpp"
 
 #include "State.h"
 #include "../Networking/Network.h"
-#include "Support/Button.h"
+#include "../Support/Button.h"
 
 class Lobby: public State {
 public:

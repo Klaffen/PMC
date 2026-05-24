@@ -5,7 +5,9 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
+
 #include "Client.h"
+
 class Network {
 public:
     /**
@@ -24,7 +26,9 @@ public:
         else
             std::cout << "UDP socket bound to UDPPort " << UDPPORT << std::endl;
     }
+
     std::vector<sf::Packet> packetQ;
+
     sf::Mutex packetQMutex;
 
     sf::Packet payload;

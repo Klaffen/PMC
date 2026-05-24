@@ -4,8 +4,7 @@
 
 #include <cmath>
 #include <math.h>
-#include <Game/Board/Board.h>
-#include <iostream>
+#include "../../Board/Board.h"
 #include "Rifle.h"
 
 #define _USE_MATH_DEFINES

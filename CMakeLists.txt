@@ -1,34 +1,50 @@
-cmake_minimum_required(VERSION 3.8)
-project(DAT220_project)
+cmake_minimum_required(VERSION 3.20)
+project(DAT220_project LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
 
-set(SOURCE_FILES main.cpp StateMachine/Game.h StateMachine/Menu.h StateMachine/Settings.h
-        StateMachine/State.h StateMachine/Menu.cpp
-        StateMachine/Game.cpp StateMachine/Settings.cpp Game/Objects/Units/UnitBase.cpp
-        Game/Objects/Units/UnitBase.h Game/Objects/Weapons/WeaponBase.cpp Game/Objects/Weapons/WeaponBase.h
-        Networking/Network.cpp Networking/Network.h Networking/Client.h
-        StateMachine/Lobby.cpp StateMachine/Lobby.h
-        Game/Board/Board.h Game/Board/Tile.h
-        Game/Board/Shape3D.h Game/Board/Board.cpp Game/Board/Shape3D.cpp
-        Game/Board/Tile.cpp Support/ActionHandler.cpp Support/ActionHandler.h
-        Game/Objects/Weapons/Rifle.cpp Game/Objects/Weapons/Rifle.h Support/Button.cpp
-        Support/Button.h
-        Game/Input.cpp Game/Input.h Game/Objects/Weapons/Grenade.cpp
-        Game/Objects/Weapons/Grenade.h
-        Game/Vision/Vision.cpp Game/Vision/Vision.h Game/Board/Levels/Level.cpp
-        Game/UserInterface.cpp Game/UserInterface.h
-        Game/Pathfinding/Pathfinding.cpp Game/Pathfinding/Pathfinding.h
-        Game/Objects/Weapons/Shotgun.cpp Game/Objects/Weapons/Shotgun.h
-        SquadBuilder/SquadIO.cpp SquadBuilder/SquadIO.h
-        Support/MathHelper.cpp Support/MathHelper.h
-        StateMachine/Squad.cpp StateMachine/Squad.h
-        Game/GameSettings.cpp Game/GameSettings.h)
+set(CMAKE_POLICY_DEFAULT_CMP0048 NEW)
 
-add_executable(DAT220_project ${SOURCE_FILES} Game/Board/Levels/Level.cpp Game/Board/Levels/Level.h)
+include(FetchContent)
 
-target_link_libraries(DAT220_project sfml-graphics sfml-window sfml-system sfml-network sfml-audio)
+set(SFML_DEPENDENCIES_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE STRING "" FORCE)
 
-target_include_directories(DAT220_project PUBLIC . plog/include)
+FetchContent_Declare(
+        SFML
+        GIT_REPOSITORY https://github.com/SFML/SFML.git
+        GIT_TAG 2.6.2
+)
+
+FetchContent_MakeAvailable(SFML)
+
+
+set(SOURCES "${CMAKE_SOURCE_DIR}/main.cpp")
+
+
+file(GLOB_RECURSE GAME_SOURCES "${CMAKE_SOURCE_DIR}/Game/*.cpp")
+list(APPEND SOURCES ${GAME_SOURCES})
+
+
+file(GLOB STATEMACHINE_SOURCES "${CMAKE_SOURCE_DIR}/StateMachine/*.cpp")
+file(GLOB SUPPORT_SOURCES "${CMAKE_SOURCE_DIR}/Support/*.cpp")
+file(GLOB NETWORKING_SOURCES "${CMAKE_SOURCE_DIR}/Networking/*.cpp")
+file(GLOB SQUADBUILDER_SOURCES "${CMAKE_SOURCE_DIR}/SquadBuilder/*.cpp")
+
+list(APPEND SOURCES
+        ${STATEMACHINE_SOURCES}
+        ${SUPPORT_SOURCES}
+        ${NETWORKING_SOURCES}
+        ${SQUADBUILDER_SOURCES}
+)
+
+add_executable(DAT220_project ${SOURCES})
+
+target_link_libraries(DAT220_project
+        sfml-graphics
+        sfml-window
+        sfml-system
+        sfml-network
+        sfml-audio
+)

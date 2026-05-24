@@ -1,9 +1,9 @@
 #ifndef DAT220_PROJECT_GAME_STATE_MENU_H
 #define DAT220_PROJECT_GAME_STATE_MENU_H
 
-#include <iostream>
-#include <Support/Button.h>
-#include "SFML/Graphics.hpp"
+#include <SFML/Graphics.hpp>
+
+#include "../Support/Button.h"
 #include "State.h"
 
 //TODO: Make a general design for menu

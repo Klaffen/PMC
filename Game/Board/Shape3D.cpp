@@ -2,7 +2,7 @@
 // Created by Roman Aleksandrov on 18/10/2017.
 //
 
-#include <Game/Board/Shape3D.h>
+#include "Shape3D.h"
 #include "Board.h"
 
 Shape3D::Shape3D(sf::Vector2f size, sf::Vector2f position, float height) {

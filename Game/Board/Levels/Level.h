@@ -7,7 +7,8 @@
 
 
 #include <vector>
-#include <Game/Board/Shape3D.h>
+
+#include "../Shape3D.h"
 
 class Level {
 
