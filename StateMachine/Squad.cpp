@@ -4,7 +4,8 @@
 
 int Squad::enter(sf::RenderWindow &window) {
     if (!squadInit) {
-        if (const bool loadedBGTexture = backgroundTexture.loadFromFile("Data/Images/background_blurred.png"); !loadedBGTexture) {
+        if (const bool loadedBGTexture = backgroundTexture.loadFromFile("Data/Images/background_blurred.png"); !
+            loadedBGTexture) {
             throw std::runtime_error("Could not load background texture!");
         }
 
@@ -24,7 +25,7 @@ int Squad::enter(sf::RenderWindow &window) {
         textColor = sf::Color::White;
 
         buildPoints = MAX_BUILD_POINTS;
-        getSquad(squadIO::readFile("squadBuilder/squad.txt"));
+        getSquad(squadIO::readFile("SquadBuilder/squad.txt"));
 
         selectedUnitId = 0;
         if (unitList.empty())
@@ -74,12 +75,12 @@ void Squad::process(sf::RenderWindow &window) {
         while (const auto event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 window.close();
-                currentScreenState = screenState::TERMINATE;
+                currentScreenState = TERMINATE;
                 return;
             }
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape)) {
-                currentScreenState = screenState::MENU;
+                currentScreenState = MENU;
                 return;
             }
 
@@ -92,7 +93,7 @@ void Squad::process(sf::RenderWindow &window) {
                     selectUnit(mousePosition);
 
                 else if (collision == 7) {
-                    currentScreenState = screenState::MENU;
+                    currentScreenState = MENU;
                     return;
                 } else
                     mouseClick();
@@ -237,58 +238,75 @@ int Squad::buttonCollission(sf::Vector2i &mouse) {
             plussMinu.setFillColor(highlighColor);
             if (plussMinu.getString() == "+")
                 return 1;
-            else
-                return 2;
-        } else
-            plussMinu.setFillColor(textColor);
+
+            return 2;
+        }
+        plussMinu.setFillColor(textColor);
     }
+
     if (addUnitButton->getButtonGlobalBounds().findIntersection(hitbox.getGlobalBounds())) {
         addUnitButton->setTextColor(sf::Color::Yellow);
         return 3;
-    } else if (removeUnitButton->getButtonGlobalBounds().findIntersection(hitbox.getGlobalBounds())) {
+    }
+
+    if (removeUnitButton->getButtonGlobalBounds().findIntersection(hitbox.getGlobalBounds())) {
         removeUnitButton->setTextColor(sf::Color::Yellow);
         return 4;
-    } else {
-        addUnitButton->setTextColor(sf::Color::White);
-        removeUnitButton->setTextColor(sf::Color::White);
     }
+
+    addUnitButton->setTextColor(sf::Color::White);
+    removeUnitButton->setTextColor(sf::Color::White);
 
     for (unsigned long unit = 0; unit < unitList.size(); unit++) {
         if (unitTexts.at(unit).getGlobalBounds().contains(sf::Vector2f{(float) mouse.x, (float) mouse.y}) && unit !=
             unsigned(selectedUnitId)) {
             unitTexts.at(unit).setFillColor(sf::Color::Cyan);
             return 5;
-        } else if (unit != unsigned(selectedUnitId))
+        }
+
+        if (unit != unsigned(selectedUnitId))
             unitTexts.at(unit).setFillColor(sf::Color::White);
     }
 
     if (saveButton->getButtonGlobalBounds().findIntersection(hitbox.getGlobalBounds())) {
         saveButton->setTextColor(sf::Color::Yellow);
         return 6;
-    } else if (backButton->getButtonGlobalBounds().findIntersection(hitbox.getGlobalBounds())) {
+    }
+    if (backButton->getButtonGlobalBounds().findIntersection(hitbox.getGlobalBounds())) {
         backButton->setTextColor(sf::Color::Yellow);
         return 7;
-    } else {
-        saveButton->setTextColor(sf::Color::White);
-        backButton->setTextColor(sf::Color::White);
     }
+    saveButton->setTextColor(sf::Color::White);
+    backButton->setTextColor(sf::Color::White);
 
     return 0;
 }
 
-void Squad::addUnit(baseUnit unit /*= baseUnit()*/) {
-    buildPoints -= PRICE_UNIT;
+int calculateUnitCost(const baseUnit unit) {
+    int cost = PRICE_UNIT;
+    cost += unit.vision * PRICE_VISION;
+    cost += unit.health * PRICE_HEALTH;
+    cost += unit.actionPoints * PRICE_ACTIONPOINT;
+    cost += weaponBase::getCost(static_cast<weaponBase::weaponType>(unit.weaponId));
+    return cost;
+}
 
+void Squad::recalcBuildPoints() {
+    buildPoints = MAX_BUILD_POINTS;
+    for (const auto &unit : unitList)
+        buildPoints -= calculateUnitCost(unit);
+}
+
+void Squad::addUnit(baseUnit unit) {
     sf::Text unitText(font);
     unitText.setCharacterSize(textSize - 10);
     unitText.setFillColor(sf::Color::White);
     unitText.setPosition({50, float(unitTexts.size()) * 75 + 150});
     unitText.setString("Unit: " + std::to_string(unitTexts.size() + 1));
 
-    buildPoints -= PRICE_UNIT;
     unitTexts.emplace_back(unitText);
     unitList.emplace_back(unit);
-    unitCost.emplace_back(0);
+    recalcBuildPoints();
 }
 
 /* Collision value list
@@ -307,54 +325,44 @@ void Squad::mouseClick() {
     if (hitbox.getGlobalBounds().findIntersection(vision->getGlobalBounds())) {
         if (collision == 1 && buildPoints >= PRICE_VISION) {
             unitList.at(selectedUnitId).vision++;
-            buildPoints -= PRICE_VISION;
-            unitCost.at(selectedUnitId) += PRICE_VISION;
+            recalcBuildPoints();
         } else if (collision == 2 && unitList.at(selectedUnitId).vision != 1) {
             unitList.at(selectedUnitId).vision--;
-            buildPoints += PRICE_VISION;
-            unitCost.at(selectedUnitId) -= PRICE_VISION;
+            recalcBuildPoints();
         }
     } else if (hitbox.getGlobalBounds().findIntersection(health->getGlobalBounds())) {
         if (collision == 1 && buildPoints >= PRICE_HEALTH) {
             unitList.at(selectedUnitId).health += 15;
-            buildPoints -= PRICE_HEALTH;
-            unitCost.at(selectedUnitId) += PRICE_HEALTH;
+            recalcBuildPoints();
         } else if (collision == 2 && unitList.at(selectedUnitId).health != 15) {
             unitList.at(selectedUnitId).health -= 15;
-            buildPoints += PRICE_HEALTH;
-            unitCost.at(selectedUnitId) -= PRICE_HEALTH;
+            recalcBuildPoints();
         }
     } else if (hitbox.getGlobalBounds().findIntersection(actionPoints->getGlobalBounds())) {
         if (collision == 1 && buildPoints >= PRICE_ACTIONPOINT) {
             unitList.at(selectedUnitId).actionPoints++;
-            buildPoints -= PRICE_ACTIONPOINT;
-            unitCost.at(selectedUnitId) += PRICE_ACTIONPOINT;
+            recalcBuildPoints();
         } else if (collision == 2 && unitList.at(selectedUnitId).actionPoints != 1) {
             unitList.at(selectedUnitId).actionPoints--;
-            buildPoints += PRICE_ACTIONPOINT;
-            unitCost.at(selectedUnitId) -= PRICE_ACTIONPOINT;
+            recalcBuildPoints();
         }
     } else if (hitbox.getGlobalBounds().findIntersection(weapon->getGlobalBounds())) {
-        if (collision == 1 && unitList.at(selectedUnitId).weaponId != 2 && (
-                buildPoints >= PRICE_WEAPON || unitList.at(selectedUnitId).weaponId != 0)) {
-            if (unitList.at(selectedUnitId).weaponId == 0) {
-                buildPoints -= PRICE_WEAPON;
-                unitCost.at(selectedUnitId) += PRICE_WEAPON;
+        auto &wId = unitList.at(selectedUnitId).weaponId;
+        if (collision == 1 && wId != weaponBase::shotgunType) {
+            int costDiff = weaponBase::getCost(static_cast<weaponBase::weaponType>(wId + 1))
+                         - weaponBase::getCost(static_cast<weaponBase::weaponType>(wId));
+            if (buildPoints >= costDiff) {
+                wId++;
+                recalcBuildPoints();
             }
-
-            unitList.at(selectedUnitId).weaponId++;
-        } else if (collision == 2 && unitList.at(selectedUnitId).weaponId != 0) {
-            if (unitList.at(selectedUnitId).weaponId == 1) {
-                buildPoints += PRICE_WEAPON;
-                unitCost.at(selectedUnitId) -= PRICE_WEAPON;
-            }
-
-            unitList.at(selectedUnitId).weaponId--;
+        } else if (collision == 2 && wId != weaponBase::noType) {
+            wId--;
+            recalcBuildPoints();
         }
     }
 
     //ADD or DELETE unit down below
-    else if (collision == 3 && buildPoints >= PRICE_UNIT && unitList.size() != 10)
+    else if (collision == 3 && buildPoints >= calculateUnitCost(baseUnit{}) && unitList.size() != 10)
         addUnit();
 
     else if (collision == 4 && unitList.size() != 1)
@@ -373,12 +381,8 @@ void Squad::updateValues() {
     actionPoints->setString("AP:            " + std::to_string(unitList.at(selectedUnitId).actionPoints));
     buildPointsText->setString("Build points left: " + std::to_string(buildPoints));
 
-    if (unitList.at(selectedUnitId).weaponId == 0)
-        weapon->setString("Weapon: Nothing");
-    else if (unitList.at(selectedUnitId).weaponId == 1)
-        weapon->setString("Weapon: Rifle");
-    else if (unitList.at(selectedUnitId).weaponId == 2)
-        weapon->setString("Weapon: Shotgun");
+    weapon->setString("Weapon: "
+                      + weaponBase::getName(static_cast<weaponBase::weaponType>(unitList.at(selectedUnitId).weaponId)));
 }
 
 void Squad::selectUnit(sf::Vector2i &mouse) {
@@ -394,12 +398,9 @@ void Squad::selectUnit(sf::Vector2i &mouse) {
 }
 
 void Squad::removeUnit() {
-    buildPoints += PRICE_UNIT;
-    buildPoints += unitCost.at(selectedUnitId);
-
     unitList.erase(unitList.begin() + selectedUnitId);
-    unitCost.erase(unitCost.begin() + selectedUnitId);
     unitTexts.erase(unitTexts.begin() + selectedUnitId);
+    recalcBuildPoints();
 
     if (unsigned(selectedUnitId) >= unitList.size())
         selectedUnitId--;
@@ -419,18 +420,7 @@ std::vector<unitBase::unitClass> Squad::unitConversion(const std::vector<baseUni
         convertedUnit.health = unit.health;
         convertedUnit.actionPoints = unit.actionPoints;
         convertedUnit.sightRange = unit.vision;
-        switch (unit.weaponId) {
-            case 0:
-                convertedUnit.weapon = weaponBase::noType;
-                break;
-            case 1:
-                convertedUnit.weapon = weaponBase::rifleType;
-                break;
-            case 2:
-                convertedUnit.weapon = weaponBase::shotgunType;
-            default:
-                break;
-        }
+        convertedUnit.weapon = static_cast<weaponBase::weaponType>(unit.weaponId);
         convertedList.push_back(convertedUnit);
     }
     return convertedList;

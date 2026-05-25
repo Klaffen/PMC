@@ -10,11 +10,10 @@
 #include "../Support/Button.h"
 
 #define PRICE_VISION 10
-#define PRICE_HEALTH 10
+#define PRICE_HEALTH 2
 #define PRICE_ACTIONPOINT 10
-#define PRICE_WEAPON 20
-#define PRICE_UNIT 50
-#define MAX_BUILD_POINTS 600
+#define PRICE_UNIT 20
+#define MAX_BUILD_POINTS 400
 
 struct baseUnit {
     int vision = 1;
@@ -103,8 +102,8 @@ private:
      * @return Returns nothing
      */
     void selectUnit(sf::Vector2i &mouse);
+    void recalcBuildPoints();
     std::vector<baseUnit> unitList;
-    std::vector<int> unitCost;
     int selectedUnitId;
     std::optional<sf::Text> unitListTitle;
     std::vector<sf::Text> unitTexts;

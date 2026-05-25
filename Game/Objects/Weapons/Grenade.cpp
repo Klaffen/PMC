@@ -7,12 +7,13 @@
 
 grenade::grenade() {
     type = grenadeType;
+    name = getName(type);
+    builderCost = getCost(type);
     damage = 20;
     maxRange = 200 * Board::TILE_SIZE;
     distanceReduction = 50;
     ammo = -1;
     apCost = 4;
-    builderCost = 0;
     area = 4;
     (void)buffer.loadFromFile("Data/Audio/grenade.wav");
     sound.emplace(buffer);

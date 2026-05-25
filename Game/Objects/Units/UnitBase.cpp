@@ -218,6 +218,7 @@ void unitBase::spendAP(int points) {
 
 void unitBase::restoreAP() {
     actionPoints = maxAP;
+    hasMoved = true;
 }
 
 unitBase::unitBase() {

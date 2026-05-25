@@ -9,13 +9,14 @@
 #include "Rifle.h"
 
 rifle::rifle() {
+    type = rifleType;
+    name = getName(type);
+    builderCost = getCost(type);
     damage = 40;
     maxRange = 25 * Board::TILE_SIZE;
     distanceReduction = 0.0005;
     ammo = -1;
     apCost = 2;
-    type = rifleType;
-    builderCost = 0;
     (void)buffer.loadFromFile("Data/Audio/laser.wav");
     sound.emplace(buffer);
 }

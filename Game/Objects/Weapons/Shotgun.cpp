@@ -12,12 +12,13 @@
 
 shotgun::shotgun() {
     type = shotgunType;
+    name = getName(type);
+    builderCost = getCost(type);
     damage = 10;
     maxRange = 10 * Board::TILE_SIZE;
     distanceReduction = 0.005;
     ammo = -1;
     apCost = 2;
-    builderCost = 0;
 
     (void)buffer.loadFromFile("Data/Audio/shotgun.wav");
     sound.emplace(buffer);

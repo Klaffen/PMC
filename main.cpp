@@ -5,7 +5,6 @@
 #include "StateMachine/Menu.h"
 #include "StateMachine/Settings.h"
 #include "StateMachine/Squad.h"
-
 int main() {
     sf::ContextSettings windowSettings;
     windowSettings.antiAliasingLevel = 15;
