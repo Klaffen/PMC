@@ -5,10 +5,6 @@
 #ifndef DAT220_PROJECT_SQUADREADER_H
 #define DAT220_PROJECT_SQUADREADER_H
 
-#include <sstream>
-#include <fstream>
-
-#include "../Support/ActionHandler.h"
 #include "../Game/Objects/Units/UnitBase.h"
 
 class squadIO {

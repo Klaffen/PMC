@@ -14,7 +14,7 @@ grenade::grenade() {
     apCost = 4;
     builderCost = 0;
     area = 4;
-    buffer.loadFromFile("Data/Audio/grenade.wav");
+    (void)buffer.loadFromFile("Data/Audio/grenade.wav");
     sound.emplace(buffer);
 }
 

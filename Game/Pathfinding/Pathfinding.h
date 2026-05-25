@@ -1,12 +1,9 @@
 #ifndef DAT220_PROJECT_PATHFINDING_H
 #define DAT220_PROJECT_PATHFINDING_H
 
-#include "../Board/Board.h"
 #include "../Board/Tile.h"
 
 #include <map>
-#include <queue>
-#include <limits>
 
 class Pathfinding {
 

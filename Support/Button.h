@@ -2,7 +2,6 @@
 #define DAT220_PROJECT_BUTTON_H
 
 #include <memory>
-#include <iostream>
 #include <optional>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>

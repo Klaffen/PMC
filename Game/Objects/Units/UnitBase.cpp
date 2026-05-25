@@ -4,6 +4,14 @@
 
 #include "UnitBase.h"
 
+#include "../../../Networking/Network.h"
+#include "../../Board/Board.h"
+#include "../../Pathfinding/Pathfinding.h"
+#include "../../Vision/Vision.h"
+#include "../Weapons/Rifle.h"
+#include "../Weapons/Grenade.h"
+#include "../Weapons/Shotgun.h"
+
 unitBase::unitBase(Network *network, unitClass unitClass, Board &gameBoard) {
     id = unitClass.unitId;
     player = unitClass.playerId; //Get current player number

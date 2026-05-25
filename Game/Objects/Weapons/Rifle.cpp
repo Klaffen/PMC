@@ -16,7 +16,7 @@ rifle::rifle() {
     apCost = 2;
     type = rifleType;
     builderCost = 0;
-    buffer.loadFromFile("Data/Audio/laser.wav");
+    (void)buffer.loadFromFile("Data/Audio/laser.wav");
     sound.emplace(buffer);
 }
 

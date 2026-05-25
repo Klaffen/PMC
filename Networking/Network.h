@@ -6,7 +6,7 @@
 #include <thread>
 #include <mutex>
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Network.hpp>
 
 #include "Client.h"

@@ -1,5 +1,6 @@
 #include <cstring>
 #include <algorithm>
+#include <stdexcept>
 #include "Lobby.h"
 
 #define PACKET_UPDATE 100
@@ -11,13 +12,15 @@ Lobby::Lobby(Network *network) {
 }
 
 int Lobby::enter(sf::RenderWindow &window) {
-    backgroundTexture.loadFromFile("Data/Images/background_blurred.png");
+    if (!backgroundTexture.loadFromFile("Data/Images/background_blurred.png"))
+        throw std::runtime_error("Could not load background texture!");
     backgroundScaleX = (float)(window.getSize().x) / (float)(backgroundTexture.getSize().x);
     backgroundScaleY = (float)(window.getSize().y) / (float)(backgroundTexture.getSize().y);
     background.emplace(backgroundTexture);
     background->setScale({backgroundScaleX, backgroundScaleY});
 
-    font.openFromFile("Data/Fonts/Inconsolata-Regular.ttf");
+    if (!font.openFromFile("Data/Fonts/Inconsolata-Regular.ttf"))
+        throw std::runtime_error("Could not load font!");
 
     userInput.emplace(font);
     userInput->setCharacterSize(40);
@@ -185,7 +188,7 @@ void Lobby::lobbySetup(sf::RenderWindow &window) {
                         std::optional<sf::IpAddress> throwaway;
                         unsigned short senderPort = 0;
                         network->UdpSocket.setBlocking(false);
-                        network->UdpSocket.receive(packet, throwaway, senderPort);
+                        (void)network->UdpSocket.receive(packet, throwaway, senderPort);
 
                         packet >> network->gameName >> hostLocalIP >> hostGlobalIP;
 
@@ -195,12 +198,12 @@ void Lobby::lobbySetup(sf::RenderWindow &window) {
                             gameNameText->setPosition({window.getSize().x / 2.0f - (gameNameText->getGlobalBounds().size.x / 2.0f), window.getSize().y / 10.0f});
 
                             sf::Socket::Status status = sf::Socket::Status::Error;
-                            if (auto addr = sf::IpAddress::resolve(hostLocalIP))
-                                status = network->clientSocket.connect(*addr, network->TCPPORT);
+                            if (auto addrs = sf::Dns::resolve(hostLocalIP); addrs && !addrs->empty())
+                                status = network->clientSocket.connect(addrs->front(), network->TCPPORT);
                             if (status != sf::Socket::Status::Done) {
                                 std::cout << "Failed to establish a tcp connection using the local IP. Trying the global ip instead" << std::endl;
-                                if (auto addr = sf::IpAddress::resolve(hostGlobalIP))
-                                    status = network->clientSocket.connect(*addr, network->TCPPORT);
+                                if (auto addrs = sf::Dns::resolve(hostGlobalIP); addrs && !addrs->empty())
+                                    status = network->clientSocket.connect(addrs->front(), network->TCPPORT);
                                 if (status != sf::Socket::Status::Done) {
                                     std::cout << "Failed to establish a tcp connection." << std::endl;
                                     break;
@@ -247,7 +250,7 @@ void Lobby::lobbySetup(sf::RenderWindow &window) {
                             stage = complete;
                             network->packetQMutex.lock();
                             network->clientSocket.setBlocking(true);
-                            network->clientSocket.send(playerNamePacket);
+                            (void)network->clientSocket.send(playerNamePacket);
                             network->packetQMutex.unlock();
                             network->UdpSocket.unbind();
                         }
@@ -258,10 +261,10 @@ void Lobby::lobbySetup(sf::RenderWindow &window) {
                 case ipInput: {
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
                         sf::Socket::Status status = sf::Socket::Status::Error;
-                        if (auto addr = sf::IpAddress::resolve(string)) {
-                            std::cout << "Trying to join: " << addr->toString() << std::endl;
+                        if (auto addrs = sf::Dns::resolve(string); addrs && !addrs->empty()) {
+                            std::cout << "Trying to join: " << addrs->front().toString() << std::endl;
                             network->clientSocket.setBlocking(true);
-                            status = network->clientSocket.connect(*addr, network->TCPPORT);
+                            status = network->clientSocket.connect(addrs->front(), network->TCPPORT);
                         }
 
                         if (status == sf::Socket::Status::Done) {
@@ -382,7 +385,7 @@ void Lobby::process(sf::RenderWindow &window) {
                     network->playerNumber++;
                     packet << PACKET_START << network->playerNumber;
                     client->socket.setBlocking(true);
-                    client->socket.send(packet);
+                    (void)client->socket.send(packet);
                     packet.clear();
                 }
                 network->packetQMutex.unlock();

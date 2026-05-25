@@ -3,7 +3,8 @@
 
 
 #include <SFML/Graphics/RenderWindow.hpp>
-#include "Objects/Units/UnitBase.h"
+
+class unitBase;
 
 class GameSettings {
 

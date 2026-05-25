@@ -1,5 +1,10 @@
 #include "Pathfinding.h"
 
+#include "../Board/Board.h"
+
+#include <algorithm>
+#include <limits>
+
 #define INF 9999
 
 

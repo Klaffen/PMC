@@ -6,6 +6,8 @@
 #include <iostream>
 #include "Shotgun.h"
 
+#include "../../Board/Board.h"
+
 #include <cmath>
 
 shotgun::shotgun() {
@@ -17,7 +19,7 @@ shotgun::shotgun() {
     apCost = 2;
     builderCost = 0;
 
-    buffer.loadFromFile("Data/Audio/shotgun.wav");
+    (void)buffer.loadFromFile("Data/Audio/shotgun.wav");
     sound.emplace(buffer);
 }
 

@@ -6,9 +6,11 @@
 #define DAT220_PROJECT_VISION_H
 
 
-#include "../Board/Board.h"
+#include "../Board/Tile.h"
 
 #include <math.h>
+
+class Board;
 
 class Vision {
 

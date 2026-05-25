@@ -1,5 +1,7 @@
 #include "Button.h"
 
+#include <stdexcept>
+
 Button::Button() {
     buttonSize = {250, 45};
     buttonOutlineSize = 2;
@@ -12,7 +14,8 @@ Button::Button() {
     shape.setFillColor(buttonColor);
     shape.setOutlineColor(buttonOutlineColor);
 
-    font.openFromFile("Data/Fonts/Inconsolata-Regular.ttf");
+    if (!font.openFromFile("Data/Fonts/Inconsolata-Regular.ttf"))
+        throw std::runtime_error("Could not load font: Data/Fonts/Inconsolata-Regular.ttf");
     text.emplace(font);
     textSize = 35;
     textOutlineSize = 1;
@@ -64,7 +67,7 @@ void Button::setButtonSize(sf::Vector2f buttonSize) {
     this->buttonSize = buttonSize;
 }
 const sf::Vector2f & Button::getButtonSize() const {
-    return shape.getSize();
+    return buttonSize;
 }
 void Button::setButtonColor(const sf::Color &color) {
     this->buttonColor = color;
@@ -83,7 +86,8 @@ void Button::setButtonOutlineSize(const float &size) {
 }
 
 void Button::setFont(const std::string &fontLocation) {
-    font.openFromFile(fontLocation);
+    if (!font.openFromFile(fontLocation))
+        throw std::runtime_error("Could not load font: " + fontLocation);
     text.emplace(font);
 }
 void Button::setText(const std::string &text) {

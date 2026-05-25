@@ -1,5 +1,7 @@
 #include "Squad.h"
 
+#include "../SquadBuilder/SquadIO.h"
+
 int Squad::enter(sf::RenderWindow &window) {
     if (!squadInit) {
         if (const bool loadedBGTexture = backgroundTexture.loadFromFile("Data/Images/background_blurred.png"); !loadedBGTexture) {

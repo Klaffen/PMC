@@ -3,6 +3,14 @@
 //
 #include "UserInterface.h"
 
+#include <stdexcept>
+
+#include "../Networking/Network.h"
+#include "Board/Board.h"
+#include "Input.h"
+#include "Pathfinding/Pathfinding.h"
+#include "../Support/ActionHandler.h"
+
 userInterface::userInterface(sf::RenderWindow &window, Network *network, std::vector<unitBase> *units) {
     this->network = network;
     view = window.getView();
@@ -40,7 +48,8 @@ userInterface::userInterface(sf::RenderWindow &window, Network *network, std::ve
     healthBar.setOutlineThickness(-1);
     healthBar.setSize(sf::Vector2f(6.4,6.4));
 
-    font.openFromFile("Data/Fonts/neuropol.ttf");
+    if (!font.openFromFile("Data/Fonts/neuropol.ttf"))
+        throw std::runtime_error("Could not load font: Data/Fonts/neuropol.ttf");
     actionPoints.emplace(font);
     actionPoints->setCharacterSize(16);
     actionPoints->setOutlineThickness(1);

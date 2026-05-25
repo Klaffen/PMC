@@ -6,6 +6,10 @@
 #include "../Game/GameSettings.h"
 #include "ActionHandler.h"
 
+#include "../Networking/Network.h"
+#include "../Game/Board/Board.h"
+#include "../Game/Vision/Vision.h"
+
 #include "MathHelper.h"
 
 #define FUNCTION_MOVE 1001
@@ -236,7 +240,7 @@ void actionHandler::victory(std::vector<unitBase> &units, Network *network) {
                 network->clients.at(player - 1)->status = Client::defeat;
                 network->clients.at(player - 1)->alive = false;
                 winnerPacket << FUNCTION_END_OF_GAME << 3;
-                network->clients.at(player - 1)->socket.send(winnerPacket);
+                (void)network->clients.at(player - 1)->socket.send(winnerPacket);
                 winnerPacket.clear();
                 playerMap.erase(player);
                 std::cout << "Player : " << player << " Defeated" << std::endl;
@@ -272,7 +276,7 @@ void actionHandler::victory(std::vector<unitBase> &units, Network *network) {
         winner--;
         network->clients.at(winner)->status = network->clients.at(winner)->victory;
         winnerPacket << FUNCTION_END_OF_GAME << 4;
-        network->clients.at(winner)->socket.send(winnerPacket);
+        (void)network->clients.at(winner)->socket.send(winnerPacket);
     }
 }
 
@@ -351,7 +355,7 @@ void actionHandler::nextTurn(int player, Network &network, std::vector<unitBase>
             sf::Packet packet;
             packet << FUNCTION_YOUR_TURN;
             network.clients.at(checkPlayer)->status = network.clients.at(checkPlayer)->turn;
-            network.clients.at(checkPlayer)->socket.send(packet);
+            (void)network.clients.at(checkPlayer)->socket.send(packet);
             found = true;
             network.turn = false;
             std::cout << " Next: " << checkPlayer << std::endl;

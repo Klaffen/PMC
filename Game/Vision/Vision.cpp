@@ -4,6 +4,10 @@
 
 #include "Vision.h"
 
+#include "../Board/Board.h"
+
+#include <algorithm>
+
 Vision::Vision() {
 }
 

@@ -48,7 +48,7 @@ void Game::process(sf::RenderWindow &window) {
                 else
                     for (auto &client : network->clients)
                         client->socket.disconnect();
-                currentScreenState = screenState::TERMINATE;
+                currentScreenState = TERMINATE;
                 return;
             }
 
@@ -58,7 +58,7 @@ void Game::process(sf::RenderWindow &window) {
                 else
                     for (auto &client : network->clients)
                         client->socket.disconnect();
-                currentScreenState = screenState::MENU;
+                currentScreenState = MENU;
                 return;
             }
             interface.proccess(*event, window, *gameBoard);
@@ -96,7 +96,5 @@ void Game::drawFrame(sf::RenderWindow &window, userInterface &interface) {
 }
 
 std::vector<unitBase> Game::makeTemporaryUnitList() {
-    std::vector<unitBase> list;
-    list = squadIO::makeUnits("SquadBuilder/squad.txt", network, *gameBoard);
-    return list;
+    return squadIO::makeUnits("SquadBuilder/squad.txt", network, *gameBoard);
 }

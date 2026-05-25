@@ -1,6 +1,8 @@
 #include <optional>
 #include "GameSettings.h"
 
+#include "Objects/Units/UnitBase.h"
+
 static bool mute = false;
 static std::optional<sf::Music> music;
 

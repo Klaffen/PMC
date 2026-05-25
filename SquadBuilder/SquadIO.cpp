@@ -6,12 +6,20 @@
 #include "../StateMachine/Squad.h"
 #include "SquadIO.h"
 
-std::vector<unitBase::unitClass> squadIO::readFile(const std::string& fPath) {
+#include <sstream>
+#include <fstream>
+#include "../Networking/Network.h"
+#include "../Game/Board/Board.h"
+#include "../Support/ActionHandler.h"
+
+std::vector<unitBase::unitClass> squadIO::readFile(const std::string &fPath) {
     if (!validUnitFile(fPath)) {
+        std::cout << "File not valid, using default units" << std::endl;
         std::vector<unitBase::unitClass> units = defaultUnitList();
         writeSquad(units);
         return units;
     }
+
     int buildCost = 0;
     int unitId = 0;
     std::vector<unitBase::unitClass> units;
@@ -38,16 +46,19 @@ std::vector<unitBase::unitClass> squadIO::readFile(const std::string& fPath) {
 
         std::getline(splitStream, currentInfo, ' ');
         switch (std::stoi(currentInfo)) {
-            case (int)weaponBase::weaponType::rifleType:
+            case static_cast<int>(weaponBase::weaponType::rifleType):
                 unitClass.weapon = weaponBase::weaponType::rifleType;
                 break;
-            case (int)weaponBase::weaponType::shotgunType:
+
+            case static_cast<int>(weaponBase::weaponType::shotgunType):
                 unitClass.weapon = weaponBase::weaponType::shotgunType;
                 break;
-            case (int)weaponBase::weaponType::grenadeType:
+
+            case static_cast<int>(weaponBase::weaponType::grenadeType):
                 unitClass.weapon = weaponBase::weaponType::grenadeType;
                 break;
-            default:unitClass.weapon = weaponBase::weaponType::noType;
+                
+            default: unitClass.weapon = weaponBase::weaponType::noType;
                 break;
         }
 
@@ -61,13 +72,13 @@ std::vector<unitBase::unitClass> squadIO::readFile(const std::string& fPath) {
     return units;
 }
 
-std::vector<unitBase> squadIO::makeUnits(const std::string& fPath, Network *net, Board &gameBoard) {
+std::vector<unitBase> squadIO::makeUnits(const std::string &fPath, Network *net, Board &gameBoard) {
     unitBase unit;
     std::vector<unitBase> units;
     int id = 0;
 
     std::vector<unitBase::unitClass> unitList = readFile(fPath);
-    for (auto &unitClass : unitList) {
+    for (auto &unitClass: unitList) {
         unitClass.playerId = net->playerNumber;
         unitClass.health = unitClass.maxHealth;
         unitClass.unitId = id++;

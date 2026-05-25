@@ -6,7 +6,7 @@
 #include "SFML/Graphics.hpp"
 
 #include "State.h"
-#include "../SquadBuilder/SquadIO.h"
+#include "../Game/Objects/Units/UnitBase.h"
 #include "../Support/Button.h"
 
 #define PRICE_VISION 10

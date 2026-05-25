@@ -9,11 +9,10 @@
 #include "SFML/Graphics.hpp"
 
 #include "../Support/Button.h"
-#include "../Support/ActionHandler.h"
 #include "Objects/Units/UnitBase.h"
-#include "../Networking/Network.h"
-#include "Board/Board.h"
-#include "Pathfinding/Pathfinding.h"
+
+class Network;
+class Board;
 
 
 class userInterface {
