@@ -41,7 +41,6 @@ public:
     static float minZoom;
 
 private:
-    sf::Event event{};
     sf::View view;
     BoardPtr gameBoard = std::make_shared<Board>();
     std::vector<unitBase> makeTemporaryUnitList();

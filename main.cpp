@@ -5,14 +5,13 @@
 #include "StateMachine/Menu.h"
 #include "StateMachine/Settings.h"
 #include "StateMachine/Squad.h"
-
 int main() {
     sf::ContextSettings windowSettings;
-    windowSettings.antialiasingLevel = 15;
+    windowSettings.antiAliasingLevel = 15;
 
     std::vector<sf::VideoMode> resolution = GameSettings::getVideoModes();
 
-    sf::RenderWindow window(resolution.at(0), "Shape Shooter", sf::Style::Fullscreen, windowSettings);
+    sf::RenderWindow window(resolution.at(0), "Shape Shooter", sf::State::Fullscreen, windowSettings);
     window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
 

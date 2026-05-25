@@ -1,6 +1,7 @@
 #ifndef DAT220_PROJECT_GAME_STATE_MENU_H
 #define DAT220_PROJECT_GAME_STATE_MENU_H
 
+#include <optional>
 #include <SFML/Graphics.hpp>
 
 #include "../Support/Button.h"
@@ -24,14 +25,13 @@ public:
 
 private:
     sf::View menuView;
-    sf::Event event{};
 
     bool menuInit = false;
 
     sf::RectangleShape mousePointer;
 
     sf::Texture backgroundTexture;
-    sf::Sprite background;
+    std::optional<sf::Sprite> background;
     float backgroundScaleX;
     float backgroundScaleY;
 

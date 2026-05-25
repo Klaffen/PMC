@@ -1,9 +1,12 @@
 #ifndef DAT220_PROJECT_NETWORK_H
 #define DAT220_PROJECT_NETWORK_H
 
+#include <atomic>
 #include <iostream>
+#include <thread>
+#include <mutex>
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Network.hpp>
 
 #include "Client.h"
@@ -16,20 +19,22 @@ public:
      */
     void sendFunction();
     //Constructor that binds the UDP socket to the UDP port
-    Network()
-    : sendThread(&Network::sendFunction, this)
-    {
-        sendThread.launch();
-        // bind the UDP socket to a UDPPort
-        if (UdpSocket.bind(UDPPORT) != sf::Socket::Done)
+    Network() {
+        if (UdpSocket.bind(UDPPORT) != sf::Socket::Status::Done)
             std::cout << "Failed to bind socket to UDPPort" << std::endl;
         else
             std::cout << "UDP socket bound to UDPPort " << UDPPORT << std::endl;
+        sendThread = std::thread(&Network::sendFunction, this);
+    }
+
+    ~Network() {
+        running = false;
+        sendThread.join();
     }
 
     std::vector<sf::Packet> packetQ;
 
-    sf::Mutex packetQMutex;
+    std::mutex packetQMutex;
 
     sf::Packet payload;
 
@@ -76,7 +81,7 @@ public:
      * @return Returns nothing
      */
     void receiveClientMessage(bool blocking, std::vector<std::string> &list);
-    std::vector<Client*> clients;
+    std::vector<std::unique_ptr<Client>> clients;
 
     //TCP Client Specific
     sf::TcpSocket clientSocket; //Used by TCP clients
@@ -87,9 +92,11 @@ public:
     bool turn = true;
     bool alive = true;
     int playerNumber = 0;
-    sf::Text title;
+    std::string titleString;
+    sf::Color titleColor = sf::Color::White;
 private:
-    sf::Thread sendThread;
+    std::atomic<bool> running{true};
+    std::thread sendThread;
 };
 
 #endif

@@ -19,8 +19,8 @@ float Game::minZoom = 0.7;
 int Game::enter(sf::RenderWindow &window) {
 
     //TODO: Handle case when you already have been here before
-    view.setSize(960, 540); // 1920 / 2, 1080 / 2
-    view.setCenter(0 + view.getSize().x/2, 0 + view.getSize().y/2);
+    view.setSize({960.f, 540.f}); // 1920 / 2, 1080 / 2
+    view.setCenter({view.getSize().x/2, view.getSize().y/2});
     window.setView(view);
     gameBoard->init(window);
 
@@ -38,30 +38,30 @@ void Game::process(sf::RenderWindow &window) {
     while (window.isOpen()) {
     //Game loop start
 
-        while (window.pollEvent(event)) {
+        while (const auto event = window.pollEvent()) {
             //Event loop start (Handling inputs)
 
-            if (event.type == sf::Event::Closed) {
+            if (event->is<sf::Event::Closed>()) {
                 window.close();
                 if (!network->HOST)
                     network->clientSocket.disconnect();
                 else
                     for (auto &client : network->clients)
                         client->socket.disconnect();
-                currentScreenState = screenState::TERMINATE;
+                currentScreenState = TERMINATE;
                 return;
             }
 
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape)) {
                 if (!network->HOST)
                     network->clientSocket.disconnect();
                 else
                     for (auto &client : network->clients)
                         client->socket.disconnect();
-                currentScreenState = screenState::MENU;
+                currentScreenState = MENU;
                 return;
             }
-            interface.proccess(event, window, *gameBoard);
+            interface.proccess(*event, window, *gameBoard);
         }
         //Event loop end
 
@@ -96,7 +96,5 @@ void Game::drawFrame(sf::RenderWindow &window, userInterface &interface) {
 }
 
 std::vector<unitBase> Game::makeTemporaryUnitList() {
-    std::vector<unitBase> list;
-    list = squadIO::makeUnits("SquadBuilder/squad.txt", network, *gameBoard);
-    return list;
+    return squadIO::makeUnits("SquadBuilder/squad.txt", network, *gameBoard);
 }

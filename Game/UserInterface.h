@@ -5,14 +5,14 @@
 #ifndef DAT220_PROJECT_USERINTERFACE_H
 #define DAT220_PROJECT_USERINTERFACE_H
 
+#include <optional>
 #include "SFML/Graphics.hpp"
 
 #include "../Support/Button.h"
-#include "../Support/ActionHandler.h"
 #include "Objects/Units/UnitBase.h"
-#include "../Networking/Network.h"
-#include "Board/Board.h"
-#include "Pathfinding/Pathfinding.h"
+
+class Network;
+class Board;
 
 
 class userInterface {
@@ -33,7 +33,7 @@ public:
      * @param window Reference to the game board
      * @return Returns nothing
      */
-    void proccess(const sf::Event &event, sf::RenderWindow &window, Board &gameBoard);
+    void proccess(sf::Event event, sf::RenderWindow &window, Board &gameBoard);
 
     /**
      * Draws the buttons
@@ -54,8 +54,8 @@ public:
     int selectedUnitID = -1;
 
     sf::RectangleShape healthBar;
-    sf::Text actionPoints;
-    sf::Text equipedWeapon;
+    std::optional<sf::Text> actionPoints;
+    std::optional<sf::Text> titleText;
     sf::Font font;
 
     sf::View view;

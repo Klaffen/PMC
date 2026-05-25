@@ -1,20 +1,19 @@
 #ifndef DAT220_PROJECT_SQUAD_H
 #define DAT220_PROJECT_SQUAD_H
 
+#include <optional>
+#include <vector>
 #include "SFML/Graphics.hpp"
 
 #include "State.h"
-#include "../SquadBuilder/SquadIO.h"
+#include "../Game/Objects/Units/UnitBase.h"
 #include "../Support/Button.h"
 
-#include <vector>
-
 #define PRICE_VISION 10
-#define PRICE_HEALTH 10
+#define PRICE_HEALTH 2
 #define PRICE_ACTIONPOINT 10
-#define PRICE_WEAPON 20
-#define PRICE_UNIT 50
-#define MAX_BUILD_POINTS 600
+#define PRICE_UNIT 20
+#define MAX_BUILD_POINTS 400
 
 struct baseUnit {
     int vision = 1;
@@ -28,8 +27,6 @@ public:
     int enter(sf::RenderWindow &window);
 
 private:
-    sf::Event event{};
-
     bool squadInit = false;
 
     /**
@@ -56,14 +53,14 @@ private:
     void updatePositions(sf::RenderWindow &window);
 
     sf::Texture backgroundTexture;
-    sf::Sprite background;
+    std::optional<sf::Sprite> background;
     sf::Vector2f backgroundScale;
     float backgroundScaleX;
     float backgroundScaleY;
 
     ButtonPtr backButton;
     ButtonPtr saveButton;
-    sf::Text saved;
+    std::optional<sf::Text> saved;
     int saveDrawTime;
 
     /**
@@ -105,15 +102,15 @@ private:
      * @return Returns nothing
      */
     void selectUnit(sf::Vector2i &mouse);
+    void recalcBuildPoints();
     std::vector<baseUnit> unitList;
-    std::vector<int> unitCost;
     int selectedUnitId;
-    sf::Text unitListTitle;
+    std::optional<sf::Text> unitListTitle;
     std::vector<sf::Text> unitTexts;
     ButtonPtr addUnitButton;
     ButtonPtr removeUnitButton;
 
-    sf::Text vision, health, actionPoints, weapon, selectedUnit;
+    std::optional<sf::Text> vision, health, actionPoints, weapon, selectedUnit;
     std::vector<sf::Text> plussMinus;
 
     sf::Color highlighColor;
@@ -121,7 +118,7 @@ private:
     sf::Color textColor;
 
     int buildPoints;
-    sf::Text buildPointsText;
+    std::optional<sf::Text> buildPointsText;
     /**
      * Convert units read from file to the format used to display units
      * @param window Reference to units read from file

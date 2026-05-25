@@ -8,7 +8,6 @@
 
 #include <SFML/Network/Packet.hpp>
 
-#include "../Game/Vision/Vision.h"
 #include "../Game/Objects/Units/UnitBase.h"
 
 class actionHandler {

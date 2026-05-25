@@ -5,10 +5,6 @@
 #ifndef DAT220_PROJECT_SQUADREADER_H
 #define DAT220_PROJECT_SQUADREADER_H
 
-#include <sstream>
-#include <fstream>
-
-#include "../Support/ActionHandler.h"
 #include "../Game/Objects/Units/UnitBase.h"
 
 class squadIO {
@@ -17,7 +13,7 @@ public:
 
     static std::vector<unitBase> makeUnits(const std::string &fPath, Network *net, Board &gameBoard);
 
-    static void writeSquad(std::vector<unitBase::unitClass> units);
+    static void writeSquad(const std::vector<unitBase::unitClass> &units);
 
     static std::vector<unitBase::unitClass> defaultUnitList();
 

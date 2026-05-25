@@ -2,6 +2,8 @@
 # Created by https://www.gitignore.io/api/c++,linux,clion,xcode,macos,windows,sublimetext,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=c++,linux,clion,xcode,macos,windows,sublimetext,visualstudiocode
 
+SquadBuilder/squad.txt
+
 ### C++ ###
 # Prerequisites
 *.d

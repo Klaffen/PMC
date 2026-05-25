@@ -1,5 +1,7 @@
 #include "Button.h"
 
+#include <stdexcept>
+
 Button::Button() {
     buttonSize = {250, 45};
     buttonOutlineSize = 2;
@@ -12,7 +14,9 @@ Button::Button() {
     shape.setFillColor(buttonColor);
     shape.setOutlineColor(buttonOutlineColor);
 
-    font.loadFromFile("Data/Fonts/Inconsolata-Regular.ttf");
+    if (!font.openFromFile("Data/Fonts/Inconsolata-Regular.ttf"))
+        throw std::runtime_error("Could not load font: Data/Fonts/Inconsolata-Regular.ttf");
+    text.emplace(font);
     textSize = 35;
     textOutlineSize = 1;
     textColor = sf::Color::Magenta;
@@ -29,29 +33,26 @@ void Button::draw(sf::RenderWindow &window) {
     shape.setOutlineColor(buttonOutlineColor);
     shape.setPosition(position);
 
-    text.setFont(font);
-    text.setString(textString);
-    text.setCharacterSize(textSize);
-    text.setOutlineThickness(textOutlineSize);
-    text.setOutlineColor(textOutlineColor);
+    text->setString(textString);
+    text->setCharacterSize(textSize);
+    text->setOutlineThickness(textOutlineSize);
+    text->setOutlineColor(textOutlineColor);
 
    if (onlyText) {
-       //Set shape same size as text so that mouse Collision happens correctly
-       shape.setSize({(shape.getSize().x * (text.getLocalBounds().width / shape.getSize().x)),
-               (shape.getSize().y * (text.getLocalBounds().height / shape.getSize().y))});
+       shape.setSize({(shape.getSize().x * (text->getLocalBounds().size.x / shape.getSize().x)),
+               (shape.getSize().y * (text->getLocalBounds().size.y / shape.getSize().y))});
     }
 
-    if(textHighlight) text.setFillColor(textHighlightColor);
-    else text.setFillColor(textColor);
+    if(textHighlight) text->setFillColor(textHighlightColor);
+    else text->setFillColor(textColor);
 
-    //Center the text inside the button box
-    textRect = text.getLocalBounds();
-    text.setOrigin(textRect.left + textRect.width/2.0f,
-                           textRect.top  + textRect.height/2.0f);
-    text.setPosition((shape.getPosition().x + (shape.getSize().x/2)), (shape.getPosition().y + (shape.getSize().y/2)));
+    textRect = text->getLocalBounds();
+    text->setOrigin({textRect.position.x + textRect.size.x/2.0f,
+                           textRect.position.y  + textRect.size.y/2.0f});
+    text->setPosition({(shape.getPosition().x + (shape.getSize().x/2)), (shape.getPosition().y + (shape.getSize().y/2))});
 
     if(!onlyText) window.draw(shape);
-    window.draw(text);
+    window.draw(*text);
 }
 
 const sf::Vector2f &Button::getPosition() const {
@@ -66,7 +67,7 @@ void Button::setButtonSize(sf::Vector2f buttonSize) {
     this->buttonSize = buttonSize;
 }
 const sf::Vector2f & Button::getButtonSize() const {
-    return shape.getSize();
+    return buttonSize;
 }
 void Button::setButtonColor(const sf::Color &color) {
     this->buttonColor = color;
@@ -85,7 +86,9 @@ void Button::setButtonOutlineSize(const float &size) {
 }
 
 void Button::setFont(const std::string &fontLocation) {
-    font.loadFromFile(fontLocation);
+    if (!font.openFromFile(fontLocation))
+        throw std::runtime_error("Could not load font: " + fontLocation);
+    text.emplace(font);
 }
 void Button::setText(const std::string &text) {
     this->textString = text;
@@ -121,10 +124,9 @@ sf::FloatRect Button::getButtonLocalBounds() {
 }
 
 sf::FloatRect Button::getTextLocalBounds() {
-    return text.getLocalBounds();
+    return text->getLocalBounds();
 }
 
 sf::FloatRect Button::getTextGlobalBounds() {
-    return text.getGlobalBounds();
+    return text->getGlobalBounds();
 }
-

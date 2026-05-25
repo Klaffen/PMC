@@ -7,6 +7,7 @@
 
 
 #include <memory>
+#include <optional>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Audio.hpp>
@@ -15,7 +16,10 @@ class weaponBase {
 public:
     weaponBase() = default;
 
-    float getDamage(float distance);
+    sf::String name;
+    sf::String getName() const;
+
+    float getDamage(float distance) const;
     double damage;      //Base damage at point blank range
     double maxRange;    //The furthest the weapon can fire
     double distanceReduction; //Loss of damage based on distance
@@ -23,14 +27,16 @@ public:
     int apCost;         //How many action points a weapon usage costs
     int builderCost;    //How much this costs to add in squadbuilder
     virtual std::vector<sf::RectangleShape> Shoot(sf::Vector2f position, sf::Vector2f target);
-    enum weaponType{noType, rifleType, shotgunType, grenadeType};
+    enum weaponType{noType = 0, rifleType = 1, shotgunType = 2, grenadeType = 3};
+    static int getCost(weaponType type);
+    static sf::String getName(weaponType type);
     weaponType type;
     sf::RectangleShape shape;
 
-    int drawTime;
+    int drawTime = 0;
 
-    sf::Sound sound;
     sf::SoundBuffer buffer;
+    std::optional<sf::Sound> sound;
     int volume;
 private:
 protected:

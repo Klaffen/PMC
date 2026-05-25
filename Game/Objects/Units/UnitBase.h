@@ -5,21 +5,17 @@
 #ifndef DAT220_PROJECT_UNITBASE_H
 #define DAT220_PROJECT_UNITBASE_H
 
+#include <map>
 #include <queue>
 
 #include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Graphics/Shape.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 
-#include "../../../Networking/Network.h"
-#include "../../Board/Board.h"
-#include "../../Input.h"
 #include "../Weapons/WeaponBase.h"
-#include "../../Objects/Weapons/Rifle.h"
-#include "../../Objects/Weapons/Grenade.h"
-#include "../../Objects/Weapons/Shotgun.h"
-#include "../../Pathfinding/Pathfinding.h"
-#include "../../Vision/Vision.h"
+#include "../../Board/Tile.h"
+
+class Network;
+class Board;
 
 class unitBase {
 public:

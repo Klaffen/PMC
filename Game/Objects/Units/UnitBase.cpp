@@ -4,6 +4,14 @@
 
 #include "UnitBase.h"
 
+#include "../../../Networking/Network.h"
+#include "../../Board/Board.h"
+#include "../../Pathfinding/Pathfinding.h"
+#include "../../Vision/Vision.h"
+#include "../Weapons/Rifle.h"
+#include "../Weapons/Grenade.h"
+#include "../Weapons/Shotgun.h"
+
 unitBase::unitBase(Network *network, unitClass unitClass, Board &gameBoard) {
     id = unitClass.unitId;
     player = unitClass.playerId; //Get current player number
@@ -36,15 +44,19 @@ unitBase::unitBase(Network *network, unitClass unitClass, Board &gameBoard) {
         case weaponBase::rifleType:
             weapons.push_back(std::make_shared<rifle>());
             break;
+
         case weaponBase::shotgunType:
             weapons.push_back(std::make_shared<shotgun>());
+            break;
 
         case weaponBase::grenadeType:
             weapons.push_back(std::make_shared<grenade>());
+            break;
 
         case weaponBase::noType:
             break;
     }
+
     Tile &startTile = gameBoard.tileMap.at(position.x).at(position.y);
     startTile.hasUnit = true;
     if (player == network->playerNumber) {
@@ -52,6 +64,7 @@ unitBase::unitBase(Network *network, unitClass unitClass, Board &gameBoard) {
         for (auto &tile : visibleTiles)
             gameBoard.tileMap.at(Pathfinding::getTileIndex(tile).x).at(Pathfinding::getTileIndex(tile).y).isVisible++;
     }
+
     actionPoints = maxAP;
     shape.setRadius(Board::TILE_SIZE/5 *2);
     shape.setOutlineColor(sf::Color::White);
@@ -71,8 +84,8 @@ unitBase::unitBase(Network *network, unitClass unitClass, Board &gameBoard) {
         turn = false;
     }
     shape.setFillColor(color);
-    shape.setOrigin(shape.getRadius(), shape.getRadius());
-    shape.setPosition(position.x * Board::TILE_SIZE + Board::TILE_SIZE/2, position.y * Board::TILE_SIZE + Board::TILE_SIZE/2);
+    shape.setOrigin({shape.getRadius(), shape.getRadius()});
+    shape.setPosition({position.x * Board::TILE_SIZE + Board::TILE_SIZE/2, position.y * Board::TILE_SIZE + Board::TILE_SIZE/2});
     this->network = network;
 }
 
@@ -205,6 +218,7 @@ void unitBase::spendAP(int points) {
 
 void unitBase::restoreAP() {
     actionPoints = maxAP;
+    hasMoved = true;
 }
 
 unitBase::unitBase() {

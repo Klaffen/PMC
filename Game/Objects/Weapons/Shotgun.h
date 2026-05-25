@@ -7,7 +7,6 @@
 
 
 #include "WeaponBase.h"
-#include "../../Board/Board.h"
 
 class shotgun : public weaponBase{
 public:
