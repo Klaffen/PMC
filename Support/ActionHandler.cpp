@@ -176,30 +176,33 @@ unitBase* actionHandler::getUnit(int id, int player, std::vector<unitBase>* unit
 }
 
 
-std::vector<sf::Packet> actionHandler::Shoot(
-    unitBase& unit, sf::Vector2f target, std::vector<unitBase>& units, Board& board) {
+std::vector<sf::Packet> actionHandler::Shoot(unitBase& unit, sf::Vector2f target, std::vector<unitBase>& units,
+    Board& board, weaponBase::weaponType type) {
     std::vector<sf::Packet> packetList;
     sf::Packet shootPacket;
 
-    if (unit.actionPoints >= unit.getWeapon()->apCost) {
-        std::vector<sf::RectangleShape> bullets = unit.getWeapon()->Shoot(unit.shape.getPosition(), target);
-        GameSettings::playUnitSound(unit);
+    std::shared_ptr<weaponBase> weapon = unit.getWeapon(type);
+    if (!weapon) return packetList;
+
+    if (unit.actionPoints >= weapon->apCost) {
+        std::vector<sf::RectangleShape> bullets = weapon->Shoot(unit.shape.getPosition(), target);
+        weapon->sound->play();
         shootPacket << FUNCTION_SHOOT << unit.id << unit.player << target.x << target.y;
         packetList.push_back(shootPacket);
-        unit.spendAP(unit.getWeapon()->apCost);
+        unit.spendAP(weapon->apCost);
         // Loops through each 'bullet' fired from the weapon
-        for (auto bullet : bullets) {
-            Tile unitTile = board.tileMap[(int) (bullet.getPosition().x / Board::TILE_SIZE)].at(
+        for (const auto& bullet : bullets) {
+            const Tile unitTile = board.tileMap[(int) (bullet.getPosition().x / Board::TILE_SIZE)].at(
                 (int) (bullet.getPosition().y / Board::TILE_SIZE));
             // Loops through all units
             for (auto& testUnit : units) {
                 if (ShootingCollision(testUnit.shape, bullet)
                     && !(testUnit.id == unit.id && testUnit.player == unit.player)) {
                     Tile testTile                = board.tileMap[testUnit.position.x].at(testUnit.position.y);
-                    std::vector<Tile> vulnerable = Vision::getVisibleTiles(unitTile, unit.getWeapon()->maxRange, board);
+                    std::vector<Tile> vulnerable = Vision::getVisibleTiles(unitTile, weapon->maxRange, board);
                     // Checks if the unit is visible, (not behind a wall) before dealing damage.
                     if (Vision::tileIsInSight(testTile, vulnerable)) {
-                        float damage = unit.getWeapon()->getDamage(
+                        float damage = weapon->getDamage(
                             mathHelper::getDistance(bullet.getPosition(), testUnit.shape.getPosition()));
                         // Check if unit is dead after taking damage
                         testUnit.hurt(damage);
@@ -210,7 +213,7 @@ std::vector<sf::Packet> actionHandler::Shoot(
                 }
             }
         }
-        for (auto packet : packetList) {
+        for (const auto& packet : packetList) {
             actionLog.push_back(packet);
         }
     }
@@ -293,8 +296,8 @@ void actionHandler::victory(std::vector<unitBase>& units, Network* network) {
     }
 }
 
-bool actionHandler::ShootingCollision(sf::CircleShape unit, sf::RectangleShape bullet) {
-    float rotation = bullet.getRotation().asDegrees();
+bool actionHandler::ShootingCollision(const sf::CircleShape& unit, const sf::RectangleShape& bullet) {
+    const float rotation = bullet.getRotation().asDegrees();
     if (rotation != 0) {
         // Find angle between unit and shooter
         float deltaX = -unit.getPosition().x + bullet.getPosition().x;

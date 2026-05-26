@@ -83,6 +83,7 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
                 found            = true;
             }
         }
+
         if (selected == move) {
             resetPath();
             unitBase selectedUnit = units->at(selectedUnitID);
@@ -106,18 +107,22 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
             && selected != end) {
             endTurnButton->setTextColor(sf::Color::Yellow);
             highlighted = end;
+
         } else if (moveButton->getButtonGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window)))
                    && selected != move) {
             moveButton->setTextColor(sf::Color::Yellow);
             highlighted = move;
+
         } else if (shootButton->getButtonGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window)))
                    && selected != shoot) {
             shootButton->setTextColor(sf::Color::Yellow);
             highlighted = shoot;
+
         } else if (grenadeButton->getButtonGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window)))
                    && selected != grenade) {
             grenadeButton->setTextColor(sf::Color::Yellow);
             highlighted = grenade;
+
         } else {
             if (selected != end) {
                 endTurnButton->setTextColor(sf::Color::White);
@@ -138,6 +143,7 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
             }
         }
     }
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && selectedUnitID != -1) {
         selected = nothing;
         units->at(selectedUnitID).shape.setOutlineThickness(0);
@@ -190,6 +196,7 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
             } else {
                 actionHandler::nextTurn(network->playerNumber, *network, units);
             }
+
         } else if (highlighted == move || keyCode == sf::Keyboard::Key::M) {
             moveButton->setTextColor(sf::Color::Red);
             endTurnButton->setTextColor(sf::Color::White);
@@ -197,6 +204,7 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
             grenadeButton->setTextColor(sf::Color::White);
 
             selected = move;
+
         } else if (highlighted == shoot || keyCode == sf::Keyboard::Key::K) {
             moveButton->setTextColor(sf::Color::White);
             endTurnButton->setTextColor(sf::Color::White);
@@ -205,6 +213,7 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
 
             resetPath();
             selected = shoot;
+
         } else if (highlighted == grenade || keyCode == sf::Keyboard::Key::G) {
             moveButton->setTextColor(sf::Color::White);
             endTurnButton->setTextColor(sf::Color::White);
@@ -227,13 +236,14 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
                     }
                     break;
                 }
+
             case shoot:
                 {
                     sf::Vector2f mousePointer  = input::getMouse(window);
                     sf::Vector2f mousePosition = sf::Vector2f(mousePointer.x, mousePointer.y);
 
-                    std::vector<sf::Packet> packets =
-                        actionHandler::Shoot(units->at(selectedUnitID), mousePosition, *units, gameBoard);
+                    std::vector<sf::Packet> packets = actionHandler::Shoot(units->at(selectedUnitID), mousePosition,
+                        *units, gameBoard, units->at(selectedUnitID).getWeapon()->type);
                     for (auto packet : packets) {
                         network->sendPacket(packet, false);
                     }
@@ -242,14 +252,14 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
                     }
                     break;
                 }
+
             case grenade:
                 {
                     sf::Vector2f mousePointer  = input::getMouse(window);
                     sf::Vector2f mousePosition = sf::Vector2f(mousePointer.x, mousePointer.y);
 
-                    units->at(selectedUnitID).weaponSwap(weaponBase::grenadeType);
-                    std::vector<sf::Packet> packets =
-                        actionHandler::Shoot(units->at(selectedUnitID), mousePosition, *units, gameBoard);
+                    std::vector<sf::Packet> packets = actionHandler::Shoot(
+                        units->at(selectedUnitID), mousePosition, *units, gameBoard, weaponBase::grenadeType);
                     for (auto packet : packets) {
                         network->sendPacket(packet, false);
                     }
@@ -258,10 +268,9 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
                     }
                     break;
                 }
+
             case nothing:
-                break;
             case end:
-                break;
             case unit:
                 break;
             }

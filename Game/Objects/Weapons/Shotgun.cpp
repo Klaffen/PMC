@@ -40,6 +40,7 @@ std::vector<sf::RectangleShape> shotgun::Shoot(sf::Vector2f position, sf::Vector
         shot.setRotation(sf::degrees(randomAngle));
         bullets.push_back(shot);
     }
-
+    this->shape = shot;
+    drawTime    = 5;
     return bullets;
 }

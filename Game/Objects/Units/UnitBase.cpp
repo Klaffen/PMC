@@ -54,6 +54,10 @@ unitBase::unitBase(Network* network, unitClass unitClass, Board& gameBoard) {
         break;
     }
 
+    if (unitClass.weapon != weaponBase::grenadeType) {
+        weapons.push_back(std::make_shared<grenade>());
+    }
+
     Tile& startTile   = gameBoard.tileMap.at(position.x).at(position.y);
     startTile.hasUnit = true;
     if (player == network->playerNumber) {
@@ -130,9 +134,11 @@ void unitBase::Draw(sf::RenderWindow& window) {
     if (player == network->playerNumber || visible) {
         window.draw(shape);
     }
-    if (weapons[currentWeapon]->drawTime != 0) {
-        window.draw(weapons[currentWeapon]->shape);
-        weapons[currentWeapon]->drawTime--;
+    for (auto& weapon : weapons) {
+        if (weapon->drawTime != 0) {
+            window.draw(weapon->shape);
+            weapon->drawTime--;
+        }
     }
 }
 
@@ -211,6 +217,15 @@ void unitBase::weaponSwap(weaponBase::weaponType type) {
 
 std::shared_ptr<weaponBase> unitBase::getWeapon() {
     return weapons[currentWeapon];
+}
+
+std::shared_ptr<weaponBase> unitBase::getWeapon(weaponBase::weaponType type) {
+    for (auto& weapon : weapons) {
+        if (weapon->type == type) {
+            return weapon;
+        }
+    }
+    return nullptr;
 }
 
 void unitBase::spendAP(int points) {

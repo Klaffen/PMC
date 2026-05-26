@@ -41,8 +41,8 @@ public:
      * @param board The gameBoard, which is necessary to check for collisions
      * @return Returns a packet which is used to perform the same action at remote clients
      */
-    static std::vector<sf::Packet> Shoot(
-        unitBase& unit, sf::Vector2f target, std::vector<unitBase>& units, Board& board);
+    static std::vector<sf::Packet> Shoot(unitBase& unit, sf::Vector2f target, std::vector<unitBase>& units,
+        Board& board, weaponBase::weaponType type);
 
     /**
      * Swaps a unit's weapon
@@ -95,7 +95,7 @@ protected:
      * @param unit bullets hitbox
      * @return Returns true if collision, false if not
      */
-    static bool ShootingCollision(sf::CircleShape unit, sf::RectangleShape bullet);
+    static bool ShootingCollision(const sf::CircleShape& unit, const sf::RectangleShape& bullet);
 };
 
 

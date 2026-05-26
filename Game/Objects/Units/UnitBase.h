@@ -49,6 +49,7 @@ public:
     std::vector<Tile> visibleTiles{};
     void weaponSwap(weaponBase::weaponType type);
     std::shared_ptr<weaponBase> getWeapon();
+    std::shared_ptr<weaponBase> getWeapon(weaponBase::weaponType type);
     virtual void Draw(sf::RenderWindow& window);
     int id;
     int player;
