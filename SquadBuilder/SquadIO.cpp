@@ -3,16 +3,16 @@
 //
 
 
-#include "../StateMachine/Squad.h"
 #include "SquadIO.h"
 
-#include <sstream>
-#include <fstream>
-#include "../Networking/Network.h"
 #include "../Game/Board/Board.h"
+#include "../Networking/Network.h"
+#include "../StateMachine/Squad.h"
 #include "../Support/ActionHandler.h"
+#include <fstream>
+#include <sstream>
 
-std::vector<unitBase::unitClass> squadIO::readFile(const std::string &fPath) {
+std::vector<unitBase::unitClass> squadIO::readFile(const std::string& fPath) {
     if (!validUnitFile(fPath)) {
         std::cout << "File not valid, using default units" << std::endl;
         std::vector<unitBase::unitClass> units = defaultUnitList();
@@ -21,7 +21,7 @@ std::vector<unitBase::unitClass> squadIO::readFile(const std::string &fPath) {
     }
 
     int buildCost = 0;
-    int unitId = 0;
+    int unitId    = 0;
     std::vector<unitBase::unitClass> units;
 
     std::string unitInfo, currentInfo;
@@ -29,13 +29,15 @@ std::vector<unitBase::unitClass> squadIO::readFile(const std::string &fPath) {
     std::fstream stream;
     stream.open(fPath);
     while (std::getline(stream, unitInfo)) {
-        if (unitInfo.empty()) continue;
+        if (unitInfo.empty()) {
+            continue;
+        }
         std::stringstream splitStream(unitInfo);
 
         std::getline(splitStream, currentInfo, ' ');
         unitClass.maxHealth = std::stoi(currentInfo);
-        unitClass.health = unitClass.maxHealth;
-        buildCost = unitClass.maxHealth * PRICE_HEALTH;
+        unitClass.health    = unitClass.maxHealth;
+        buildCost           = unitClass.maxHealth * PRICE_HEALTH;
 
         std::getline(splitStream, currentInfo, ' ');
         unitClass.sightRange = std::stoi(currentInfo);
@@ -47,14 +49,18 @@ std::vector<unitBase::unitClass> squadIO::readFile(const std::string &fPath) {
 
         std::getline(splitStream, currentInfo, ' ');
         switch (std::stoi(currentInfo)) {
-            case weaponBase::rifleType: unitClass.weapon = weaponBase::rifleType;
-                break;
-            case weaponBase::shotgunType: unitClass.weapon = weaponBase::shotgunType;
-                break;
-            case weaponBase::grenadeType: unitClass.weapon = weaponBase::grenadeType;
-                break;
-            default: unitClass.weapon = weaponBase::noType;
-                break;
+        case weaponBase::rifleType:
+            unitClass.weapon = weaponBase::rifleType;
+            break;
+        case weaponBase::shotgunType:
+            unitClass.weapon = weaponBase::shotgunType;
+            break;
+        case weaponBase::grenadeType:
+            unitClass.weapon = weaponBase::grenadeType;
+            break;
+        default:
+            unitClass.weapon = weaponBase::noType;
+            break;
         }
 
         if (buildCost > MAX_BUILD_POINTS) {
@@ -70,17 +76,17 @@ std::vector<unitBase::unitClass> squadIO::readFile(const std::string &fPath) {
     return units;
 }
 
-std::vector<unitBase> squadIO::makeUnits(const std::string &fPath, Network *net, Board &gameBoard) {
+std::vector<unitBase> squadIO::makeUnits(const std::string& fPath, Network* net, Board& gameBoard) {
     unitBase unit;
     std::vector<unitBase> units;
     int id = 0;
 
     std::vector<unitBase::unitClass> unitList = readFile(fPath);
-    for (auto &unitClass: unitList) {
+    for (auto& unitClass : unitList) {
         unitClass.playerId = net->playerNumber;
-        unitClass.health = unitClass.maxHealth;
-        unitClass.unitId = id++;
-        unit = unitBase(net, unitClass, gameBoard);
+        unitClass.health   = unitClass.maxHealth;
+        unitClass.unitId   = id++;
+        unit               = unitBase(net, unitClass, gameBoard);
         units.push_back(unit);
         actionHandler::sendUnit(unit, net, unitClass);
     }
@@ -89,13 +95,13 @@ std::vector<unitBase> squadIO::makeUnits(const std::string &fPath, Network *net,
 
 std::vector<unitBase::unitClass> squadIO::defaultUnitList() {
     unitBase::unitClass unit;
-    unit.sightRange = 7;
+    unit.sightRange   = 7;
     unit.actionPoints = 11;
-    unit.maxHealth = 120;
+    unit.maxHealth    = 120;
 
     unitBase::unitClass unit2 = unit;
 
-    unit.weapon = weaponBase::weaponType::rifleType;
+    unit.weapon  = weaponBase::weaponType::rifleType;
     unit2.weapon = weaponBase::weaponType::shotgunType;
 
     std::vector<unitBase::unitClass> units;
@@ -105,7 +111,7 @@ std::vector<unitBase::unitClass> squadIO::defaultUnitList() {
     return units;
 }
 
-void squadIO::writeSquad(const std::vector<unitBase::unitClass> &units) {
+void squadIO::writeSquad(const std::vector<unitBase::unitClass>& units) {
     std::ofstream stream;
     stream.open("SquadBuilder/squad.txt", std::ofstream::out | std::ofstream::trunc);
     if (!stream.is_open()) {
@@ -113,15 +119,15 @@ void squadIO::writeSquad(const std::vector<unitBase::unitClass> &units) {
         return;
     }
 
-    for (const auto &unit: units) {
-        stream << unit.maxHealth << ' ' << unit.sightRange << ' ' << unit.actionPoints << ' '
-                << unit.weapon << std::endl;
+    for (const auto& unit : units) {
+        stream << unit.maxHealth << ' ' << unit.sightRange << ' ' << unit.actionPoints << ' ' << unit.weapon
+               << std::endl;
     }
     std::cout << "writeSquad: done" << std::endl;
     stream.close();
 }
 
-bool squadIO::validUnitFile(const std::string &fPath) {
+bool squadIO::validUnitFile(const std::string& fPath) {
     std::cout << "Validating file" << std::endl;
 
     std::string unitInfo, currentInfo;

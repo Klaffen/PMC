@@ -7,7 +7,6 @@
 
 
 #include "../Board/Tile.h"
-
 #include <math.h>
 
 class Board;
@@ -15,7 +14,6 @@ class Board;
 class Vision {
 
 public:
-
     /**
      * Default vision constructor
      */
@@ -28,7 +26,7 @@ public:
      * @param board Reference to the game board
      * @return Returns vector of visible tiles
      */
-    static std::vector<Tile> getVisibleTiles(Tile tile, int visionRadius, Board &board);
+    static std::vector<Tile> getVisibleTiles(Tile tile, int visionRadius, Board& board);
 
     /**
      * Checks whether tile is visible from particular tile
@@ -39,7 +37,6 @@ public:
     static bool tileIsInSight(Tile tile, std::vector<Tile> visibleTiles);
 
 private:
-
 };
 
-#endif //DAT220_PROJECT_VISION_H
+#endif // DAT220_PROJECT_VISION_H

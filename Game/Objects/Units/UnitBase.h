@@ -5,14 +5,13 @@
 #ifndef DAT220_PROJECT_UNITBASE_H
 #define DAT220_PROJECT_UNITBASE_H
 
+#include "../../Board/Tile.h"
+#include "../Weapons/WeaponBase.h"
 #include <map>
 #include <queue>
 
-#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
-
-#include "../Weapons/WeaponBase.h"
-#include "../../Board/Tile.h"
+#include <SFML/Graphics/RenderWindow.hpp>
 
 class Network;
 class Board;
@@ -22,35 +21,35 @@ public:
     unitBase();
     struct unitClass {
         weaponBase::weaponType weapon = weaponBase::weaponType::rifleType;
-        int sightRange = 1;
-        int maxHealth = 10;
-        int health = maxHealth;
-        int actionPoints = 1;
-        int builderCost = 0;
+        int sightRange                = 1;
+        int maxHealth                 = 10;
+        int health                    = maxHealth;
+        int actionPoints              = 1;
+        int builderCost               = 0;
 
         int unitId;
         int playerId;
     };
 
-    unitBase(Network *network, unitClass unitClass, Board &gameBoard);
-    int currentWeapon;      //What weapon the unit currently uses
-    int health;          //Unit current health
+    unitBase(Network* network, unitClass unitClass, Board& gameBoard);
+    int currentWeapon; // What weapon the unit currently uses
+    int health; // Unit current health
     int maxHealth;
     int sightRange;
-    sf::Vector2i position;  //Unit position on the map
-    bool alive = true;            //Is the unit dead?
-    bool turn = false;
-    sf::CircleShape shape;  //The shape to be drawn
+    sf::Vector2i position; // Unit position on the map
+    bool alive = true; // Is the unit dead?
+    bool turn  = false;
+    sf::CircleShape shape; // The shape to be drawn
     void spendAP(int points);
     void restoreAP();
-    void shoot(sf::RenderWindow &window, sf::Vector2f target);
-    void move(sf::Vector2i target, std::vector<std::vector<Tile>> &tileMap);
+    void shoot(sf::RenderWindow& window, sf::Vector2f target);
+    void move(sf::Vector2i target, std::vector<std::vector<Tile>>& tileMap);
     void hurt(int damage);
-    void process(Board &gameBoard, sf::RenderWindow &window, std::vector<unitBase> &units);
+    void process(Board& gameBoard, sf::RenderWindow& window, std::vector<unitBase>& units);
     std::vector<Tile> visibleTiles{};
     void weaponSwap(weaponBase::weaponType type);
     std::shared_ptr<weaponBase> getWeapon();
-    virtual void Draw(sf::RenderWindow &window);
+    virtual void Draw(sf::RenderWindow& window);
     int id;
     int player;
     int actionPoints;
@@ -67,12 +66,11 @@ private:
 
 protected:
     void updateVision(Board& board);
-    Network *network;
+    Network* network;
     int maxAP;
     sf::Vector2i nextTile;
     void Animate(sf::Vector2f goal);
-
 };
 
 
-#endif //DAT220_PROJECT_UNITBASE_H
+#endif // DAT220_PROJECT_UNITBASE_H

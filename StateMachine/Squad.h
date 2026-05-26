@@ -1,30 +1,30 @@
 #ifndef DAT220_PROJECT_SQUAD_H
 #define DAT220_PROJECT_SQUAD_H
 
-#include <optional>
-#include <vector>
-#include "SFML/Graphics.hpp"
-
-#include "State.h"
 #include "../Game/Objects/Units/UnitBase.h"
 #include "../Support/Button.h"
+#include "State.h"
+#include <optional>
+#include <vector>
 
-#define PRICE_VISION 10
-#define PRICE_HEALTH 2
+#include "SFML/Graphics.hpp"
+
+#define PRICE_VISION      10
+#define PRICE_HEALTH      2
 #define PRICE_ACTIONPOINT 10
-#define PRICE_UNIT 20
-#define MAX_BUILD_POINTS 400
+#define PRICE_UNIT        20
+#define MAX_BUILD_POINTS  400
 
 struct baseUnit {
-    int vision = 1;
-    int health = 10;
+    int vision       = 1;
+    int health       = 10;
     int actionPoints = 1;
-    int weaponId = 0;
+    int weaponId     = 0;
 };
 
-class Squad: public State {
+class Squad : public State {
 public:
-    int enter(sf::RenderWindow &window);
+    int enter(sf::RenderWindow& window);
 
 private:
     bool squadInit = false;
@@ -34,23 +34,23 @@ private:
      * @param window Reference to the game window
      * @return Returns nothing
      */
-    void process(sf::RenderWindow &window);
+    void process(sf::RenderWindow& window);
 
     /**
      * Draw all the buttons
      * @param window Reference to the game window
      * @return Returns nothing
      */
-    void draw(sf::RenderWindow &window);
+    void draw(sf::RenderWindow& window);
 
     /**
      * Update the text with new values
      * @return Returns nothing
      */
     void updateValues();
-    void textInit(sf::RenderWindow &window);
-    void buttonInit(sf::RenderWindow &window);
-    void updatePositions(sf::RenderWindow &window);
+    void textInit(sf::RenderWindow& window);
+    void buttonInit(sf::RenderWindow& window);
+    void updatePositions(sf::RenderWindow& window);
 
     sf::Texture backgroundTexture;
     std::optional<sf::Sprite> background;
@@ -74,7 +74,7 @@ private:
      * @param window Reference to mouse coordinates
      * @return Returns the type of the button pressed
      */
-    int buttonCollission(sf::Vector2i &mouse);
+    int buttonCollission(sf::Vector2i& mouse);
 
     sf::Vector2i mousePosition;
     sf::RectangleShape hitbox;
@@ -101,7 +101,7 @@ private:
      * @param window Reference to mouse coordinates
      * @return Returns nothing
      */
-    void selectUnit(sf::Vector2i &mouse);
+    void selectUnit(sf::Vector2i& mouse);
     void recalcBuildPoints();
     std::vector<baseUnit> unitList;
     int selectedUnitId;

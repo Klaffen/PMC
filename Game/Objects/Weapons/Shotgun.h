@@ -8,7 +8,7 @@
 
 #include "WeaponBase.h"
 
-class shotgun : public weaponBase{
+class shotgun : public weaponBase {
 public:
     shotgun();
 
@@ -19,4 +19,4 @@ private:
 };
 
 
-#endif //DAT220_PROJECT_SHOTGUN_H
+#endif // DAT220_PROJECT_SHOTGUN_H

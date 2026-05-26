@@ -1,25 +1,26 @@
 #ifndef DAT220_PROJECT_GAME_STATE_SETTINGS_H
 #define DAT220_PROJECT_GAME_STATE_SETTINGS_H
 
-#include <optional>
 #include "../Support/Button.h"
-#include "SFML/Graphics.hpp"
 #include "State.h"
+#include <optional>
 
-class Settings: public State{
+#include "SFML/Graphics.hpp"
+
+class Settings : public State {
 
 public:
     /**
-    * Initialization for the state
-    * @param window window to manipulate in the state
-    * @return retuns what state to change to
-    */
-    int enter(sf::RenderWindow &window);
+     * Initialization for the state
+     * @param window window to manipulate in the state
+     * @return retuns what state to change to
+     */
+    int enter(sf::RenderWindow& window);
     /**
      * Processes user input, makes updates and draw frames
      * @param window window to manipulate in the state
      */
-    void process(sf::RenderWindow &window);
+    void process(sf::RenderWindow& window);
 
 private:
     bool settingsInit = false;
@@ -43,9 +44,9 @@ private:
 
     sf::Font font;
 
-    unsigned int textSizeLarge = 56;
+    unsigned int textSizeLarge  = 56;
     unsigned int textSizeMedium = 44;
-    unsigned int textSizeSmall = 32;
+    unsigned int textSizeSmall  = 32;
 
     float textSpaceFactor = 1.5f;
 
@@ -79,31 +80,31 @@ private:
      * Setup for text
      * @param window Window to position text
      */
-    void textLablesInit(sf::RenderWindow &window);
+    void textLablesInit(sf::RenderWindow& window);
     /**
      * Scale text based on resolution
      * @param window Window to check size
      */
-    void resolutionTextSize(sf::RenderWindow &window);
+    void resolutionTextSize(sf::RenderWindow& window);
     /**
      * Updates the text positions
      * @param window
      */
-    void updateTextPosition(sf::RenderWindow &window);
+    void updateTextPosition(sf::RenderWindow& window);
     /**
      * Setup for buttons
      * @param window Window to position buttons
      */
-    void buttonInit(sf::RenderWindow &window);
+    void buttonInit(sf::RenderWindow& window);
     /**
      * Handles mouse input in the window
      * @param mousePointer The mouse pointer
      * @param window Window to check mouse pointer interactions with
      * @return True when changing state
      */
-    bool mouseInput(sf::RectangleShape &mousePointer, sf::RenderWindow &window);
+    bool mouseInput(sf::RectangleShape& mousePointer, sf::RenderWindow& window);
 };
 
 typedef std::shared_ptr<Settings> SettingsPtr;
 
-#endif //DAT220_PROJECT_GAME_STATE_SETTINGS_H
+#endif // DAT220_PROJECT_GAME_STATE_SETTINGS_H

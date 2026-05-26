@@ -6,14 +6,12 @@
 #define DAT220_PROJECT_LEVEL1_H
 
 
-#include <vector>
-
 #include "../Shape3D.h"
+#include <vector>
 
 class Level {
 
 public:
-
     /**
      * Default level constructor
      */
@@ -25,7 +23,6 @@ public:
     std::vector<Shape3D> obstacles;
 
 private:
-
     /**
      * Reflects all obstacles in top left quadrant of the game board over X axis
      */
@@ -37,10 +34,10 @@ private:
     void reflectOverY();
 
     /**
-     * Reflects all obstacles located inside the triangle obtained by drawing a diagonal from bottom left corner over XY axis
+     * Reflects all obstacles located inside the triangle obtained by drawing a diagonal from bottom left corner over XY
+     * axis
      */
     void reflectOverXY();
-
 };
 
-#endif //DAT220_PROJECT_LEVEL1_H
+#endif // DAT220_PROJECT_LEVEL1_H

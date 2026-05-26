@@ -5,11 +5,11 @@
 #ifndef DAT220_PROJECT_USERINTERFACE_H
 #define DAT220_PROJECT_USERINTERFACE_H
 
-#include <optional>
-#include "SFML/Graphics.hpp"
-
 #include "../Support/Button.h"
 #include "Objects/Units/UnitBase.h"
+#include <optional>
+
+#include "SFML/Graphics.hpp"
 
 class Network;
 class Board;
@@ -24,7 +24,7 @@ public:
      * @param units Pointer to the unit list
      * @return Returns nothing
      */
-    userInterface(sf::RenderWindow &window, Network *network, std::vector<unitBase> *units);
+    userInterface(sf::RenderWindow& window, Network* network, std::vector<unitBase>* units);
 
     /**
      * Process user input
@@ -33,25 +33,25 @@ public:
      * @param window Reference to the game board
      * @return Returns nothing
      */
-    void proccess(sf::Event event, sf::RenderWindow &window, Board &gameBoard);
+    void proccess(sf::Event event, sf::RenderWindow& window, Board& gameBoard);
 
     /**
      * Draws the buttons
      * @param window Reference to the game window
      * @return Returns nothing
      */
-    void draw(sf::RenderWindow &window);
+    void draw(sf::RenderWindow& window);
 
-    Network *network;
+    Network* network;
 
     ButtonPtr endTurnButton, moveButton, shootButton, grenadeButton;
-    enum buttonEnum {nothing, end, move, shoot, grenade, unit};
+    enum buttonEnum { nothing, end, move, shoot, grenade, unit };
     buttonEnum highlighted;
     buttonEnum selected;
 
-    std::vector<unitBase> *units;
+    std::vector<unitBase>* units;
     int highlithedUnitID = -1;
-    int selectedUnitID = -1;
+    int selectedUnitID   = -1;
 
     sf::RectangleShape healthBar;
     std::optional<sf::Text> actionPoints;
@@ -59,6 +59,7 @@ public:
     sf::Font font;
 
     sf::View view;
+
 private:
     std::vector<Tile*> highlightedPath{};
 
@@ -74,8 +75,8 @@ private:
      * @param window Reference to the game window
      * @return Returns nothing
      */
-    void displayStats(unitBase *unit, sf::RenderWindow &window);
+    void displayStats(unitBase* unit, sf::RenderWindow& window);
 };
 
 
-#endif //DAT220_PROJECT_USERINTERFACE_H
+#endif // DAT220_PROJECT_USERINTERFACE_H

@@ -7,10 +7,9 @@
 
 #include <SFML/Graphics.hpp>
 
-class Tile: public sf::RectangleShape{
+class Tile : public sf::RectangleShape {
 
 public:
-
     /**
      * Default tile constructor
      * @param position Position of the tile
@@ -49,7 +48,6 @@ public:
     void setNotHighlighted();
 
 private:
-
     /**
      * Generates tile id
      */
@@ -74,9 +72,8 @@ private:
      * Tile color for highlighted
      */
     sf::Color highlighted;
-
 };
 
-bool operator==(const Tile &tile1, const Tile &tile2);
+bool operator==(const Tile& tile1, const Tile& tile2);
 
-#endif //DAT220_PROJECT_TILE_H
+#endif // DAT220_PROJECT_TILE_H

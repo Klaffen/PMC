@@ -6,14 +6,14 @@
 #define DAT220_PROJECT_SHAPE3D_H
 
 #include <memory>
+
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
 
 class Shape3D {
 
 public:
-
     /**
      * Default obstacle constructor
      * @param size Size of the obstacle to be created
@@ -32,16 +32,15 @@ public:
      *
      * @return Returns the base rectangle of the obstacle
      */
-    sf::RectangleShape &getBaseRect();
+    sf::RectangleShape& getBaseRect();
 
     /**
      * Draws obstacle
      * @param window Reference to the game window
      */
-    void draw(sf::RenderWindow &window);
+    void draw(sf::RenderWindow& window);
 
 protected:
-
     sf::RectangleShape base;
     sf::RectangleShape top;
     sf::RectangleShape transparentRect;
@@ -60,4 +59,4 @@ protected:
     sf::Color outlineColor;
 };
 
-#endif //DAT220_PROJECT_SHAPE3D_H
+#endif // DAT220_PROJECT_SHAPE3D_H

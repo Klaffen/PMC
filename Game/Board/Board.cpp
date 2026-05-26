@@ -3,14 +3,14 @@
 //
 
 
-#include "../../StateMachine/Game.h"
 #include "Board.h"
 
+#include "../../StateMachine/Game.h"
 #include <cmath>
 
 const float Board::TILE_SIZE = 32;
 
-void Board::init(sf::RenderWindow &window) {
+void Board::init(sf::RenderWindow& window) {
 
     mapSize = sf::Vector2i(1920, 1080);
 
@@ -26,21 +26,24 @@ void Board::init(sf::RenderWindow &window) {
     setTileTaken(level.obstacles, tileMap);
 }
 
-void Board::drawTiles(sf::RenderWindow &window) {
-    for (auto &tileList : tileMap){
-        for (Tile &tile: tileList) {
-            if (tile.isVisible)
+void Board::drawTiles(sf::RenderWindow& window) {
+    for (auto& tileList : tileMap) {
+        for (Tile& tile : tileList) {
+            if (tile.isVisible) {
                 window.draw(tile);
+            }
         }
     }
 }
 
-void Board::drawObstacles(sf::RenderWindow &window) {
-    for (auto &obstacle: level.obstacles) {
+void Board::drawObstacles(sf::RenderWindow& window) {
+    for (auto& obstacle : level.obstacles) {
 
         for (int i = 0; i < obstacle.getSize().x; ++i) {
             for (int j = 0; j < obstacle.getSize().y; ++j) {
-                if (tileMap[getTileCoord(obstacle.getBaseRect().getPosition()).x + i][getTileCoord(obstacle.getBaseRect().getPosition()).y + j].isVisible){
+                if (tileMap[getTileCoord(obstacle.getBaseRect().getPosition()).x + i]
+                           [getTileCoord(obstacle.getBaseRect().getPosition()).y + j]
+                               .isVisible) {
                     obstacle.draw(window);
                     break;
                 }
@@ -49,67 +52,75 @@ void Board::drawObstacles(sf::RenderWindow &window) {
     }
 }
 
-//todo: why do we need view here?
-void Board::moveUp(sf::RenderWindow &window, sf::View &view) {
-    view.move({Game::viewMoveStep * std::sin(view.getRotation().asRadians()), -Game::viewMoveStep * std::cos(view.getRotation().asRadians())});
+// todo: why do we need view here?
+void Board::moveUp(sf::RenderWindow& window, sf::View& view) {
+    view.move({Game::viewMoveStep * std::sin(view.getRotation().asRadians()),
+        -Game::viewMoveStep * std::cos(view.getRotation().asRadians())});
     window.setView(view);
 
     // reset view if it goes outside upper window bound
-    if (view.getCenter().y < view.getSize().y/10) {
-    view.setCenter({view.getCenter().x, view.getSize().y/10});
-    window.setView(view);
+    if (view.getCenter().y < view.getSize().y / 10) {
+        view.setCenter({view.getCenter().x, view.getSize().y / 10});
+        window.setView(view);
     }
 }
 
-void Board::moveDown(sf::RenderWindow &window, sf::View &view) {
-    view.move({-Game::viewMoveStep * std::sin(view.getRotation().asRadians()), Game::viewMoveStep * std::cos(view.getRotation().asRadians())});
+void Board::moveDown(sf::RenderWindow& window, sf::View& view) {
+    view.move({-Game::viewMoveStep * std::sin(view.getRotation().asRadians()),
+        Game::viewMoveStep * std::cos(view.getRotation().asRadians())});
     window.setView(view);
 
 
     // reset view if it goes outside lower window bound
-    if (view.getCenter().y > window.getSize().y - view.getSize().y/10) {
-    view.setCenter({view.getCenter().x, (float)(window.getSize().y) - view.getSize().y/10});
-    window.setView(view);
+    if (view.getCenter().y > window.getSize().y - view.getSize().y / 10) {
+        view.setCenter({view.getCenter().x, (float) (window.getSize().y) - view.getSize().y / 10});
+        window.setView(view);
     }
 }
 
-void Board::moveLeft(sf::RenderWindow &window, sf::View &view) {
-    view.move({-Game::viewMoveStep * std::cos(view.getRotation().asRadians()), -Game::viewMoveStep * std::sin(view.getRotation().asRadians())});
+void Board::moveLeft(sf::RenderWindow& window, sf::View& view) {
+    view.move({-Game::viewMoveStep * std::cos(view.getRotation().asRadians()),
+        -Game::viewMoveStep * std::sin(view.getRotation().asRadians())});
     window.setView(view);
 
 
     // reset view if it goes outside left window bound
-    if (view.getCenter().x < view.getSize().x/4) {
-    view.setCenter({view.getSize().x/4, view.getCenter().y});
-    window.setView(view);
+    if (view.getCenter().x < view.getSize().x / 4) {
+        view.setCenter({view.getSize().x / 4, view.getCenter().y});
+        window.setView(view);
     }
 }
 
-void Board::moveRight(sf::RenderWindow &window, sf::View &view) {
-    view.move({Game::viewMoveStep * std::cos(view.getRotation().asRadians()), Game::viewMoveStep * std::sin(view.getRotation().asRadians())});
+void Board::moveRight(sf::RenderWindow& window, sf::View& view) {
+    view.move({Game::viewMoveStep * std::cos(view.getRotation().asRadians()),
+        Game::viewMoveStep * std::sin(view.getRotation().asRadians())});
     window.setView(view);
 
 
     // reset view if it goes outside right window bound
-    if (view.getCenter().x > window.getSize().x - view.getSize().x/4) {
-    view.setCenter({(float)(window.getSize().x) - view.getSize().x/4, view.getCenter().y});
-    window.setView(view);
+    if (view.getCenter().x > window.getSize().x - view.getSize().x / 4) {
+        view.setCenter({(float) (window.getSize().x) - view.getSize().x / 4, view.getCenter().y});
+        window.setView(view);
     }
 }
 
-void Board::Process(sf::RenderWindow &window, sf::View &view) {
+void Board::Process(sf::RenderWindow& window, sf::View& view) {
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
         moveUp(window, view);
+    }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
         moveDown(window, view);
+    }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
         moveLeft(window, view);
+    }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
         moveRight(window, view);
+    }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::E)) {
         view.rotate(sf::degrees(-0.9f));
@@ -139,33 +150,37 @@ void Board::Process(sf::RenderWindow &window, sf::View &view) {
 }
 
 sf::Vector2i Board::getTileCoord(sf::Vector2f position) {
-    int tileX = (int)roundf(position.x/TILE_SIZE);
-    int tileY = (int)roundf(position.y/TILE_SIZE);
+    int tileX = (int) roundf(position.x / TILE_SIZE);
+    int tileY = (int) roundf(position.y / TILE_SIZE);
     return {tileX, tileY};
 }
 
-void Board::setTileTaken(std::vector<Shape3D> &obstacles, std::vector<std::vector<Tile>> &tileMap) {
+void Board::setTileTaken(std::vector<Shape3D>& obstacles, std::vector<std::vector<Tile>>& tileMap) {
 
-    for (auto &obstacle : obstacles) {
+    for (auto& obstacle : obstacles) {
 
-        sf::Vector2f size = {obstacle.getBaseRect().getSize().x/Board::TILE_SIZE, obstacle.getBaseRect().getSize().y/Board::TILE_SIZE};
-        sf::Vector2f position = {obstacle.getBaseRect().getPosition().x/Board::TILE_SIZE, obstacle.getBaseRect().getPosition().y/Board::TILE_SIZE};
+        sf::Vector2f size     = {obstacle.getBaseRect().getSize().x / Board::TILE_SIZE,
+                obstacle.getBaseRect().getSize().y / Board::TILE_SIZE};
+        sf::Vector2f position = {obstacle.getBaseRect().getPosition().x / Board::TILE_SIZE,
+            obstacle.getBaseRect().getPosition().y / Board::TILE_SIZE};
 
         for (int x = 0; x < size.x; ++x) {
             for (int y = 0; y < size.y; ++y) {
                 tileMap[position.x + x][position.y + y].isTaken = true;
-                //std::cout << "Tile " << position.x + x << "," << position.y + y << " set to TAKEN" << std::endl;
+                // std::cout << "Tile " << position.x + x << "," << position.y + y << " set to TAKEN" << std::endl;
             }
         }
     }
 }
 
-void Board::setTileFree(std::vector<Shape3D> &obstacles, std::vector<std::vector<Tile>> &tileMap) {
+void Board::setTileFree(std::vector<Shape3D>& obstacles, std::vector<std::vector<Tile>>& tileMap) {
 
-    for (auto &obstacle : obstacles) {
+    for (auto& obstacle : obstacles) {
 
-        sf::Vector2f size = {obstacle.getBaseRect().getSize().x/Board::TILE_SIZE, obstacle.getBaseRect().getSize().y/Board::TILE_SIZE};
-        sf::Vector2f position = {obstacle.getBaseRect().getPosition().x/Board::TILE_SIZE, obstacle.getBaseRect().getPosition().y/Board::TILE_SIZE};
+        sf::Vector2f size     = {obstacle.getBaseRect().getSize().x / Board::TILE_SIZE,
+                obstacle.getBaseRect().getSize().y / Board::TILE_SIZE};
+        sf::Vector2f position = {obstacle.getBaseRect().getPosition().x / Board::TILE_SIZE,
+            obstacle.getBaseRect().getPosition().y / Board::TILE_SIZE};
 
         for (int x = 0; x < size.x; ++x) {
             for (int y = 0; y < size.y; ++y) {
