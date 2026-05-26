@@ -32,7 +32,6 @@ std::vector<sf::RectangleShape> rifle::Shoot(sf::Vector2f position, sf::Vector2f
     const sf::Vector2f shotSize(maxRange, 1);
     sf::RectangleShape shot = sf::RectangleShape(shotSize);
     shot.setPosition(position);
-    // shot.setOrigin(position);
     shot.setRotation(sf::degrees(angle));
     shot.setFillColor(sf::Color::Red);
     this->shape = shot;

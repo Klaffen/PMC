@@ -15,6 +15,7 @@
 
 class weaponBase {
 public:
+    virtual ~weaponBase() = default;
     weaponBase() = default;
 
     sf::String name;

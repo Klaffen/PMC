@@ -65,14 +65,6 @@ void GameSettings::playMusic() {
     }
 }
 
-void GameSettings::playUnitSound(unitBase& unit) {
-    if (!mute) {
-        if (unit.getWeapon()->sound) {
-            unit.getWeapon()->sound->play();
-        }
-    }
-}
-
 void GameSettings::muteSound() {
     mute = true;
     if (music) {

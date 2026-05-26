@@ -37,11 +37,6 @@ public:
      */
     static void playMusic();
     /**
-     * Play sound on a specific unit
-     * @param unit the unit that plays the sound
-     */
-    static void playUnitSound(unitBase& unit);
-    /**
      * Mutes all sounds
      */
     static void muteSound();
