@@ -1,15 +1,17 @@
-#include "../Game/GameSettings.h"
 #include "Menu.h"
 
-int Menu::enter(sf::RenderWindow &window) {
-    //Reset view
+#include "../Game/GameSettings.h"
+
+int Menu::enter(sf::RenderWindow& window) {
+    // Reset view
     menuView = window.getView();
     menuView.setSize({static_cast<float>(window.getSize().x), static_cast<float>(window.getSize().y)});
     menuView.setCenter({window.getSize().x / 2.f, window.getSize().y / 2.f});
     menuView.setRotation(sf::degrees(0));
     window.setView(menuView);
 
-    if (const bool loadedBGTexture = backgroundTexture.loadFromFile("Data/Images/background_title.png"); !loadedBGTexture) {
+    if (const bool loadedBGTexture = backgroundTexture.loadFromFile("Data/Images/background_title.png");
+        !loadedBGTexture) {
         throw std::runtime_error("Could not load background texture!");
     }
     backgroundScaleX = static_cast<float>(window.getSize().x) / static_cast<float>(backgroundTexture.getSize().x);
@@ -31,7 +33,7 @@ int Menu::enter(sf::RenderWindow &window) {
     return currentScreenState;
 }
 
-void Menu::process(sf::RenderWindow &window) {
+void Menu::process(sf::RenderWindow& window) {
     while (window.isOpen()) {
         while (const auto event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
@@ -41,7 +43,9 @@ void Menu::process(sf::RenderWindow &window) {
             }
         }
 
-        if (mouseInput(mousePointer, window)) return;
+        if (mouseInput(mousePointer, window)) {
+            return;
+        }
 
         window.clear(sf::Color(22, 21, 64));
         window.draw(*background);
@@ -55,7 +59,7 @@ void Menu::process(sf::RenderWindow &window) {
     }
 }
 
-void Menu::buttonInit(const sf::RenderWindow &window) {
+void Menu::buttonInit(const sf::RenderWindow& window) {
     playButton = std::make_shared<Button>();
     playButton->setFont("Data/Fonts/ethnocentric rg.ttf");
     playButton->setText("PLAY");
@@ -63,10 +67,7 @@ void Menu::buttonInit(const sf::RenderWindow &window) {
     playButton->setTextColor(sf::Color(253, 216, 53));
     playButton->setTextOutlineColor(sf::Color(213, 0, 0));
     playButton->setTextOutlineSize(2);
-    playButton->setPosition({
-        (window.getSize().x / 16.0f),
-        window.getSize().y / 2.0f
-    });
+    playButton->setPosition({(window.getSize().x / 16.0f), window.getSize().y / 2.0f});
     playButton->setOnlyText(true);
 
     squadButton = std::make_shared<Button>();
@@ -76,10 +77,8 @@ void Menu::buttonInit(const sf::RenderWindow &window) {
     squadButton->setTextColor(sf::Color(253, 216, 53));
     squadButton->setTextOutlineColor(sf::Color(213, 0, 0));
     squadButton->setTextOutlineSize(2);
-    squadButton->setPosition({
-        (window.getSize().x / 16.0f),
-        playButton->getPosition().y + squadButton->getButtonGlobalBounds().size.y * 1.8f
-    });
+    squadButton->setPosition({(window.getSize().x / 16.0f),
+        playButton->getPosition().y + squadButton->getButtonGlobalBounds().size.y * 1.8f});
     squadButton->setOnlyText(true);
 
     settingsButton = std::make_shared<Button>();
@@ -89,10 +88,8 @@ void Menu::buttonInit(const sf::RenderWindow &window) {
     settingsButton->setTextColor(sf::Color(253, 216, 53));
     settingsButton->setTextOutlineColor(sf::Color(213, 0, 0));
     settingsButton->setTextOutlineSize(2);
-    settingsButton->setPosition({
-        (window.getSize().x / 16.0f),
-        (squadButton->getPosition().y + settingsButton->getButtonGlobalBounds().size.y * 1.8f)
-    });
+    settingsButton->setPosition({(window.getSize().x / 16.0f),
+        (squadButton->getPosition().y + settingsButton->getButtonGlobalBounds().size.y * 1.8f)});
     settingsButton->setOnlyText(true);
 
     exitButton = std::make_shared<Button>();
@@ -102,14 +99,12 @@ void Menu::buttonInit(const sf::RenderWindow &window) {
     exitButton->setTextColor(sf::Color(253, 216, 53));
     exitButton->setTextOutlineColor(sf::Color(213, 0, 0));
     exitButton->setTextOutlineSize(2);
-    exitButton->setPosition({
-        (window.getSize().x / 16.0f),
-        (settingsButton->getPosition().y + exitButton->getButtonGlobalBounds().size.y * 1.8f)
-    });
+    exitButton->setPosition({(window.getSize().x / 16.0f),
+        (settingsButton->getPosition().y + exitButton->getButtonGlobalBounds().size.y * 1.8f)});
     exitButton->setOnlyText(true);
 }
 
-bool Menu::mouseInput(sf::RectangleShape &mousePointer, const sf::RenderWindow &window) {
+bool Menu::mouseInput(sf::RectangleShape& mousePointer, const sf::RenderWindow& window) {
     mousePointer.setPosition(sf::Vector2f(sf::Mouse::getPosition(window)));
     if (mousePointer.getGlobalBounds().findIntersection(playButton->getButtonGlobalBounds())) {
         playButton->setButtonHighlight(true);

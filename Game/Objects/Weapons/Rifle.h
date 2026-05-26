@@ -6,16 +6,18 @@
 #define DAT220_PROJECT_RIFLE_H
 
 
-#include <SFML/Graphics/RectangleShape.hpp>
 #include "WeaponBase.h"
 
-class rifle : public weaponBase{
+#include <SFML/Graphics/RectangleShape.hpp>
+
+class rifle : public weaponBase {
 public:
     rifle();
     std::vector<sf::RectangleShape> Shoot(sf::Vector2f position, sf::Vector2f target);
+
 protected:
 private:
 };
 
 
-#endif //DAT220_PROJECT_RIFLE_H
+#endif // DAT220_PROJECT_RIFLE_H

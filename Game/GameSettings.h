@@ -13,17 +13,17 @@ public:
      * Set window to fullscreen
      * @param window The window to change
      */
-    static void setFullscreenMode(sf::RenderWindow &window);
+    static void setFullscreenMode(sf::RenderWindow& window);
     /**
      * Set window to windowed mode
      * @param window window to change
      */
-    static void setWindowedMode(sf::RenderWindow &window);
+    static void setWindowedMode(sf::RenderWindow& window);
     /**
      * Get the supported resolution for the current system
      * @return A vector of supported resolutions
      */
-    static const std::vector<sf::VideoMode> & getVideoModes();
+    static const std::vector<sf::VideoMode>& getVideoModes();
     /**
      * Set resolution of the window
      * @param window window to change
@@ -31,16 +31,11 @@ public:
      * @param isFullscren If the window is fullscreen or not
      * @return If changing resolution is successful or not
      */
-    static bool setResolution(sf::RenderWindow &window, int change, bool isFullscren);
+    static bool setResolution(sf::RenderWindow& window, int change, bool isFullscren);
     /**
      * Plays music
      */
     static void playMusic();
-    /**
-     * Play sound on a specific unit
-     * @param unit the unit that plays the sound
-     */
-    static void playUnitSound(unitBase &unit);
     /**
      * Mutes all sounds
      */
@@ -51,7 +46,6 @@ public:
     static void unmuteSound();
 
 private:
-
 };
 
-#endif //DAT220_PROJECT_GAMESETTINGS_H
+#endif // DAT220_PROJECT_GAMESETTINGS_H

@@ -1,45 +1,44 @@
 #ifndef DAT220_PROJECT_HOST_H
 #define DAT220_PROJECT_HOST_H
 
+#include "../Networking/Network.h"
+#include "../Support/Button.h"
+#include "State.h"
 #include <optional>
 #include <vector>
 
 #include "SFML/Graphics.hpp"
 
-#include "State.h"
-#include "../Networking/Network.h"
-#include "../Support/Button.h"
-
-class Lobby: public State {
+class Lobby : public State {
 public:
     /**
-    * Constructor for the lobby state
-    * @param network the network object
-    * @return Returns nothing
-    */
-    Lobby(Network *network);
-    Network *network;
+     * Constructor for the lobby state
+     * @param network the network object
+     * @return Returns nothing
+     */
+    Lobby(Network* network);
+    Network* network;
 
     /**
      * Loads and sets up the text and buttons for the state
      * @param window Reference to the game window
      * @return Returns the id of the next state
      */
-    int enter(sf::RenderWindow &window);
+    int enter(sf::RenderWindow& window);
 
     /**
      * Process all the user input and networking
      * @param window Reference to the game window
      * @return returns nothing
      */
-    void process(sf::RenderWindow &window);
+    void process(sf::RenderWindow& window);
 
     /**
      * Setup for joining or hosting a game
      * @param window Reference to the game window
      * @return Returns nothing
      */
-    void lobbySetup(sf::RenderWindow &window);
+    void lobbySetup(sf::RenderWindow& window);
 
     sf::Texture backgroundTexture;
     std::optional<sf::Sprite> background;
@@ -64,7 +63,8 @@ public:
     int playerCount;
 
     std::string hostGlobalIP = "";
-    std::string hostLocalIP = "";
+    std::string hostLocalIP  = "";
+
 private:
 };
 

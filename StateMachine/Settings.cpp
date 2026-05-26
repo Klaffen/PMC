@@ -1,10 +1,11 @@
-#include "../Game/GameSettings.h"
 #include "Settings.h"
 
-int Settings::enter(sf::RenderWindow &window) {
+#include "../Game/GameSettings.h"
+
+int Settings::enter(sf::RenderWindow& window) {
     if (!settingsInit) {
-        if (const bool loadedBGTexture = backgroundTexture.loadFromFile("Data/Images/background_blurred.png"); !
-            loadedBGTexture) {
+        if (const bool loadedBGTexture = backgroundTexture.loadFromFile("Data/Images/background_blurred.png");
+            !loadedBGTexture) {
             throw std::runtime_error("Could not load background texture!");
         }
 
@@ -13,8 +14,8 @@ int Settings::enter(sf::RenderWindow &window) {
         background.emplace(backgroundTexture);
         background->setScale({backgroundScaleX, backgroundScaleY});
 
-        if (const bool loadedKeybindTexture = keybindTexture.loadFromFile("Data/Images/keybindings.png"); !
-            loadedKeybindTexture) {
+        if (const bool loadedKeybindTexture = keybindTexture.loadFromFile("Data/Images/keybindings.png");
+            !loadedKeybindTexture) {
             throw std::runtime_error("Could not load keybind texture!");
         }
 
@@ -22,13 +23,11 @@ int Settings::enter(sf::RenderWindow &window) {
         keybindScaleY = static_cast<float>(window.getSize().y) * 0.50f / static_cast<float>(keybindTexture.getSize().y);
         keybind.emplace(keybindTexture);
         keybind->setScale({keybindScaleX, keybindScaleY});
-        keybind->setPosition({
-            window.getSize().x / 2.0f - keybind->getGlobalBounds().size.x / 2.0f,
-            window.getSize().y / 2.0f - textSizeLarge * 3.0f
-        });
+        keybind->setPosition({window.getSize().x / 2.0f - keybind->getGlobalBounds().size.x / 2.0f,
+            window.getSize().y / 2.0f - textSizeLarge * 3.0f});
 
         VMresolutions = GameSettings::getVideoModes();
-        isFullscreen = true;
+        isFullscreen  = true;
 
         resolutionTextSize(window);
 
@@ -44,7 +43,7 @@ int Settings::enter(sf::RenderWindow &window) {
     return currentScreenState;
 }
 
-void Settings::process(sf::RenderWindow &window) {
+void Settings::process(sf::RenderWindow& window) {
     while (window.isOpen()) {
         while (const auto event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
@@ -58,7 +57,9 @@ void Settings::process(sf::RenderWindow &window) {
                 return;
             }
 
-            if (mouseInput(mousePointer, window)) return;
+            if (mouseInput(mousePointer, window)) {
+                return;
+            }
         }
 
 
@@ -96,7 +97,7 @@ void Settings::process(sf::RenderWindow &window) {
     }
 }
 
-bool Settings::mouseInput(sf::RectangleShape &mousePointer, sf::RenderWindow &window) {
+bool Settings::mouseInput(sf::RectangleShape& mousePointer, sf::RenderWindow& window) {
     mousePointer.setPosition(sf::Vector2f(sf::Mouse::getPosition(window)));
 
     if (mousePointer.getGlobalBounds().findIntersection(fullscreenLEFT->getButtonGlobalBounds())) {
@@ -140,8 +141,8 @@ bool Settings::mouseInput(sf::RectangleShape &mousePointer, sf::RenderWindow &wi
         if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
             bool changeRes = GameSettings::setResolution(window, -1, isFullscreen);
             if (changeRes) {
-                std::string resNumText = std::to_string(window.getSize().x) + " x " +
-                                         std::to_string(window.getSize().y);
+                std::string resNumText =
+                    std::to_string(window.getSize().x) + " x " + std::to_string(window.getSize().y);
                 resNumbers->setString(resNumText);
                 resolutionChanged = true;
             }
@@ -155,8 +156,8 @@ bool Settings::mouseInput(sf::RectangleShape &mousePointer, sf::RenderWindow &wi
         if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
             bool changeRes = GameSettings::setResolution(window, +1, isFullscreen);
             if (changeRes) {
-                std::string resNumText = std::to_string(window.getSize().x) + " x " +
-                                         std::to_string(window.getSize().y);
+                std::string resNumText =
+                    std::to_string(window.getSize().x) + " x " + std::to_string(window.getSize().y);
                 resNumbers->setString(resNumText);
                 resolutionChanged = true;
             }
@@ -210,7 +211,7 @@ bool Settings::mouseInput(sf::RectangleShape &mousePointer, sf::RenderWindow &wi
     return false;
 }
 
-void Settings::textLablesInit(sf::RenderWindow &window) {
+void Settings::textLablesInit(sf::RenderWindow& window) {
     if (const bool loadedFont = font.openFromFile("Data/Fonts/neuropol.ttf"); !loadedFont) {
         throw std::runtime_error("Could not load font!");
     }
@@ -228,12 +229,11 @@ void Settings::textLablesInit(sf::RenderWindow &window) {
     resolution.emplace(font, "RESOLUTION");
     resolution->setCharacterSize(textSizeLarge);
     resolution->setFillColor(sf::Color::White);
-    resolution->setPosition({
-        window.getSize().x / 20.0f, fullscreen->getPosition().y + (textSizeLarge * textSpaceFactor)
-    });
+    resolution->setPosition(
+        {window.getSize().x / 20.0f, fullscreen->getPosition().y + (textSizeLarge * textSpaceFactor)});
 
-    std::string resNumText = std::to_string(VMresolutions.at(0).size.x) + " x " + std::to_string(
-                                 VMresolutions.at(0).size.y);
+    std::string resNumText =
+        std::to_string(VMresolutions.at(0).size.x) + " x " + std::to_string(VMresolutions.at(0).size.y);
     resNumbers.emplace(font, resNumText);
     resNumbers->setCharacterSize(textSizeLarge);
     resNumbers->setFillColor(sf::Color::White);
@@ -259,17 +259,16 @@ void Settings::textLablesInit(sf::RenderWindow &window) {
     lineKeybind.setPosition({window.getSize().x / 20.0f, keybinds->getPosition().y + (textSizeLarge * 1.25f)});
 }
 
-void Settings::buttonInit(sf::RenderWindow &window) {
+void Settings::buttonInit(sf::RenderWindow& window) {
     std::string fontPath = "Data/Fonts/neuropol.ttf";
-    fullscreenLEFT = std::make_shared<Button>();
+    fullscreenLEFT       = std::make_shared<Button>();
     fullscreenLEFT->setFont(fontPath);
     fullscreenLEFT->setText("<");
     fullscreenLEFT->setTextSize(textSizeLarge);
     fullscreenLEFT->setTextColor(sf::Color::White);
     fullscreenLEFT->setTextHighlightColor(sf::Color::Cyan);
-    fullscreenLEFT->setPosition({
-        toggleWindowedFullscreen->getPosition().x - textSizeLarge, fullscreen->getPosition().y + 23
-    });
+    fullscreenLEFT->setPosition(
+        {toggleWindowedFullscreen->getPosition().x - textSizeLarge, fullscreen->getPosition().y + 23});
     fullscreenLEFT->setOnlyText(true);
 
     fullscreenRIGHT = std::make_shared<Button>();
@@ -278,10 +277,9 @@ void Settings::buttonInit(sf::RenderWindow &window) {
     fullscreenRIGHT->setTextSize(textSizeLarge);
     fullscreenRIGHT->setTextColor(sf::Color::White);
     fullscreenRIGHT->setTextHighlightColor(sf::Color::Cyan);
-    fullscreenRIGHT->setPosition({
-        toggleWindowedFullscreen->getPosition().x + toggleWindowedFullscreen->getLocalBounds().size.x + textSizeLarge,
-        fullscreen->getPosition().y + 23
-    });
+    fullscreenRIGHT->setPosition(
+        {toggleWindowedFullscreen->getPosition().x + toggleWindowedFullscreen->getLocalBounds().size.x + textSizeLarge,
+            fullscreen->getPosition().y + 23});
     fullscreenRIGHT->setOnlyText(true);
 
     resolutionLEFT = std::make_shared<Button>();
@@ -299,10 +297,8 @@ void Settings::buttonInit(sf::RenderWindow &window) {
     resolutionRIGHT->setTextSize(textSizeLarge);
     resolutionRIGHT->setTextColor(sf::Color::White);
     resolutionRIGHT->setTextHighlightColor(sf::Color::Cyan);
-    resolutionRIGHT->setPosition({
-        resNumbers->getPosition().x + resNumbers->getLocalBounds().size.x + textSizeLarge,
-        resolution->getPosition().y + 23
-    });
+    resolutionRIGHT->setPosition({resNumbers->getPosition().x + resNumbers->getLocalBounds().size.x + textSizeLarge,
+        resolution->getPosition().y + 23});
     resolutionRIGHT->setOnlyText(true);
 
     soundLEFT = std::make_shared<Button>();
@@ -320,10 +316,9 @@ void Settings::buttonInit(sf::RenderWindow &window) {
     soundRIGHT->setTextSize(textSizeLarge);
     soundRIGHT->setTextColor(sf::Color::White);
     soundRIGHT->setTextHighlightColor(sf::Color::Cyan);
-    soundRIGHT->setPosition({
-        toggleSoundOffOn->getPosition().x + toggleSoundOffOn->getLocalBounds().size.x + textSizeLarge,
-        sound->getPosition().y + 23
-    });
+    soundRIGHT->setPosition(
+        {toggleSoundOffOn->getPosition().x + toggleSoundOffOn->getLocalBounds().size.x + textSizeLarge,
+            sound->getPosition().y + 23});
     soundRIGHT->setOnlyText(true);
 
     back = std::make_shared<Button>();
@@ -336,7 +331,7 @@ void Settings::buttonInit(sf::RenderWindow &window) {
     back->setOnlyText(true);
 }
 
-void Settings::updateTextPosition(sf::RenderWindow &window) {
+void Settings::updateTextPosition(sf::RenderWindow& window) {
     fullscreen->setCharacterSize(textSizeLarge);
     toggleWindowedFullscreen->setCharacterSize(textSizeLarge);
 
@@ -347,66 +342,62 @@ void Settings::updateTextPosition(sf::RenderWindow &window) {
     toggleSoundOffOn->setCharacterSize(textSizeLarge);
     keybinds->setCharacterSize(textSizeLarge);
 
-    //Image
+    // Image
     keybindScaleX = (float) (window.getSize().x) * 0.50f / (float) (keybindTexture.getSize().x);
     keybindScaleY = (float) (window.getSize().y) * 0.50f / (float) (keybindTexture.getSize().y);
 
-    //Text
+    // Text
     fullscreen->setPosition({window.getSize().x / 20.0f, window.getSize().y / 20.0f});
     toggleWindowedFullscreen->setPosition({window.getSize().x / 2.f, fullscreen->getPosition().y});
-    resolution->setPosition({
-        window.getSize().x / 20.0f, fullscreen->getPosition().y + (textSizeLarge * textSpaceFactor)
-    });
+    resolution->setPosition(
+        {window.getSize().x / 20.0f, fullscreen->getPosition().y + (textSizeLarge * textSpaceFactor)});
     resNumbers->setPosition({window.getSize().x / 2.0f, resolution->getPosition().y});
     sound->setPosition({window.getSize().x / 20.0f, resolution->getPosition().y + (textSizeLarge * textSpaceFactor)});
     toggleSoundOffOn->setPosition({window.getSize().x / 2.0f, sound->getPosition().y});
     keybinds->setPosition({window.getSize().x / 20.0f, sound->getPosition().y + (textSizeLarge * textSpaceFactor)});
     lineKeybind.setPosition({window.getSize().x / 20.0f, keybinds->getPosition().y + (textSizeLarge * 1.25f)});
-    keybind->setPosition({
-        window.getSize().x / 2.0f - keybind->getGlobalBounds().size.x / 2.0f,
-        window.getSize().y / 2.0f - textSizeLarge * 2.0f
-    });
+    keybind->setPosition({window.getSize().x / 2.0f - keybind->getGlobalBounds().size.x / 2.0f,
+        window.getSize().y / 2.0f - textSizeLarge * 2.0f});
 
-    //Buttons
-    fullscreenLEFT->setPosition({
-        toggleWindowedFullscreen->getPosition().x - textSizeLarge, fullscreen->getPosition().y + 23
-    });
-    fullscreenRIGHT->setPosition({
-        toggleWindowedFullscreen->getPosition().x + toggleWindowedFullscreen->getLocalBounds().size.x + textSizeLarge,
-        fullscreen->getPosition().y + 23
-    });
+    // Buttons
+    fullscreenLEFT->setPosition(
+        {toggleWindowedFullscreen->getPosition().x - textSizeLarge, fullscreen->getPosition().y + 23});
+    fullscreenRIGHT->setPosition(
+        {toggleWindowedFullscreen->getPosition().x + toggleWindowedFullscreen->getLocalBounds().size.x + textSizeLarge,
+            fullscreen->getPosition().y + 23});
 
     resolutionLEFT->setPosition({resNumbers->getPosition().x - textSizeLarge, resolution->getPosition().y + 23});
-    resolutionRIGHT->setPosition({
-        resNumbers->getPosition().x + resNumbers->getLocalBounds().size.x + textSizeLarge,
-        resolution->getPosition().y + 23
-    });
+    resolutionRIGHT->setPosition({resNumbers->getPosition().x + resNumbers->getLocalBounds().size.x + textSizeLarge,
+        resolution->getPosition().y + 23});
 
     soundLEFT->setPosition({toggleSoundOffOn->getPosition().x - textSizeLarge, sound->getPosition().y + 23});
-    soundRIGHT->setPosition({
-        toggleSoundOffOn->getPosition().x + toggleSoundOffOn->getLocalBounds().size.x + textSizeLarge,
-        sound->getPosition().y + 23
-    });
+    soundRIGHT->setPosition(
+        {toggleSoundOffOn->getPosition().x + toggleSoundOffOn->getLocalBounds().size.x + textSizeLarge,
+            sound->getPosition().y + 23});
 
     back->setPosition({window.getSize().x / 20.0f, window.getSize().y - (window.getSize().y / 10.0f)});
 }
 
-void Settings::resolutionTextSize(sf::RenderWindow &window) {
+void Settings::resolutionTextSize(sf::RenderWindow& window) {
     if (window.getSize().y <= 900 || window.getSize().x <= 1300) {
-        textSizeLarge = 44;
+        textSizeLarge  = 44;
         textSizeMedium = 32;
-        textSizeSmall = 20;
+        textSizeSmall  = 20;
 
         keybindScaleX = (float) (window.getSize().x) * 0.40f / (float) (keybindTexture.getSize().x);
         keybindScaleY = (float) (window.getSize().y) * 0.40f / (float) (keybindTexture.getSize().y);
-        if (keybind) keybind->setScale({keybindScaleX, keybindScaleY});
+        if (keybind) {
+            keybind->setScale({keybindScaleX, keybindScaleY});
+        }
     } else {
-        textSizeLarge = 56;
+        textSizeLarge  = 56;
         textSizeMedium = 44;
-        textSizeSmall = 32;
+        textSizeSmall  = 32;
 
         keybindScaleX = (float) (window.getSize().x) * 0.50f / (float) (keybindTexture.getSize().x);
         keybindScaleY = (float) (window.getSize().y) * 0.50f / (float) (keybindTexture.getSize().y);
-        if (keybind) keybind->setScale({keybindScaleX, keybindScaleY});
+        if (keybind) {
+            keybind->setScale({keybindScaleX, keybindScaleY});
+        }
     }
 }

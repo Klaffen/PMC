@@ -6,6 +6,7 @@
 #define DAT220_PROJECT_MATHHELPER_H
 
 #include <cmath>
+
 #include <SFML/Window.hpp>
 
 class mathHelper {
@@ -28,4 +29,4 @@ public:
 };
 
 
-#endif //DAT220_PROJECT_MATHHELPER_H
+#endif // DAT220_PROJECT_MATHHELPER_H

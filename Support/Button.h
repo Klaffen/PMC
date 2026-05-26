@@ -3,9 +3,10 @@
 
 #include <memory>
 #include <optional>
+
+#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
 
 class Button {
@@ -19,17 +20,17 @@ public:
      * Draws the button to the window
      * @param window Window to draw the button in
      */
-    void draw(sf::RenderWindow &window);
+    void draw(sf::RenderWindow& window);
     /**
      * Get position of the button
      * @return Returns the position of the button
      */
-    const sf::Vector2f &getPosition() const;
+    const sf::Vector2f& getPosition() const;
     /**
      * Set position of the button
      * @param position The bosition of the button
      */
-    void setPosition(const sf::Vector2f &position);
+    void setPosition(const sf::Vector2f& position);
     /**
      * Set button size
      * @param buttonSize The size of the button
@@ -39,12 +40,12 @@ public:
      * Get button size
      * @return Returns the size of the button
      */
-    const sf::Vector2f &getButtonSize() const;
+    const sf::Vector2f& getButtonSize() const;
     /**
      * Set the color of the button
      * @param color the color of the button
      */
-    void setButtonColor(const sf::Color &color);
+    void setButtonColor(const sf::Color& color);
     /**
      * Set Highlighting of the button
      * @param buttonHighlight Set true if you want the button to be highlighted
@@ -54,28 +55,28 @@ public:
      * Set the button highlight color
      * @param color The color of the highlight
      */
-    void setButtonHighlightColor(const sf::Color &color);
+    void setButtonHighlightColor(const sf::Color& color);
     /**
      * Set the outline color of the button
      * @param outlineColor The outline color
      */
-    void setButtonOutlineColor(const sf::Color &outlineColor);
+    void setButtonOutlineColor(const sf::Color& outlineColor);
     /**
      * Set the thickness of the button outline
      * @param size Size of the outline
      */
-    void setButtonOutlineSize(const float &size);
+    void setButtonOutlineSize(const float& size);
 
     /**
      * Set button text font
      * @param fontLocation Path to the font
      */
-    void setFont(const std::string &fontLocation);
+    void setFont(const std::string& fontLocation);
     /**
      * Set button text
      * @param text The text to set in the button
      */
-    void setText(const std::string &text);
+    void setText(const std::string& text);
     /**
      * Set the size of button text
      * @param textSize size of thext
@@ -85,7 +86,7 @@ public:
      * Set the color of the button text
      * @param textColor The color of the button text
      */
-    void setTextColor(const sf::Color &textColor);
+    void setTextColor(const sf::Color& textColor);
     /**
      * Set highlighting of text
      * @param textHighlight Set true if you want to highlight text
@@ -95,12 +96,12 @@ public:
      * Set the highlight color of the text
      * @param textHighlightColor The color to be highlighted
      */
-    void setTextHighlightColor(const sf::Color &textHighlightColor);
+    void setTextHighlightColor(const sf::Color& textHighlightColor);
     /**
      * Set text outline color
      * @param textOutlineColor The color of the outline
      */
-    void setTextOutlineColor(const sf::Color &textOutlineColor);
+    void setTextOutlineColor(const sf::Color& textOutlineColor);
     /**
      * Set the thickness of text ouline
      * @param textOutlineSize Size of outline
@@ -160,4 +161,4 @@ private:
 
 typedef std::shared_ptr<Button> ButtonPtr;
 
-#endif //DAT220_PROJECT_BUTTON_H
+#endif // DAT220_PROJECT_BUTTON_H

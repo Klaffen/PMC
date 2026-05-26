@@ -3,45 +3,46 @@
 //
 
 
-#include <iostream>
 #include "Shotgun.h"
 
 #include "../../Board/Board.h"
-
 #include <cmath>
+#include <iostream>
 
 shotgun::shotgun() {
-    type = shotgunType;
-    name = getName(type);
-    builderCost = getCost(type);
-    damage = 10;
-    maxRange = 10 * Board::TILE_SIZE;
+    type              = shotgunType;
+    name              = getName(type);
+    builderCost       = getCost(type);
+    damage            = 2;
+    maxRange          = 10 * Board::TILE_SIZE;
     distanceReduction = 0.005;
-    ammo = -1;
-    apCost = 2;
+    ammo              = -1;
+    apCost            = 2;
 
-    (void)buffer.loadFromFile("Data/Audio/shotgun.wav");
+    (void) buffer.loadFromFile("Data/Audio/shotgun.wav");
     sound.emplace(buffer);
 }
 
 std::vector<sf::RectangleShape> shotgun::Shoot(sf::Vector2f position, sf::Vector2f target) {
     std::vector<sf::RectangleShape> bullets;
 
-    float deltaX = position.x - target.x;
-    float deltaY = position.y - target.y;
-    float angle = (atan2(deltaY, deltaX) + M_PI);
-    angle *= (180/M_PI);
-    sf::Vector2f shotSize(maxRange, 1);
-    sf::RectangleShape shot = sf::RectangleShape(shotSize);
-    for (int i = 0; i < 20; i++){
+    const float deltaX    = position.x - target.x;
+    const float deltaY    = position.y - target.y;
+    const float baseAngle = (atan2(deltaY, deltaX) + M_PI) * (180.f / M_PI);
+
+    const int numBullets = 5;
+    const float spread   = 40.f;
+    const float step     = spread / (numBullets - 1);
+
+    const sf::Vector2f shotSize(maxRange, 1);
+    for (int i = 0; i < numBullets; i++) {
+        const float angle = baseAngle - spread / 2.f + step * i;
+        sf::RectangleShape shot(shotSize);
         shot.setPosition(position);
-        shot.setSize(shotSize);
-        float randomAngle = (rand() % 22 - 11 + angle);
-        std::cout << "angle. " << angle << " randomAngle: " << randomAngle << std::endl;
-        shot.setRotation(sf::degrees(randomAngle));
+        shot.setRotation(sf::degrees(angle));
         bullets.push_back(shot);
     }
-
+    shapes = bullets;
+    drawTime          = 5;
     return bullets;
 }
-

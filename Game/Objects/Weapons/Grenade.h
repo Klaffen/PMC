@@ -6,10 +6,11 @@
 #define DAT220_PROJECT_GRENADE_H
 
 
-#include <SFML/Graphics/RectangleShape.hpp>
 #include "WeaponBase.h"
 
-class grenade : public weaponBase{
+#include <SFML/Graphics/RectangleShape.hpp>
+
+class grenade : public weaponBase {
 public:
     int area;
     grenade();
@@ -17,4 +18,4 @@ public:
 };
 
 
-#endif //DAT220_PROJECT_GRENADE_H
+#endif // DAT220_PROJECT_GRENADE_H
