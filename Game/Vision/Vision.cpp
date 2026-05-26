@@ -16,7 +16,7 @@ std::vector<Tile> Vision::getVisibleTiles(Tile tile, int visionRadius, Board& bo
     for (int i = 0; i <= 360; ++i) {
         const float angleRad = i * M_PI / 180;
 
-        for (int radius = 0; radius < visionRadius; ++radius) {
+        for (int radius = 0; radius < visionRadius + 1; ++radius) {
             float posX = tile.getPosition().x + radius * Board::TILE_SIZE * cos(angleRad);
             float posY = tile.getPosition().y + radius * Board::TILE_SIZE * sin(angleRad);
 

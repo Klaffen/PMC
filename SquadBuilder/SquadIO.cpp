@@ -20,7 +20,6 @@ std::vector<unitBase::unitClass> squadIO::readFile(const std::string& fPath) {
         return units;
     }
 
-    int buildCost = 0;
     int unitId    = 0;
     std::vector<unitBase::unitClass> units;
 
@@ -37,15 +36,12 @@ std::vector<unitBase::unitClass> squadIO::readFile(const std::string& fPath) {
         std::getline(splitStream, currentInfo, ' ');
         unitClass.maxHealth = std::stoi(currentInfo);
         unitClass.health    = unitClass.maxHealth;
-        buildCost           = unitClass.maxHealth * PRICE_HEALTH;
 
         std::getline(splitStream, currentInfo, ' ');
         unitClass.sightRange = std::stoi(currentInfo);
-        buildCost += unitClass.sightRange * PRICE_VISION;
 
         std::getline(splitStream, currentInfo, ' ');
         unitClass.actionPoints = std::stoi(currentInfo);
-        buildCost += unitClass.actionPoints * PRICE_ACTIONPOINT;
 
         std::getline(splitStream, currentInfo, ' ');
         switch (std::stoi(currentInfo)) {
@@ -63,12 +59,6 @@ std::vector<unitBase::unitClass> squadIO::readFile(const std::string& fPath) {
             break;
         }
 
-        if (buildCost > MAX_BUILD_POINTS) {
-            std::cout << "buildCost too large (" << buildCost << ")" << std::endl;
-            units = defaultUnitList();
-            writeSquad(units);
-            return units;
-        }
         unitClass.unitId = unitId++;
         units.push_back(unitClass);
     }

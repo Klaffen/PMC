@@ -24,7 +24,6 @@ int Squad::enter(sf::RenderWindow& window) {
         selectedColor = sf::Color::White;
         textColor     = sf::Color::White;
 
-        buildPoints = MAX_BUILD_POINTS;
         getSquad(squadIO::readFile("SquadBuilder/squad.txt"));
 
         selectedUnitId = 0;
@@ -328,26 +327,32 @@ void Squad::mouseClick() {
         if (collision == 1 && buildPoints >= PRICE_VISION) {
             unitList.at(selectedUnitId).vision++;
             recalcBuildPoints();
+
         } else if (collision == 2 && unitList.at(selectedUnitId).vision != 1) {
             unitList.at(selectedUnitId).vision--;
             recalcBuildPoints();
         }
+
     } else if (hitbox.getGlobalBounds().findIntersection(health->getGlobalBounds())) {
         if (collision == 1 && buildPoints >= PRICE_HEALTH) {
-            unitList.at(selectedUnitId).health += 15;
+            unitList.at(selectedUnitId).health++;
             recalcBuildPoints();
-        } else if (collision == 2 && unitList.at(selectedUnitId).health != 15) {
-            unitList.at(selectedUnitId).health -= 15;
+
+        } else if (collision == 2 && unitList.at(selectedUnitId).health > 1) {
+            unitList.at(selectedUnitId).health--;
             recalcBuildPoints();
         }
+
     } else if (hitbox.getGlobalBounds().findIntersection(actionPoints->getGlobalBounds())) {
         if (collision == 1 && buildPoints >= PRICE_ACTIONPOINT) {
             unitList.at(selectedUnitId).actionPoints++;
             recalcBuildPoints();
+
         } else if (collision == 2 && unitList.at(selectedUnitId).actionPoints != 1) {
             unitList.at(selectedUnitId).actionPoints--;
             recalcBuildPoints();
         }
+
     } else if (hitbox.getGlobalBounds().findIntersection(weapon->getGlobalBounds())) {
         auto& wId = unitList.at(selectedUnitId).weaponId;
         if (collision == 1 && wId != weaponBase::shotgunType) {
@@ -434,11 +439,20 @@ std::vector<unitBase::unitClass> Squad::unitConversion(const std::vector<baseUni
 void Squad::getSquad(const std::vector<unitBase::unitClass>& units) {
     baseUnit convertedUnit;
     std::vector<baseUnit> convertedList;
+    int buildCost = 0;
+
     for (auto unit : units) {
         convertedUnit.health       = unit.health;
         convertedUnit.actionPoints = unit.actionPoints;
         convertedUnit.vision       = unit.sightRange;
         convertedUnit.weaponId     = (int) unit.weapon;
+
+        buildCost += calculateUnitCost(convertedUnit);
+        if (buildCost > MAX_BUILD_POINTS) {
+            break;
+        }
+
         addUnit(convertedUnit);
     }
+
 }

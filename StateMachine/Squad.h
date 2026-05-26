@@ -10,14 +10,14 @@
 #include "SFML/Graphics.hpp"
 
 #define PRICE_VISION      10
-#define PRICE_HEALTH      2
+#define PRICE_HEALTH      20
 #define PRICE_ACTIONPOINT 10
 #define PRICE_UNIT        20
 #define MAX_BUILD_POINTS  400
 
 struct baseUnit {
     int vision       = 1;
-    int health       = 10;
+    int health       = 1;
     int actionPoints = 1;
     int weaponId     = 0;
 };

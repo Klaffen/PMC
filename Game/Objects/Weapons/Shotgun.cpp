@@ -31,7 +31,7 @@ std::vector<sf::RectangleShape> shotgun::Shoot(sf::Vector2f position, sf::Vector
     const float baseAngle = (atan2(deltaY, deltaX) + M_PI) * (180.f / M_PI);
 
     const int numBullets = 5;
-    const float spread   = 60.f;
+    const float spread   = 40.f;
     const float step     = spread / (numBullets - 1);
 
     const sf::Vector2f shotSize(maxRange, 1);
