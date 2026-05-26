@@ -33,7 +33,7 @@ public:
     static int getCost(weaponType type);
     static sf::String getName(weaponType type);
     weaponType type;
-    sf::RectangleShape shape;
+    std::vector<sf::RectangleShape> shapes;
 
     int drawTime = 0;
 

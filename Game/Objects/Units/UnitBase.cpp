@@ -136,7 +136,9 @@ void unitBase::Draw(sf::RenderWindow& window) {
     }
     for (auto& weapon : weapons) {
         if (weapon->drawTime != 0) {
-            window.draw(weapon->shape);
+            for (const auto& s : weapon->shapes) {
+                window.draw(s);
+            }
             weapon->drawTime--;
         }
     }

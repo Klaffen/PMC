@@ -13,7 +13,7 @@ rifle::rifle() {
     type              = rifleType;
     name              = getName(type);
     builderCost       = getCost(type);
-    damage            = 40;
+    damage            = 4;
     maxRange          = 25 * Board::TILE_SIZE;
     distanceReduction = 0.0005;
     ammo              = -1;
@@ -34,8 +34,8 @@ std::vector<sf::RectangleShape> rifle::Shoot(sf::Vector2f position, sf::Vector2f
     shot.setPosition(position);
     shot.setRotation(sf::degrees(angle));
     shot.setFillColor(sf::Color::Red);
-    this->shape = shot;
     shots.push_back(shot);
+    shapes   = shots;
     drawTime = 5;
     return shots;
 }

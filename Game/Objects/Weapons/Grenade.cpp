@@ -10,7 +10,7 @@ grenade::grenade() {
     type              = grenadeType;
     name              = getName(type);
     builderCost       = getCost(type);
-    damage            = 20;
+    damage            = 1;
     maxRange          = 200 * Board::TILE_SIZE;
     distanceReduction = 50;
     ammo              = -1;
@@ -27,9 +27,9 @@ std::vector<sf::RectangleShape> grenade::Shoot(sf::Vector2f position, sf::Vector
         sf::RectangleShape bang(explosionSize);
         bang.setOrigin({explosionSize.x / 2, explosionSize.y / 2});
         bang.setPosition(target);
-        shape = bang;
         explosions.push_back(bang);
-        drawTime = 10;
+        drawTime = 30;
     }
+    shapes = explosions;
     return explosions;
 }
