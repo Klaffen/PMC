@@ -197,7 +197,6 @@ void Lobby::lobbySetup(sf::RenderWindow& window) {
                         sf::Packet packet;
                         std::optional<sf::IpAddress> throwaway;
                         unsigned short senderPort = 0;
-                        network->UdpSocket.setBlocking(false);
                         (void) network->UdpSocket.receive(packet, throwaway, senderPort);
 
                         packet >> network->gameName >> hostLocalIP >> hostGlobalIP;
@@ -229,6 +228,7 @@ void Lobby::lobbySetup(sf::RenderWindow& window) {
                             } else {
                                 std::cout << "TCP Connection established. Ready to roll" << std::endl;
                             };
+                            network->clientSocket.setBlocking(false);
                             inputTag->setString("Input:");
                             string = "";
                             userInput->setString(string);
@@ -267,7 +267,6 @@ void Lobby::lobbySetup(sf::RenderWindow& window) {
                             userInput->setString(string);
                             stage = complete;
                             network->packetQMutex.lock();
-                            network->clientSocket.setBlocking(true);
                             (void) network->clientSocket.send(playerNamePacket);
                             network->packetQMutex.unlock();
                             network->UdpSocket.unbind();
@@ -282,12 +281,12 @@ void Lobby::lobbySetup(sf::RenderWindow& window) {
                         sf::Socket::Status status = sf::Socket::Status::Error;
                         if (auto addrs = sf::Dns::resolve(string); addrs && !addrs->empty()) {
                             std::cout << "Trying to join: " << addrs->front().toString() << std::endl;
-                            network->clientSocket.setBlocking(true);
                             status = network->clientSocket.connect(addrs->front(), network->TCPPORT);
                         }
 
                         if (status == sf::Socket::Status::Done) {
                             std::cout << "TCP Connection established!" << std::endl;
+                            network->clientSocket.setBlocking(false);
                             gameNameText->setString(
                                 "Found a game with name: " + network->gameName + "\nEnter your name");
                             gameNameText->setPosition(
@@ -357,14 +356,14 @@ void Lobby::process(sf::RenderWindow& window) {
                 if (!network->HOST && !string.empty()) {
                     payload.clear();
                     payload << 1337 << string;
-                    network->sendPacket(payload, false);
+                    network->sendPacket(payload);
                     messageVector.push_back("You: " + string);
                     string = "";
                     userInput->setString("");
                 } else if (!string.empty()) {
                     payload.clear();
                     payload << PACKET_MESSAGE << string << "Host";
-                    network->sendPacket(payload, false);
+                    network->sendPacket(payload);
                     messageVector.push_back("You: " + string);
                     string = "";
                     userInput->setString("");
@@ -403,7 +402,6 @@ void Lobby::process(sf::RenderWindow& window) {
                 for (auto& client : network->clients) {
                     network->playerNumber++;
                     packet << PACKET_START << network->playerNumber;
-                    client->socket.setBlocking(true);
                     (void) client->socket.send(packet);
                     packet.clear();
                 }
@@ -421,14 +419,14 @@ void Lobby::process(sf::RenderWindow& window) {
                                     + "             Global IP: " + hostGlobalIP + " Local IP: " + hostLocalIP);
                 payload.clear();
                 payload << PACKET_UPDATE << playerCount << hostLocalIP << hostGlobalIP;
-                network->sendPacket(payload, false);
+                network->sendPacket(payload);
                 std::cout << "Players: " << network->clients.size() << std::endl;
             }
-            network->receiveClientMessage(false, messageVector);
+            network->receiveClientMessage(messageVector);
         } else {
             payload.clear();
             packetType = 0;
-            payload    = network->receivePacket(false);
+            payload    = network->receivePacket();
             payload >> packetType;
             if (packetType != 0) {
                 std::cout << "Type: " << packetType << std::endl;

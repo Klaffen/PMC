@@ -191,7 +191,7 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
             if (!network->HOST) {
                 sf::Packet packet;
                 packet << 1010 << network->playerNumber;
-                network->sendPacket(packet, false);
+                network->sendPacket(packet);
                 network->turn = false;
             } else {
                 actionHandler::nextTurn(network->playerNumber, *network, units);
@@ -232,7 +232,7 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
                     std::vector<sf::Packet> packets = actionHandler::Move(units->at(selectedUnitID),
                         tile->getPosition().x / 32, tile->getPosition().y / 32, gameBoard.tileMap);
                     for (auto packet : packets) {
-                        network->sendPacket(packet, false);
+                        network->sendPacket(packet);
                     }
                     break;
                 }
@@ -245,7 +245,7 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
                     std::vector<sf::Packet> packets = actionHandler::Shoot(units->at(selectedUnitID), mousePosition,
                         *units, gameBoard, units->at(selectedUnitID).getWeapon()->type);
                     for (auto packet : packets) {
-                        network->sendPacket(packet, false);
+                        network->sendPacket(packet);
                     }
                     if (network->HOST) {
                         actionHandler::victory(*units, network);
@@ -261,7 +261,7 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
                     std::vector<sf::Packet> packets = actionHandler::Shoot(
                         units->at(selectedUnitID), mousePosition, *units, gameBoard, weaponBase::grenadeType);
                     for (auto packet : packets) {
-                        network->sendPacket(packet, false);
+                        network->sendPacket(packet);
                     }
                     if (network->HOST) {
                         actionHandler::victory(*units, network);

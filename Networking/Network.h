@@ -3,6 +3,8 @@
 
 #include "Client.h"
 #include <atomic>
+#include <condition_variable>
+#include <deque>
 #include <iostream>
 #include <mutex>
 #include <thread>
@@ -12,31 +14,27 @@
 
 class Network {
 public:
-    /**
-     * Function used by network thread to send packets
-     * @return Returns nothing
-     */
     void sendFunction();
-    // Constructor that binds the UDP socket to the UDP port
+
     Network() {
         if (UdpSocket.bind(UDPPORT) != sf::Socket::Status::Done) {
             std::cout << "Failed to bind socket to UDPPort" << std::endl;
         } else {
             std::cout << "UDP socket bound to UDPPort " << UDPPORT << std::endl;
         }
+        UdpSocket.setBlocking(false);
         sendThread = std::thread(&Network::sendFunction, this);
     }
 
     ~Network() {
         running = false;
+        cvPacketQ.notify_one();
         sendThread.join();
     }
 
-    std::vector<sf::Packet> packetQ;
+    std::deque<sf::Packet> packetQ;
 
     std::mutex packetQMutex;
-
-    sf::Packet payload;
 
     // TCP Common
     unsigned short UDPPORT = 50000;
@@ -45,22 +43,20 @@ public:
     bool HOST = true;
     /**
      * Checks if there is an incomming packet
-     * @param blocking Used to specify if the thread should be set as blocked untill packet received
      * @return Returns either an incomming packet or an empty one if nothing was received
      */
-    sf::Packet receivePacket(bool blocking);
+    sf::Packet receivePacket();
 
     /**
      * Adds packet to send vector
      * @param packet Reference packet that is to be sent
-     * @param blocking Unused. Only there for compatibility reasons
      * @return Returns nothing
      */
-    void sendPacket(sf::Packet& packet, bool blocking);
+    void sendPacket(sf::Packet& packet);
 
     // TCP Host Specific
     sf::Packet namePacket;
-    Client* nextClient;
+    std::unique_ptr<Client> nextClient;
 
     /**
      * Sets up listening socket and adds a creates client object
@@ -76,11 +72,10 @@ public:
 
     /**
      * Checks for incomming text messages from clients
-     * @param blocking Used to specify if the thread should be blocked untill a message is received
      * @param list reference to the list of messages
      * @return Returns nothing
      */
-    void receiveClientMessage(bool blocking, std::vector<std::string>& list);
+    void receiveClientMessage(std::vector<std::string>& list);
     std::vector<std::unique_ptr<Client>> clients;
 
     // TCP Client Specific
@@ -97,6 +92,7 @@ public:
 
 private:
     std::atomic<bool> running{true};
+    std::condition_variable cvPacketQ;
     std::thread sendThread;
 };
 

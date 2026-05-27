@@ -61,7 +61,7 @@ void actionHandler::GetRemoteAction(
         packet >> unitID >> playerID >> xPos >> yPos;
         unit = getUnit(unitID, playerID, unitList);
         if (unit != nullptr) {
-            Move(*unit, xPos, yPos, gameBoard.tileMap);
+            unit->move(sf::Vector2i(xPos, yPos), gameBoard.tileMap);
         }
         break;
 
@@ -149,10 +149,10 @@ void actionHandler::GetRemoteAction(
             int status;
             packet >> status;
 
-            if (status == 3) {
+            if (status == Client::defeat) {
                 network->titleString = "You lost!";
                 network->titleColor  = sf::Color::Red;
-            } else if (status == 4) {
+            } else if (status == Client::victory) {
                 network->titleString = "You won!";
                 network->titleColor  = sf::Color::Green;
             }
@@ -176,13 +176,15 @@ unitBase* actionHandler::getUnit(int id, int player, std::vector<unitBase>* unit
 }
 
 
-std::vector<sf::Packet> actionHandler::Shoot(unitBase& unit, sf::Vector2f target, std::vector<unitBase>& units,
-    Board& board, weaponBase::weaponType type) {
+std::vector<sf::Packet> actionHandler::Shoot(
+    unitBase& unit, sf::Vector2f target, std::vector<unitBase>& units, Board& board, weaponBase::weaponType type) {
     std::vector<sf::Packet> packetList;
     sf::Packet shootPacket;
 
     std::shared_ptr<weaponBase> weapon = unit.getWeapon(type);
-    if (!weapon) return packetList;
+    if (!weapon) {
+        return packetList;
+    }
 
     if (unit.actionPoints >= weapon->apCost) {
         std::vector<sf::RectangleShape> bullets = weapon->Shoot(unit.shape.getPosition(), target);
@@ -272,7 +274,7 @@ void actionHandler::victory(std::vector<unitBase>& units, Network* network) {
         return;
     }
 
-    int winner;
+    int winner = -1;
 
     for (const auto& it : playerMap) {
         if (it.second) {
@@ -281,17 +283,18 @@ void actionHandler::victory(std::vector<unitBase>& units, Network* network) {
         }
     }
 
+    if (winner == -1) return;
+
     if (winner == network->playerNumber) {
         network->titleString = "You won!";
         network->titleColor  = sf::Color::Green;
-        return;
     } else {
         network->titleString = "You lost!";
         network->titleColor  = sf::Color::Red;
 
         winner--;
-        network->clients.at(winner)->status = network->clients.at(winner)->victory;
-        winnerPacket << FUNCTION_END_OF_GAME << 4;
+        network->clients.at(winner)->status = Client::victory;
+        winnerPacket << FUNCTION_END_OF_GAME << Client::victory;
         (void) network->clients.at(winner)->socket.send(winnerPacket);
     }
 }
@@ -325,12 +328,12 @@ std::vector<sf::Packet> actionHandler::weaponSwap(unitBase* unit, weaponBase::we
     if (unit->actionPoints > 2) {
         unit->weaponSwap(type);
         unit->spendAP(2);
+        sf::Packet packet;
+        packet << FUNCTION_WEAPONSWAP << unit->id << unit->player << static_cast<int>(type);
+        actionLog.push_back(packet);
+        return std::vector{packet};
     }
-    int sendType = (int(type));
-    sf::Packet packet;
-    packet << FUNCTION_WEAPONSWAP << unit->id << unit->player << sendType;
-    actionLog.push_back(packet);
-    return std::vector{packet};
+    return {};
 }
 
 void actionHandler::sendUnit(unitBase unit, Network* network, unitBase::unitClass unitClass) {
@@ -343,7 +346,7 @@ void actionHandler::sendUnit(unitBase unit, Network* network, unitBase::unitClas
               << " Weapon: " << (int) unitClass.weapon << std::endl;
     packet << function << unitID << playerID << unitClass.health << unitClass.sightRange << unitClass.actionPoints
            << (int) unitClass.weapon;
-    network->sendPacket(packet, false);
+    network->sendPacket(packet);
 }
 
 void actionHandler::nextTurn(int player, Network& network, std::vector<unitBase>* unitList) {

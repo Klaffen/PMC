@@ -71,7 +71,7 @@ void Game::process(sf::RenderWindow& window) {
         // Event loop end
 
 
-        sf::Packet packet = network->receivePacket(false);
+        sf::Packet packet = network->receivePacket();
         actionHandler::GetRemoteAction(packet, &units, network, *gameBoard);
 
         for (auto& unit : units) {
