@@ -35,6 +35,7 @@ public:
     std::deque<sf::Packet> packetQ;
 
     std::mutex packetQMutex;
+    std::mutex clientsMutex;
 
     // TCP Common
     unsigned short UDPPORT = 50000;

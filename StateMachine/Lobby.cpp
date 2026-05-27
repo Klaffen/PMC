@@ -398,14 +398,16 @@ void Lobby::process(sf::RenderWindow& window) {
                 && startGameButton->getButtonGlobalBounds().contains(mousePos) && network->HOST) {
                 std::cout << "Start game pressed" << std::endl;
                 sf::Packet packet;
-                network->packetQMutex.lock();
-                for (auto& client : network->clients) {
-                    network->playerNumber++;
-                    packet << PACKET_START << network->playerNumber;
-                    (void) client->socket.send(packet);
-                    packet.clear();
+                {
+                    std::lock_guard clientsLock(network->clientsMutex);
+                    std::lock_guard qLock(network->packetQMutex);
+                    for (auto& client : network->clients) {
+                        network->playerNumber++;
+                        packet << PACKET_START << network->playerNumber;
+                        (void) client->socket.send(packet);
+                        packet.clear();
+                    }
                 }
-                network->packetQMutex.unlock();
                 network->playerNumber = 0; // Host always 0
                 currentScreenState    = screenState::GAME;
                 return;
@@ -420,7 +422,10 @@ void Lobby::process(sf::RenderWindow& window) {
                 payload.clear();
                 payload << PACKET_UPDATE << playerCount << hostLocalIP << hostGlobalIP;
                 network->sendPacket(payload);
-                std::cout << "Players: " << network->clients.size() << std::endl;
+                {
+                    std::lock_guard lock(network->clientsMutex);
+                    std::cout << "Players: " << network->clients.size() << std::endl;
+                }
             }
             network->receiveClientMessage(messageVector);
         } else {

@@ -19,12 +19,18 @@ bool Network::listen() {
         packet >> nextClient->playerName;
         nextClient->socket.setBlocking(false);
         std::cout << "\nAdded: " << nextClient->playerName << std::endl;
-        clients.emplace(clients.begin(), std::move(nextClient));
+        {
+            std::lock_guard lock(clientsMutex);
+            clients.emplace(clients.begin(), std::move(nextClient));
+        }
         nextClient = std::make_unique<Client>();
 
         std::cout << "List of clients" << std::endl;
-        for (auto& client : clients) {
-            std::cout << client->playerName << std::endl;
+        {
+            std::lock_guard lock(clientsMutex);
+            for (auto& client : clients) {
+                std::cout << client->playerName << std::endl;
+            }
         }
 
         return true;
@@ -37,6 +43,7 @@ void Network::receiveClientMessage(std::vector<std::string>& list) {
     std::string message, combinedMessage;
     int type;
 
+    std::lock_guard lock(clientsMutex);
     for (auto& client : clients) {
         type = 0;
         (void) client->socket.receive(packet);
@@ -62,6 +69,7 @@ void Network::receiveClientMessage(std::vector<std::string>& list) {
 sf::Packet Network::receivePacket() {
     sf::Packet packet;
     if (HOST) {
+        std::lock_guard lock(clientsMutex);
         for (auto& client : clients) {
             (void) client->socket.receive(packet);
             if (packet.getDataSize() > 0) {
@@ -88,7 +96,7 @@ sf::Packet Network::receivePacket() {
 
 void Network::sendPacket(sf::Packet& packet) {
     {
-        std::lock_guard<std::mutex> lock(packetQMutex);
+        std::lock_guard lock(packetQMutex);
         packetQ.emplace_back(packet);
     }
     cvPacketQ.notify_one();
@@ -98,13 +106,14 @@ void Network::sendFunction() {
     while (true) {
         sf::Packet payload;
         {
-            std::unique_lock<std::mutex> lock(packetQMutex);
+            std::unique_lock lock(packetQMutex);
             cvPacketQ.wait(lock, [this] { return !packetQ.empty() || !running; });
             if (!running && packetQ.empty()) break;
             payload = std::move(packetQ.front());
             packetQ.pop_front();
         }
         if (HOST) {
+            std::lock_guard lock(clientsMutex);
             for (auto& client : clients) {
                 sf::Socket::Status status = client->socket.send(payload);
                 if (status == sf::Socket::Status::Done) {

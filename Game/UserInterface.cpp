@@ -183,6 +183,7 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
             resetPath();
             endTurnButton->setTextColor(sf::Color::White);
 
+            std::lock_guard lock(network->clientsMutex);
             if (!network->HOST || !network->clients.empty()) {
                 network->titleString = "Opponent's turn";
                 network->titleColor  = sf::Color::Blue;

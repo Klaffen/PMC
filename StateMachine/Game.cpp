@@ -47,6 +47,7 @@ void Game::process(sf::RenderWindow& window) {
                 if (!network->HOST) {
                     network->clientSocket.disconnect();
                 } else {
+                    std::lock_guard lock(network->clientsMutex);
                     for (auto& client : network->clients) {
                         client->socket.disconnect();
                     }
@@ -59,6 +60,7 @@ void Game::process(sf::RenderWindow& window) {
                 if (!network->HOST) {
                     network->clientSocket.disconnect();
                 } else {
+                    std::lock_guard lock(network->clientsMutex);
                     for (auto& client : network->clients) {
                         client->socket.disconnect();
                     }
@@ -81,7 +83,6 @@ void Game::process(sf::RenderWindow& window) {
         gameBoard->Process(window, view);
 
         drawFrame(window, interface);
-
         // Game loop end
     }
 }

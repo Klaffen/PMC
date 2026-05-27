@@ -319,9 +319,8 @@ bool actionHandler::ShootingCollision(const sf::CircleShape& unit, const sf::Rec
             return true;
         }
         return false;
-    } else {
-        return (bullet.getGlobalBounds().findIntersection(unit.getGlobalBounds()).has_value());
     }
+    return (bullet.getGlobalBounds().findIntersection(unit.getGlobalBounds()).has_value());
 }
 
 std::vector<sf::Packet> actionHandler::weaponSwap(unitBase* unit, weaponBase::weaponType type) {
@@ -350,6 +349,7 @@ void actionHandler::sendUnit(unitBase unit, Network* network, unitBase::unitClas
 }
 
 void actionHandler::nextTurn(int player, Network& network, std::vector<unitBase>* unitList) {
+    actionLog.clear();
     std::cout << "Input player: " << player << std::endl;
     if (player != 0) {
         network.clients.at(player - 1)->status = network.clients.at(player - 1)->opponentsTurn;
