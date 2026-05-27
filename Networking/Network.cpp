@@ -1,33 +1,36 @@
 #include "Network.h"
 
 void Network::host() {
-    // bind the listener to the tcp port
     if (listener.listen(TCPPORT) != sf::Socket::Status::Done) {
         std::cout << "Failed to bind TCP listener to TCPPort" << std::endl;
     } else {
         std::cout << "TCP listener bound to port " << TCPPORT << std::endl;
     }
-
-    nextClient = new Client();
+    listener.setBlocking(false);
+    nextClient = std::make_unique<Client>();
 }
 
 bool Network::listen() {
-    UdpSocket.setBlocking(false);
-
     (void) UdpSocket.send(namePacket, sf::IpAddress::Broadcast, UDPPORT);
 
-    listener.setBlocking(false);
     if (listener.accept(nextClient->socket) == sf::Socket::Status::Done) {
         sf::Packet packet;
         (void) nextClient->socket.receive(packet);
         packet >> nextClient->playerName;
-        clients.emplace(clients.begin(), nextClient);
+        nextClient->socket.setBlocking(false);
         std::cout << "\nAdded: " << nextClient->playerName << std::endl;
-        nextClient = new Client();
+        {
+            std::lock_guard lock(clientsMutex);
+            clients.push_back(std::move(nextClient));
+        }
+        nextClient = std::make_unique<Client>();
 
         std::cout << "List of clients" << std::endl;
-        for (auto& client : clients) {
-            std::cout << client->playerName << std::endl;
+        {
+            std::lock_guard lock(clientsMutex);
+            for (auto& client : clients) {
+                std::cout << client->playerName << std::endl;
+            }
         }
 
         return true;
@@ -35,14 +38,14 @@ bool Network::listen() {
     return false;
 }
 
-void Network::receiveClientMessage(bool blocking, std::vector<std::string>& list) {
+void Network::receiveClientMessage(std::vector<std::string>& list) {
     sf::Packet packet;
     std::string message, combinedMessage;
     int type;
 
+    std::lock_guard lock(clientsMutex);
     for (auto& client : clients) {
         type = 0;
-        client->socket.setBlocking(blocking);
         (void) client->socket.receive(packet);
         packet >> type;
         if (type == 1337) {
@@ -63,26 +66,18 @@ void Network::receiveClientMessage(bool blocking, std::vector<std::string>& list
     }
 }
 
-sf::Packet Network::receivePacket(bool blocking) {
+sf::Packet Network::receivePacket() {
     sf::Packet packet;
-    if (HOST) {
+    if (isHost()) {
+        std::lock_guard lock(clientsMutex);
         for (auto& client : clients) {
-            client->socket.setBlocking(false);
             (void) client->socket.receive(packet);
-            if (packet.getData() != NULL) {
+            if (packet.getDataSize() > 0) {
                 std::cout << "Packet received from: " << client->playerName << std::endl;
-
-                for (auto& otherClient : clients) {
-                    if (otherClient->playerName != client->playerName) {
-                        std::cout << "Sending packet to: " << otherClient->playerName << std::endl;
-                        (void) otherClient->socket.send(packet);
-                    }
-                }
                 return packet;
             }
         }
     } else {
-        clientSocket.setBlocking(false);
         (void) clientSocket.receive(packet);
         if (packet.getDataSize() > 0) {
             std::cout << "Received packet from host" << std::endl;
@@ -92,37 +87,39 @@ sf::Packet Network::receivePacket(bool blocking) {
     return packet;
 }
 
-void Network::sendPacket(sf::Packet& packet, bool blocking) {
-    packetQMutex.lock();
-    packetQ.emplace_back(packet);
-    packetQMutex.unlock();
+void Network::sendPacket(sf::Packet& packet) {
+    {
+        std::lock_guard lock(packetQMutex);
+        packetQ.emplace_back(packet);
+    }
+    cvPacketQ.notify_one();
 }
 
 void Network::sendFunction() {
-    while (running) {
-        if (!packetQ.empty()) {
-            packetQMutex.lock();
-            payload = packetQ.at(0);
-            packetQ.erase(packetQ.begin());
-            packetQMutex.unlock();
-            if (HOST) {
-                sf::Socket::Status status;
-                for (auto& client : clients) {
-                    client->socket.setBlocking(true);
-                    status = client->socket.send(payload);
-                    if (status == sf::Socket::Status::Done) {
-                        std::cout << "Packet sent to player: " << client->playerName << std::endl;
-                    } else {
-                        std::cout << "Failed to send packet to player: " << client->playerName << std::endl;
-                    }
-                }
-            } else {
-                clientSocket.setBlocking(true);
-                if (clientSocket.send(payload) == sf::Socket::Status::Done) {
-                    std::cout << "Packet sent to host" << std::endl;
+    while (true) {
+        sf::Packet payload;
+        {
+            std::unique_lock lock(packetQMutex);
+            cvPacketQ.wait(lock, [this] { return !packetQ.empty() || !running; });
+            if (!running && packetQ.empty()) break;
+            payload = std::move(packetQ.front());
+            packetQ.pop_front();
+        }
+        if (isHost()) {
+            std::lock_guard lock(clientsMutex);
+            for (auto& client : clients) {
+                sf::Socket::Status status = client->socket.send(payload);
+                if (status == sf::Socket::Status::Done) {
+                    std::cout << "Packet sent to player: " << client->playerName << std::endl;
                 } else {
-                    std::cout << "Failed to send packet to host" << std::endl;
+                    std::cout << "Failed to send packet to player: " << client->playerName << std::endl;
                 }
+            }
+        } else {
+            if (clientSocket.send(payload) == sf::Socket::Status::Done) {
+                std::cout << "Packet sent to host" << std::endl;
+            } else {
+                std::cout << "Failed to send packet to host" << std::endl;
             }
         }
     }

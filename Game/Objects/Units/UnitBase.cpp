@@ -4,7 +4,6 @@
 
 #include "UnitBase.h"
 
-#include "../../../Networking/Network.h"
 #include "../../Board/Board.h"
 #include "../../Pathfinding/Pathfinding.h"
 #include "../../Vision/Vision.h"
@@ -12,7 +11,7 @@
 #include "../Weapons/Rifle.h"
 #include "../Weapons/Shotgun.h"
 
-unitBase::unitBase(Network* network, unitClass unitClass, Board& gameBoard) {
+unitBase::unitBase(int localPlayerNumber, unitClass unitClass, Board& gameBoard) {
     id     = unitClass.unitId;
     player = unitClass.playerId; // Get current player number
     if (player == 0) {
@@ -60,7 +59,7 @@ unitBase::unitBase(Network* network, unitClass unitClass, Board& gameBoard) {
 
     Tile& startTile   = gameBoard.tileMap.at(position.x).at(position.y);
     startTile.hasUnit = true;
-    if (player == network->playerNumber) {
+    if (player == localPlayerNumber) {
         visibleTiles = Vision::getVisibleTiles(startTile, sightRange, gameBoard);
         for (auto& tile : visibleTiles) {
             gameBoard.tileMap.at(Pathfinding::getTileIndex(tile).x).at(Pathfinding::getTileIndex(tile).y).isVisible++;
@@ -87,7 +86,7 @@ unitBase::unitBase(Network* network, unitClass unitClass, Board& gameBoard) {
     shape.setOrigin({shape.getRadius(), shape.getRadius()});
     shape.setPosition(
         {position.x * Board::TILE_SIZE + Board::TILE_SIZE / 2, position.y * Board::TILE_SIZE + Board::TILE_SIZE / 2});
-    this->network = network;
+    this->localPlayerNumber = localPlayerNumber;
 }
 
 
@@ -116,7 +115,7 @@ void unitBase::process(Board& gameBoard, sf::RenderWindow& window, std::vector<u
                 path.pop();
                 gameBoard.tileMap.at(nextTile.x).at(nextTile.y).hasUnit = true;
 
-                if (player == network->playerNumber) {
+                if (player == localPlayerNumber) {
                     updateVision(gameBoard);
                 }
             }
@@ -131,7 +130,7 @@ void unitBase::process(Board& gameBoard, sf::RenderWindow& window, std::vector<u
 }
 
 void unitBase::Draw(sf::RenderWindow& window) {
-    if (player == network->playerNumber || visible) {
+    if (player == localPlayerNumber || visible) {
         window.draw(shape);
     }
     for (auto& weapon : weapons) {

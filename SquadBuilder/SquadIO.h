@@ -7,11 +7,13 @@
 
 #include "../Game/Objects/Units/UnitBase.h"
 
+class ISession;
+
 class squadIO {
 public:
     static std::vector<unitBase::unitClass> readFile(const std::string& fPath);
 
-    static std::vector<unitBase> makeUnits(const std::string& fPath, Network* net, Board& gameBoard);
+    static std::vector<unitBase> makeUnits(const std::string& fPath, int playerNumber, ISession* session, Board& gameBoard);
 
     static void writeSquad(const std::vector<unitBase::unitClass>& units);
 

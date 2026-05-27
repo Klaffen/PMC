@@ -27,7 +27,7 @@ int Game::enter(sf::RenderWindow& window) {
 
     units = makeTemporaryUnitList();
 
-    network->turn = network->HOST;
+    matchState.turn = network->isHost();
 
     process(window);
 
@@ -35,7 +35,7 @@ int Game::enter(sf::RenderWindow& window) {
 }
 
 void Game::process(sf::RenderWindow& window) {
-    userInterface interface(window, network, &units);
+    userInterface interface(window, network, &matchState, &units);
     while (window.isOpen()) {
         // Game loop start
 
@@ -44,9 +44,10 @@ void Game::process(sf::RenderWindow& window) {
 
             if (event->is<sf::Event::Closed>()) {
                 window.close();
-                if (!network->HOST) {
+                if (!network->isHost()) {
                     network->clientSocket.disconnect();
                 } else {
+                    std::lock_guard lock(network->clientsMutex);
                     for (auto& client : network->clients) {
                         client->socket.disconnect();
                     }
@@ -56,9 +57,10 @@ void Game::process(sf::RenderWindow& window) {
             }
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape)) {
-                if (!network->HOST) {
+                if (!network->isHost()) {
                     network->clientSocket.disconnect();
                 } else {
+                    std::lock_guard lock(network->clientsMutex);
                     for (auto& client : network->clients) {
                         client->socket.disconnect();
                     }
@@ -66,13 +68,13 @@ void Game::process(sf::RenderWindow& window) {
                 currentScreenState = MENU;
                 return;
             }
-            interface.proccess(*event, window, *gameBoard);
+            interface.process(*event, window, *gameBoard);
         }
         // Event loop end
 
 
-        sf::Packet packet = network->receivePacket(false);
-        actionHandler::GetRemoteAction(packet, &units, network, *gameBoard);
+        sf::Packet packet = network->receivePacket();
+        actionHandler::GetRemoteAction(packet, &units, network, *gameBoard, matchState);
 
         for (auto& unit : units) {
             unit.process(*gameBoard, window, units);
@@ -81,7 +83,6 @@ void Game::process(sf::RenderWindow& window) {
         gameBoard->Process(window, view);
 
         drawFrame(window, interface);
-
         // Game loop end
     }
 }
@@ -102,5 +103,5 @@ void Game::drawFrame(sf::RenderWindow& window, userInterface& interface) {
 }
 
 std::vector<unitBase> Game::makeTemporaryUnitList() {
-    return squadIO::makeUnits("SquadBuilder/squad.txt", network, *gameBoard);
+    return squadIO::makeUnits("SquadBuilder/squad.txt", matchState.playerNumber, network, *gameBoard);
 }

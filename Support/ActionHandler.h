@@ -6,94 +6,63 @@
 #define DAT220_PROJECT_ACTIONHANDLER_H
 
 
+#include "../Game/MatchState.h"
 #include "../Game/Objects/Units/UnitBase.h"
+#include "PacketTypes.h"
 
 #include <SFML/Network/Packet.hpp>
 
+class Network;
+class ISession;
+
 class actionHandler {
 public:
-    static std::vector<sf::Packet> actionLog;
     /**
      * Finds a unit based on id and playernumber
-     * @param id the unit's id
-     * @param player the player who owns the unit
-     * @param unitList The actual list of units to pick from
-     * @return A pointer to the unit specified by id and player
      */
     static unitBase* getUnit(int id, int player, std::vector<unitBase>* unitList);
 
     /**
-     *Move's a unit from its current position to the specified one
-     * @param unit The unit to be moved
-     * @param xPos The x coordinate of the tile to be moved to
-     * @param yPos The y coordinate of the tile to be moved to
-     * @param tileMap The map of tiles in which the unit moves
-     * @return Returns a packet which is used to perform the same action at remote clients
+     * Moves a unit from its current position to the specified one
      */
     static std::vector<sf::Packet> Move(
         unitBase& unit, float xPos, float yPos, std::vector<std::vector<Tile>>& tileMap);
 
     /**
-     * Fire a unit's weapon
-     * @param unit The unit which will fire
-     * @param target A set of coordinates showing where the shot will be fired
-     * @param units A list of units, to check for a hit
-     * @param board The gameBoard, which is necessary to check for collisions
-     * @return Returns a packet which is used to perform the same action at remote clients
+     * Fires a unit's weapon
      */
     static std::vector<sf::Packet> Shoot(unitBase& unit, sf::Vector2f target, std::vector<unitBase>& units,
         Board& board, weaponBase::weaponType type);
 
     /**
      * Swaps a unit's weapon
-     * @param unit The unit which will swap weapon
-     * @param type The weapon the unit will swap to
-     * @return Returns a packet which is used to perform the same action at remote clients
      */
     static std::vector<sf::Packet> weaponSwap(unitBase* unit, weaponBase::weaponType type);
 
     /**
-     * Reads received packages all of which process the opponent's moves.
-     * @param packet The packet, containing one identifier for functions and the necessary parameters for the function
-     * @param unitList A list of units, to be passed on to certain functions
-     * @param network A pointer to network, to be used when receiving units to be produced
-     * @param gameBoard A reference to board, to be used when receiving units to be produced
-     * @param turn A bool used to check if it's your turn
-     * @return
+     * Deserializes and replays an incoming packet
      */
-    static void GetRemoteAction(sf::Packet packet, std::vector<unitBase>* unitList, Network* network, Board& gameBoard);
+    static void GetRemoteAction(sf::Packet packet, std::vector<unitBase>* unitList, Network* network,
+        Board& gameBoard, MatchState& matchState);
 
     /**
      * Sends the information to create a unit to a remote client
-     * @param unit The unit to be transferred
-     * @param network A pointer to network, so the package can be sent
-     * @param unitClass Contains the "class" variables for the unit, containing base stats
      */
-    static void sendUnit(unitBase unit, Network* network, unitBase::unitClass unitClass);
+    static void sendUnit(unitBase unit, ISession* session, unitBase::unitClass unitClass);
 
     /**
      * Check for dead units and see if win condition is met
-     * @param unitList Reference to the unit list
-     * @param network Reference to the network object
-     * @return Returns nothing
      */
-    static void victory(std::vector<unitBase>& unitList, Network* network);
+    static void victory(std::vector<unitBase>& unitList, Network* network, MatchState& matchState);
 
     /**
      * Passes the turn to the next player
-     * @param player Id of player who just ended is turn
-     * @param network Reference to network object
-     * @param unitList Reference to the unit list
-     * @return Returns nothing
      */
-    static void nextTurn(int player, Network& network, std::vector<unitBase>* unitList);
+    static void nextTurn(int player, Network& network, std::vector<unitBase>* unitList, MatchState& matchState);
 
 protected:
     /**
-     * Checks collision between bullets and unit
-     * @param unit Units hitbox
-     * @param unit bullets hitbox
-     * @return Returns true if collision, false if not
+     * Checks collision between a bullet and a unit
      */
     static bool ShootingCollision(const sf::CircleShape& unit, const sf::RectangleShape& bullet);
 };

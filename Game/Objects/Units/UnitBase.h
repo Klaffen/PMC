@@ -13,7 +13,6 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 
-class Network;
 class Board;
 
 class unitBase {
@@ -31,7 +30,7 @@ public:
         int playerId;
     };
 
-    unitBase(Network* network, unitClass unitClass, Board& gameBoard);
+    unitBase(int localPlayerNumber, unitClass unitClass, Board& gameBoard);
     int currentWeapon; // What weapon the unit currently uses
     int health; // Unit current health
     int maxHealth;
@@ -67,7 +66,7 @@ private:
 
 protected:
     void updateVision(Board& board);
-    Network* network;
+    int localPlayerNumber;
     int maxAP;
     sf::Vector2i nextTile;
     void Animate(sf::Vector2f goal);

@@ -15,10 +15,10 @@ int main() {
     window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
 
-    auto *network = new Network();
+    auto network = std::make_unique<Network>();
     MenuPtr menu = std::make_shared<Menu>();
-    GamePtr game = std::make_shared<Game>(network);
-    LobbyPtr lobby = std::make_shared<Lobby>(network);
+    GamePtr game = std::make_shared<Game>(network.get());
+    LobbyPtr lobby = std::make_shared<Lobby>(network.get(), &game->matchState);
     SettingsPtr settings = std::make_shared<Settings>();
     SquadPtr squad = std::make_shared<Squad>();
 

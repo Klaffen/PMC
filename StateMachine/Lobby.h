@@ -1,6 +1,7 @@
 #ifndef DAT220_PROJECT_HOST_H
 #define DAT220_PROJECT_HOST_H
 
+#include "../Game/MatchState.h"
 #include "../Networking/Network.h"
 #include "../Support/Button.h"
 #include "State.h"
@@ -14,10 +15,12 @@ public:
     /**
      * Constructor for the lobby state
      * @param network the network object
+     * @param matchState pointer to the shared game state
      * @return Returns nothing
      */
-    Lobby(Network* network);
+    Lobby(Network* network, MatchState* matchState);
     Network* network;
+    MatchState* matchState;
 
     /**
      * Loads and sets up the text and buttons for the state
