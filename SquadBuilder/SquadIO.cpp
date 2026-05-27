@@ -66,19 +66,19 @@ std::vector<unitBase::unitClass> squadIO::readFile(const std::string& fPath) {
     return units;
 }
 
-std::vector<unitBase> squadIO::makeUnits(const std::string& fPath, Network* net, Board& gameBoard) {
+std::vector<unitBase> squadIO::makeUnits(const std::string& fPath, int playerNumber, ISession* session, Board& gameBoard) {
     unitBase unit;
     std::vector<unitBase> units;
     int id = 0;
 
     std::vector<unitBase::unitClass> unitList = readFile(fPath);
     for (auto& unitClass : unitList) {
-        unitClass.playerId = net->playerNumber;
+        unitClass.playerId = playerNumber;
         unitClass.health   = unitClass.maxHealth;
         unitClass.unitId   = id++;
-        unit               = unitBase(net, unitClass, gameBoard);
+        unit               = unitBase(playerNumber, unitClass, gameBoard);
         units.push_back(unit);
-        actionHandler::sendUnit(unit, net, unitClass);
+        actionHandler::sendUnit(unit, session, unitClass);
     }
     return units;
 }

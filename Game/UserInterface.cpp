@@ -10,10 +10,11 @@
 #include "Pathfinding/Pathfinding.h"
 #include <stdexcept>
 
-userInterface::userInterface(sf::RenderWindow& window, Network* network, std::vector<unitBase>* units) {
-    this->network = network;
-    view          = window.getView();
-    this->units   = units;
+userInterface::userInterface(sf::RenderWindow& window, Network* network, MatchState* matchState, std::vector<unitBase>* units) {
+    this->network    = network;
+    this->matchState = matchState;
+    view             = window.getView();
+    this->units      = units;
 
     endTurnButton = std::make_shared<Button>();
     endTurnButton->setText("end (P)");
@@ -67,7 +68,7 @@ userInterface::userInterface(sf::RenderWindow& window, Network* network, std::ve
 }
 
 void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& gameBoard) {
-    if (!network->turn) {
+    if (!matchState->turn) {
         return;
     }
 
@@ -77,7 +78,7 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
         bool found = false;
         for (int i = 0; i < (int) units->size(); i++) {
             if (units->at(i).shape.getGlobalBounds().findIntersection(testTile->getGlobalBounds())
-                && units->at(i).player == network->playerNumber && units->at(i).alive) {
+                && units->at(i).player == matchState->playerNumber && units->at(i).alive) {
                 highlithedUnitID = i;
                 highlighted      = unit;
                 found            = true;
@@ -155,7 +156,7 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
 
     if ((event.is<sf::Event::MouseButtonReleased>() && highlighted != nothing) || (selectedUnitID != -1 && keyReleased)
         || (keyCode == sf::Keyboard::Key::P)) {
-        if (highlighted == unit && units->at(highlithedUnitID).player == network->playerNumber) {
+        if (highlighted == unit && units->at(highlithedUnitID).player == matchState->playerNumber) {
             if (selectedUnitID != -1) {
                 units->at(selectedUnitID).shape.setOutlineThickness(0);
             }
@@ -184,18 +185,18 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
             endTurnButton->setTextColor(sf::Color::White);
 
             std::lock_guard lock(network->clientsMutex);
-            if (!network->HOST || !network->clients.empty()) {
-                network->titleString = "Opponent's turn";
-                network->titleColor  = sf::Color::Blue;
+            if (!network->isHost() || !network->clients.empty()) {
+                matchState->titleString = "Opponent's turn";
+                matchState->titleColor  = sf::Color::Blue;
             }
 
-            if (!network->HOST) {
+            if (!network->isHost()) {
                 sf::Packet packet;
-                packet << FUNCTION_END_OF_TURN << network->playerNumber;
+                packet << FUNCTION_END_OF_TURN << matchState->playerNumber;
                 network->sendPacket(packet);
-                network->turn = false;
+                matchState->turn = false;
             } else {
-                actionHandler::nextTurn(network->playerNumber, *network, units);
+                actionHandler::nextTurn(matchState->playerNumber, *network, units, *matchState);
             }
 
         } else if (highlighted == move || keyCode == sf::Keyboard::Key::M) {
@@ -232,7 +233,7 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
                     Tile* tile    = input::getMouseOverTile(gameBoard.tileMap, window);
                     const float x = tile->getPosition().x / 32;
                     const float y = tile->getPosition().y / 32;
-                    if (network->HOST) {
+                    if (network->isHost()) {
                         auto packets = actionHandler::Move(units->at(selectedUnitID), x, y, gameBoard.tileMap);
                         for (auto& p : packets) network->sendPacket(p);
                     } else {
@@ -247,11 +248,11 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
             case shoot:
                 {
                     const sf::Vector2f target = input::getMouse(window);
-                    if (network->HOST) {
+                    if (network->isHost()) {
                         auto packets = actionHandler::Shoot(units->at(selectedUnitID), target,
                             *units, gameBoard, units->at(selectedUnitID).getWeapon()->type);
                         for (auto& p : packets) network->sendPacket(p);
-                        actionHandler::victory(*units, network);
+                        actionHandler::victory(*units, network, *matchState);
                     } else {
                         sf::Packet request;
                         auto& u = units->at(selectedUnitID);
@@ -265,11 +266,11 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
             case grenade:
                 {
                     const sf::Vector2f target = input::getMouse(window);
-                    if (network->HOST) {
+                    if (network->isHost()) {
                         auto packets = actionHandler::Shoot(units->at(selectedUnitID), target,
                             *units, gameBoard, weaponBase::grenadeType);
                         for (auto& p : packets) network->sendPacket(p);
-                        actionHandler::victory(*units, network);
+                        actionHandler::victory(*units, network, *matchState);
                     } else {
                         sf::Packet request;
                         auto& u = units->at(selectedUnitID);
@@ -293,7 +294,7 @@ void userInterface::draw(sf::RenderWindow& window) {
     view = window.getView();
     window.setView(window.getDefaultView());
 
-    if (network->turn) {
+    if (matchState->turn) {
         endTurnButton->draw(window);
     }
 
@@ -303,8 +304,8 @@ void userInterface::draw(sf::RenderWindow& window) {
         grenadeButton->draw(window);
     }
     if (titleText) {
-        titleText->setString(network->titleString);
-        titleText->setFillColor(network->titleColor);
+        titleText->setString(matchState->titleString);
+        titleText->setFillColor(matchState->titleColor);
         window.draw(*titleText);
     }
     window.setView(view);

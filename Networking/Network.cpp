@@ -68,7 +68,7 @@ void Network::receiveClientMessage(std::vector<std::string>& list) {
 
 sf::Packet Network::receivePacket() {
     sf::Packet packet;
-    if (HOST) {
+    if (isHost()) {
         std::lock_guard lock(clientsMutex);
         for (auto& client : clients) {
             (void) client->socket.receive(packet);
@@ -105,7 +105,7 @@ void Network::sendFunction() {
             payload = std::move(packetQ.front());
             packetQ.pop_front();
         }
-        if (HOST) {
+        if (isHost()) {
             std::lock_guard lock(clientsMutex);
             for (auto& client : clients) {
                 sf::Socket::Status status = client->socket.send(payload);

@@ -32,7 +32,7 @@ std::vector<sf::Packet> actionHandler::Move(
 }
 
 void actionHandler::GetRemoteAction(
-    sf::Packet packet, std::vector<unitBase>* unitList, Network* network, Board& gameBoard) {
+    sf::Packet packet, std::vector<unitBase>* unitList, Network* network, Board& gameBoard, MatchState& matchState) {
     int function = -1;
 
     packet >> function;
@@ -104,30 +104,30 @@ void actionHandler::GetRemoteAction(
                       << " Health: " << unitClass.health << " Vision: " << unitClass.sightRange
                       << " AP: " << unitClass.actionPoints << " Weapon: " << unitClass.weapon << std::endl;
 
-            unitBase newUnit(network, unitClass, gameBoard);
+            unitBase newUnit(matchState.playerNumber, unitClass, gameBoard);
             unitList->push_back(newUnit);
             break;
         }
 
     case FUNCTION_END_OF_TURN:
         {
-            if (!network->HOST) {
+            if (!network->isHost()) {
                 break;
             }
 
             int player;
             packet >> player;
-            nextTurn(player, *network, unitList);
+            nextTurn(player, *network, unitList, matchState);
             break;
         }
 
     case FUNCTION_YOUR_TURN:
         {
-            network->turn        = true;
-            network->titleString = "Your turn";
-            network->titleColor  = sf::Color::White;
+            matchState.turn        = true;
+            matchState.titleString = "Your turn";
+            matchState.titleColor  = sf::Color::White;
             for (auto& i : *unitList) {
-                i.turn = i.player == network->playerNumber;
+                i.turn = i.player == matchState.playerNumber;
                 i.restoreAP();
             }
             break;
@@ -139,18 +139,18 @@ void actionHandler::GetRemoteAction(
             packet >> status;
 
             if (status == Client::defeat) {
-                network->titleString = "You lost!";
-                network->titleColor  = sf::Color::Red;
+                matchState.titleString = "You lost!";
+                matchState.titleColor  = sf::Color::Red;
             } else if (status == Client::victory) {
-                network->titleString = "You won!";
-                network->titleColor  = sf::Color::Green;
+                matchState.titleString = "You won!";
+                matchState.titleColor  = sf::Color::Green;
             }
             break;
         }
 
     case REQUEST_MOVE:
         {
-            if (!network->HOST) break;
+            if (!network->isHost()) break;
             packet >> unitID >> playerID >> xPos >> yPos;
             unit = getUnit(unitID, playerID, unitList);
             if (unit != nullptr) {
@@ -162,21 +162,21 @@ void actionHandler::GetRemoteAction(
 
     case REQUEST_SHOOT:
         {
-            if (!network->HOST) break;
+            if (!network->isHost()) break;
             packet >> unitID >> playerID >> xPos >> yPos >> weapon;
             unit = getUnit(unitID, playerID, unitList);
             if (unit != nullptr) {
                 const auto type = static_cast<weaponBase::weaponType>(weapon);
                 auto packets    = Shoot(*unit, {xPos, yPos}, *unitList, gameBoard, type);
                 for (auto& p : packets) network->sendPacket(p);
-                victory(*unitList, network);
+                victory(*unitList, network, matchState);
             }
             break;
         }
 
     case REQUEST_WEAPONSWAP:
         {
-            if (!network->HOST) break;
+            if (!network->isHost()) break;
             packet >> unitID >> playerID >> weapon;
             unit = getUnit(unitID, playerID, unitList);
             if (unit != nullptr) {
@@ -250,7 +250,7 @@ std::vector<sf::Packet> actionHandler::Shoot(
     return packetList;
 }
 
-void actionHandler::victory(std::vector<unitBase>& units, Network* network) {
+void actionHandler::victory(std::vector<unitBase>& units, Network* network, MatchState& matchState) {
     std::map<int, bool> playerMap;
     sf::Packet winnerPacket;
 
@@ -268,14 +268,14 @@ void actionHandler::victory(std::vector<unitBase>& units, Network* network) {
 
     for (int player = 0; player < (int) playerMap.size(); player++) {
         if (player == 0) {
-            if (!playerMap[0] && network->alive) {
-                network->alive       = false;
-                network->titleString = "You lost!";
-                network->titleColor  = sf::Color::Red;
+            if (!playerMap[0] && matchState.alive) {
+                matchState.alive       = false;
+                matchState.titleString = "You lost!";
+                matchState.titleColor  = sf::Color::Red;
                 playerMap.erase(0);
                 std::cout << "Host Defeated!" << std::endl;
-                if (network->turn) {
-                    nextTurn(0, *network, &units);
+                if (matchState.turn) {
+                    nextTurn(0, *network, &units, matchState);
                 }
             }
         } else {
@@ -313,12 +313,12 @@ void actionHandler::victory(std::vector<unitBase>& units, Network* network) {
 
     if (winner == -1) return;
 
-    if (winner == network->playerNumber) {
-        network->titleString = "You won!";
-        network->titleColor  = sf::Color::Green;
+    if (winner == matchState.playerNumber) {
+        matchState.titleString = "You won!";
+        matchState.titleColor  = sf::Color::Green;
     } else {
-        network->titleString = "You lost!";
-        network->titleColor  = sf::Color::Red;
+        matchState.titleString = "You lost!";
+        matchState.titleColor  = sf::Color::Red;
 
         winner--;
         network->clients.at(winner)->status = Client::victory;
@@ -363,7 +363,7 @@ std::vector<sf::Packet> actionHandler::weaponSwap(unitBase* unit, weaponBase::we
     return {};
 }
 
-void actionHandler::sendUnit(unitBase unit, Network* network, unitBase::unitClass unitClass) {
+void actionHandler::sendUnit(unitBase unit, ISession* session, unitBase::unitClass unitClass) {
     sf::Packet packet;
     int function = FUNCTION_ADD_UNIT;
     int unitID   = unit.id;
@@ -373,10 +373,10 @@ void actionHandler::sendUnit(unitBase unit, Network* network, unitBase::unitClas
               << " Weapon: " << (int) unitClass.weapon << std::endl;
     packet << function << unitID << playerID << unitClass.health << unitClass.sightRange << unitClass.actionPoints
            << (int) unitClass.weapon;
-    network->sendPacket(packet);
+    session->sendPacket(packet);
 }
 
-void actionHandler::nextTurn(int player, Network& network, std::vector<unitBase>* unitList) {
+void actionHandler::nextTurn(int player, Network& network, std::vector<unitBase>* unitList, MatchState& matchState) {
     actionLog.clear();
     std::cout << "Input player: " << player << std::endl;
     if (player != 0) {
@@ -387,17 +387,17 @@ void actionHandler::nextTurn(int player, Network& network, std::vector<unitBase>
     int checkPlayer = player;
 
     while (!found) {
-        if (checkPlayer + 1 > (int) network.clients.size() && network.alive) {
+        if (checkPlayer + 1 > (int) network.clients.size() && matchState.alive) {
             std::cout << " Next: Host" << std::endl;
             for (auto& i : *unitList) {
                 i.turn = true;
                 i.restoreAP();
             }
-            network.turn        = true;
-            network.titleString = "Your turn";
-            network.titleColor  = sf::Color::White;
-            found               = true;
-        } else if (checkPlayer + 1 > (int) network.clients.size() && !network.alive) {
+            matchState.turn        = true;
+            matchState.titleString = "Your turn";
+            matchState.titleColor  = sf::Color::White;
+            found                  = true;
+        } else if (checkPlayer + 1 > (int) network.clients.size() && !matchState.alive) {
             std::cout << "Skipping hosts turn since he is dead" << std::endl;
             checkPlayer = -1;
         } else if (network.clients.at(checkPlayer)->alive) {
@@ -405,8 +405,8 @@ void actionHandler::nextTurn(int player, Network& network, std::vector<unitBase>
             packet << FUNCTION_YOUR_TURN;
             network.clients.at(checkPlayer)->status = network.clients.at(checkPlayer)->turn;
             (void) network.clients.at(checkPlayer)->socket.send(packet);
-            found        = true;
-            network.turn = false;
+            found             = true;
+            matchState.turn   = false;
             std::cout << " Next: " << checkPlayer << std::endl;
         }
         checkPlayer++;

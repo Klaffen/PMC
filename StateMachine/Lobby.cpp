@@ -8,8 +8,9 @@
 #define PACKET_MESSAGE 101
 #define PACKET_START   102
 
-Lobby::Lobby(Network* network) {
-    this->network = network;
+Lobby::Lobby(Network* network, MatchState* matchState) {
+    this->network    = network;
+    this->matchState = matchState;
 }
 
 int Lobby::enter(sf::RenderWindow& window) {
@@ -168,9 +169,9 @@ void Lobby::lobbySetup(sf::RenderWindow& window) {
                         gameNameText->setPosition(
                             {window.getSize().x / 2.0f - (gameNameText->getGlobalBounds().size.x / 2.0f),
                                 window.getSize().y / 10.0f});
-                        network->HOST        = true;
-                        network->titleString = "Your turn";
-                        network->titleColor  = sf::Color::White;
+                        network->setAsHost();
+                        matchState->titleString = "Your turn";
+                        matchState->titleColor  = sf::Color::White;
                         network->host();
                         hostGlobalIP = "";
                         if (auto addr = sf::IpAddress::getLocalAddress()) {
@@ -183,17 +184,17 @@ void Lobby::lobbySetup(sf::RenderWindow& window) {
                         userInput->setString(string);
                     } else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)
                                && joinManuallyButton->getButtonGlobalBounds().contains(mousePos)) {
-                        stage                = ipInput;
-                        network->HOST        = false;
-                        network->titleString = "Opponent's turn";
-                        network->titleColor  = sf::Color::Blue;
+                        stage                   = ipInput;
+                        network->setAsClient();
+                        matchState->titleString = "Opponent's turn";
+                        matchState->titleColor  = sf::Color::Blue;
                         break;
                     } else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)
                                && joinButton->getButtonGlobalBounds().contains(mousePos)) {
                         std::cout << "Join selected" << std::endl;
-                        network->HOST        = false;
-                        network->titleString = "Opponent's turn";
-                        network->titleColor  = sf::Color::Blue;
+                        network->setAsClient();
+                        matchState->titleString = "Opponent's turn";
+                        matchState->titleColor  = sf::Color::Blue;
                         sf::Packet packet;
                         std::optional<sf::IpAddress> throwaway;
                         unsigned short senderPort = 0;
@@ -247,7 +248,7 @@ void Lobby::lobbySetup(sf::RenderWindow& window) {
             case nameInput:
                 {
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
-                        if (network->HOST && !string.empty()) {
+                        if (network->isHost() && !string.empty()) {
                             network->gameName = string;
                             network->namePacket << string << hostLocalIP << hostGlobalIP;
                             string = "";
@@ -353,7 +354,7 @@ void Lobby::process(sf::RenderWindow& window) {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
                 string.erase(std::remove(string.begin(), string.end(), '\n'), string.end());
                 string.erase(std::remove(string.begin(), string.end(), '\r'), string.end());
-                if (!network->HOST && !string.empty()) {
+                if (!network->isHost() && !string.empty()) {
                     payload.clear();
                     payload << 1337 << string;
                     network->sendPacket(payload);
@@ -395,25 +396,25 @@ void Lobby::process(sf::RenderWindow& window) {
             }
 
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)
-                && startGameButton->getButtonGlobalBounds().contains(mousePos) && network->HOST) {
+                && startGameButton->getButtonGlobalBounds().contains(mousePos) && network->isHost()) {
                 std::cout << "Start game pressed" << std::endl;
                 sf::Packet packet;
                 {
                     std::lock_guard clientsLock(network->clientsMutex);
                     std::lock_guard qLock(network->packetQMutex);
                     for (auto& client : network->clients) {
-                        network->playerNumber++;
-                        packet << PACKET_START << network->playerNumber;
+                        matchState->playerNumber++;
+                        packet << PACKET_START << matchState->playerNumber;
                         (void) client->socket.send(packet);
                         packet.clear();
                     }
                 }
-                network->playerNumber = 0; // Host always 0
-                currentScreenState    = screenState::GAME;
+                matchState->playerNumber = 0; // Host always 0
+                currentScreenState       = screenState::GAME;
                 return;
             }
         }
-        if (network->HOST) {
+        if (network->isHost()) {
             if (network->listen()) {
                 playerCount++;
                 titlebar->setString("Chat room for game: " + network->gameName
@@ -447,7 +448,7 @@ void Lobby::process(sf::RenderWindow& window) {
                                         + "          Players: " + std::to_string(playerCount)
                                         + "             Global IP: " + hostGlobalIP + "   Local IP: " + hostLocalIP);
                 } else if (packetType == PACKET_START) {
-                    payload >> network->playerNumber;
+                    payload >> matchState->playerNumber;
                     currentScreenState = screenState::GAME;
                     return;
                 }
@@ -474,7 +475,7 @@ void Lobby::process(sf::RenderWindow& window) {
             }
         }
         window.draw(*userInput);
-        if (network->HOST) {
+        if (network->isHost()) {
             startGameButton->draw(window);
         }
         window.display();

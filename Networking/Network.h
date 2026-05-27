@@ -2,6 +2,7 @@
 #define DAT220_PROJECT_NETWORK_H
 
 #include "Client.h"
+#include "ISession.h"
 #include <atomic>
 #include <condition_variable>
 #include <deque>
@@ -9,10 +10,9 @@
 #include <mutex>
 #include <thread>
 
-#include <SFML/Graphics/Color.hpp>
 #include <SFML/Network.hpp>
 
-class Network {
+class Network : public ISession {
 public:
     void sendFunction();
 
@@ -33,68 +33,39 @@ public:
     }
 
     std::deque<sf::Packet> packetQ;
-
     std::mutex packetQMutex;
     std::mutex clientsMutex;
 
-    // TCP Common
     unsigned short UDPPORT = 50000;
     unsigned short TCPPORT = 51000;
     std::string gameName;
-    bool HOST = true;
-    /**
-     * Checks if there is an incomming packet
-     * @return Returns either an incomming packet or an empty one if nothing was received
-     */
-    sf::Packet receivePacket();
 
-    /**
-     * Adds packet to send vector
-     * @param packet Reference packet that is to be sent
-     * @return Returns nothing
-     */
-    void sendPacket(sf::Packet& packet);
+    bool isHost() const override { return _isHost; }
+    void setAsHost() { _isHost = true; }
+    void setAsClient() { _isHost = false; }
+
+    sf::Packet receivePacket() override;
+    void sendPacket(sf::Packet& packet) override;
 
     // TCP Host Specific
     sf::Packet namePacket;
     std::unique_ptr<Client> nextClient;
 
-    /**
-     * Sets up listening socket and adds a creates client object
-     * @return Returns nothing
-     */
     void host();
-
-    /**
-     * Listen for connecting clients
-     * @return Returns nothing
-     */
     bool listen();
-
-    /**
-     * Checks for incomming text messages from clients
-     * @param list reference to the list of messages
-     * @return Returns nothing
-     */
     void receiveClientMessage(std::vector<std::string>& list);
     std::vector<std::unique_ptr<Client>> clients;
 
     // TCP Client Specific
-    sf::TcpSocket clientSocket; // Used by TCP clients
-
-    sf::TcpListener listener; // Used by the TCP lobby to connect to clients
-    sf::UdpSocket UdpSocket; // Used by both client and server for UDP packets
-
-    bool turn        = true;
-    bool alive       = true;
-    int playerNumber = 0;
-    std::string titleString;
-    sf::Color titleColor = sf::Color::White;
+    sf::TcpSocket clientSocket;
+    sf::TcpListener listener;
+    sf::UdpSocket UdpSocket;
 
 private:
+    bool _isHost = true;
     std::atomic<bool> running{true};
     std::condition_variable cvPacketQ;
     std::thread sendThread;
 };
 
-#endif
+#endif // DAT220_PROJECT_NETWORK_H

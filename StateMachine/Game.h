@@ -2,6 +2,7 @@
 #define DAT220_PROJECT_GAME_STATE_GAME_H
 
 #include "../Game/Board/Board.h"
+#include "../Game/MatchState.h"
 #include "../Game/Objects/Units/UnitBase.h"
 #include "../Game/UserInterface.h"
 #include "../Networking/Network.h"
@@ -30,6 +31,7 @@ public:
     void process(sf::RenderWindow& window);
 
     std::vector<unitBase> units;
+    MatchState matchState;
 
     Network* network;
 

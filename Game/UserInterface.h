@@ -6,6 +6,7 @@
 #define DAT220_PROJECT_USERINTERFACE_H
 
 #include "../Support/Button.h"
+#include "MatchState.h"
 #include "Objects/Units/UnitBase.h"
 #include <optional>
 
@@ -24,7 +25,7 @@ public:
      * @param units Pointer to the unit list
      * @return Returns nothing
      */
-    userInterface(sf::RenderWindow& window, Network* network, std::vector<unitBase>* units);
+    userInterface(sf::RenderWindow& window, Network* network, MatchState* matchState, std::vector<unitBase>* units);
 
     /**
      * Process user input
@@ -43,6 +44,7 @@ public:
     void draw(sf::RenderWindow& window);
 
     Network* network;
+    MatchState* matchState;
 
     ButtonPtr endTurnButton, moveButton, shootButton, grenadeButton;
     enum buttonEnum { nothing, end, move, shoot, grenade, unit };
