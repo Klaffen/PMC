@@ -191,7 +191,7 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
 
             if (!network->HOST) {
                 sf::Packet packet;
-                packet << 1010 << network->playerNumber;
+                packet << FUNCTION_END_OF_TURN << network->playerNumber;
                 network->sendPacket(packet);
                 network->turn = false;
             } else {
@@ -229,43 +229,53 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
             switch (selected) {
             case move:
                 {
-                    Tile* tile                      = input::getMouseOverTile(gameBoard.tileMap, window);
-                    std::vector<sf::Packet> packets = actionHandler::Move(units->at(selectedUnitID),
-                        tile->getPosition().x / 32, tile->getPosition().y / 32, gameBoard.tileMap);
-                    for (auto packet : packets) {
-                        network->sendPacket(packet);
+                    Tile* tile    = input::getMouseOverTile(gameBoard.tileMap, window);
+                    const float x = tile->getPosition().x / 32;
+                    const float y = tile->getPosition().y / 32;
+                    if (network->HOST) {
+                        auto packets = actionHandler::Move(units->at(selectedUnitID), x, y, gameBoard.tileMap);
+                        for (auto& p : packets) network->sendPacket(p);
+                    } else {
+                        sf::Packet request;
+                        auto& u = units->at(selectedUnitID);
+                        request << REQUEST_MOVE << u.id << u.player << x << y;
+                        network->sendPacket(request);
                     }
                     break;
                 }
 
             case shoot:
                 {
-                    sf::Vector2f mousePointer  = input::getMouse(window);
-                    sf::Vector2f mousePosition = sf::Vector2f(mousePointer.x, mousePointer.y);
-
-                    std::vector<sf::Packet> packets = actionHandler::Shoot(units->at(selectedUnitID), mousePosition,
-                        *units, gameBoard, units->at(selectedUnitID).getWeapon()->type);
-                    for (auto packet : packets) {
-                        network->sendPacket(packet);
-                    }
+                    const sf::Vector2f target = input::getMouse(window);
                     if (network->HOST) {
+                        auto packets = actionHandler::Shoot(units->at(selectedUnitID), target,
+                            *units, gameBoard, units->at(selectedUnitID).getWeapon()->type);
+                        for (auto& p : packets) network->sendPacket(p);
                         actionHandler::victory(*units, network);
+                    } else {
+                        sf::Packet request;
+                        auto& u = units->at(selectedUnitID);
+                        request << REQUEST_SHOOT << u.id << u.player << target.x << target.y
+                                << static_cast<int>(u.getWeapon()->type);
+                        network->sendPacket(request);
                     }
                     break;
                 }
 
             case grenade:
                 {
-                    sf::Vector2f mousePointer  = input::getMouse(window);
-                    sf::Vector2f mousePosition = sf::Vector2f(mousePointer.x, mousePointer.y);
-
-                    std::vector<sf::Packet> packets = actionHandler::Shoot(
-                        units->at(selectedUnitID), mousePosition, *units, gameBoard, weaponBase::grenadeType);
-                    for (auto packet : packets) {
-                        network->sendPacket(packet);
-                    }
+                    const sf::Vector2f target = input::getMouse(window);
                     if (network->HOST) {
+                        auto packets = actionHandler::Shoot(units->at(selectedUnitID), target,
+                            *units, gameBoard, weaponBase::grenadeType);
+                        for (auto& p : packets) network->sendPacket(p);
                         actionHandler::victory(*units, network);
+                    } else {
+                        sf::Packet request;
+                        auto& u = units->at(selectedUnitID);
+                        request << REQUEST_SHOOT << u.id << u.player << target.x << target.y
+                                << static_cast<int>(weaponBase::grenadeType);
+                        network->sendPacket(request);
                     }
                     break;
                 }

@@ -74,13 +74,6 @@ sf::Packet Network::receivePacket() {
             (void) client->socket.receive(packet);
             if (packet.getDataSize() > 0) {
                 std::cout << "Packet received from: " << client->playerName << std::endl;
-
-                for (auto& otherClient : clients) {
-                    if (otherClient->playerName != client->playerName) {
-                        std::cout << "Sending packet to: " << otherClient->playerName << std::endl;
-                        (void) otherClient->socket.send(packet);
-                    }
-                }
                 return packet;
             }
         }

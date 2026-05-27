@@ -11,14 +11,6 @@
 #include "../Networking/Network.h"
 #include "MathHelper.h"
 
-#define FUNCTION_MOVE        1001
-#define FUNCTION_SHOOT       1002
-#define FUNCTION_HURT        1003
-#define FUNCTION_WEAPONSWAP  1004
-#define FUNCTION_ADD_UNIT    1005
-#define FUNCTION_END_OF_TURN 1010
-#define FUNCTION_YOUR_TURN   1011
-#define FUNCTION_END_OF_GAME 1020
 
 
 std::vector<sf::Packet> actionHandler::actionLog{};
@@ -98,9 +90,6 @@ void actionHandler::GetRemoteAction(
             unit = getUnit(unitID, playerID, unitList);
             if (unit != nullptr) {
                 unit->hurt(damage);
-                if (network->HOST) {
-                    victory(*unitList, network);
-                }
             }
             break;
         }
@@ -155,6 +144,45 @@ void actionHandler::GetRemoteAction(
             } else if (status == Client::victory) {
                 network->titleString = "You won!";
                 network->titleColor  = sf::Color::Green;
+            }
+            break;
+        }
+
+    case REQUEST_MOVE:
+        {
+            if (!network->HOST) break;
+            packet >> unitID >> playerID >> xPos >> yPos;
+            unit = getUnit(unitID, playerID, unitList);
+            if (unit != nullptr) {
+                auto packets = Move(*unit, xPos, yPos, gameBoard.tileMap);
+                for (auto& p : packets) network->sendPacket(p);
+            }
+            break;
+        }
+
+    case REQUEST_SHOOT:
+        {
+            if (!network->HOST) break;
+            packet >> unitID >> playerID >> xPos >> yPos >> weapon;
+            unit = getUnit(unitID, playerID, unitList);
+            if (unit != nullptr) {
+                const auto type = static_cast<weaponBase::weaponType>(weapon);
+                auto packets    = Shoot(*unit, {xPos, yPos}, *unitList, gameBoard, type);
+                for (auto& p : packets) network->sendPacket(p);
+                victory(*unitList, network);
+            }
+            break;
+        }
+
+    case REQUEST_WEAPONSWAP:
+        {
+            if (!network->HOST) break;
+            packet >> unitID >> playerID >> weapon;
+            unit = getUnit(unitID, playerID, unitList);
+            if (unit != nullptr) {
+                const auto type = static_cast<weaponBase::weaponType>(weapon);
+                auto packets    = weaponSwap(unit, type);
+                for (auto& p : packets) network->sendPacket(p);
             }
             break;
         }

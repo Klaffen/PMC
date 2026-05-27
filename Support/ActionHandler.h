@@ -7,6 +7,7 @@
 
 
 #include "../Game/Objects/Units/UnitBase.h"
+#include "PacketTypes.h"
 
 #include <SFML/Network/Packet.hpp>
 
