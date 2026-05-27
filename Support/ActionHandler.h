@@ -17,7 +17,6 @@ class ISession;
 
 class actionHandler {
 public:
-    static std::vector<sf::Packet> actionLog;
     /**
      * Finds a unit based on id and playernumber
      */

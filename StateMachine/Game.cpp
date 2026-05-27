@@ -68,7 +68,7 @@ void Game::process(sf::RenderWindow& window) {
                 currentScreenState = MENU;
                 return;
             }
-            interface.proccess(*event, window, *gameBoard);
+            interface.process(*event, window, *gameBoard);
         }
         // Event loop end
 

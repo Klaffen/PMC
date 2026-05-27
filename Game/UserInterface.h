@@ -34,7 +34,7 @@ public:
      * @param window Reference to the game board
      * @return Returns nothing
      */
-    void proccess(sf::Event event, sf::RenderWindow& window, Board& gameBoard);
+    void process(sf::Event event, sf::RenderWindow& window, Board& gameBoard);
 
     /**
      * Draws the buttons

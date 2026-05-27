@@ -21,7 +21,7 @@ bool Network::listen() {
         std::cout << "\nAdded: " << nextClient->playerName << std::endl;
         {
             std::lock_guard lock(clientsMutex);
-            clients.emplace(clients.begin(), std::move(nextClient));
+            clients.push_back(std::move(nextClient));
         }
         nextClient = std::make_unique<Client>();
 

@@ -13,8 +13,6 @@
 
 
 
-std::vector<sf::Packet> actionHandler::actionLog{};
-
 std::vector<sf::Packet> actionHandler::Move(
     unitBase& unit, float xPos, float yPos, std::vector<std::vector<Tile>>& tileMap) {
 
@@ -24,9 +22,6 @@ std::vector<sf::Packet> actionHandler::Move(
         unit.move(sf::Vector2i(xPos, yPos), tileMap);
         packet << FUNCTION_MOVE << unit.id << unit.player << xPos << yPos;
         packets.push_back(packet);
-        for (auto packet : packets) {
-            actionLog.push_back(packet);
-        }
     }
     return packets;
 }
@@ -70,7 +65,6 @@ void actionHandler::GetRemoteAction(
 
     case FUNCTION_SHOOT:
         {
-            actionLog.push_back(packet);
             packet >> unitID >> playerID >> xPos >> yPos;
             unit = getUnit(unitID, playerID, unitList);
             if (unit != nullptr) {
@@ -220,7 +214,6 @@ std::vector<sf::Packet> actionHandler::Shoot(
         shootPacket << FUNCTION_SHOOT << unit.id << unit.player << target.x << target.y;
         packetList.push_back(shootPacket);
         unit.spendAP(weapon->apCost);
-        // Loops through each 'bullet' fired from the weapon
         for (const auto& bullet : bullets) {
             const Tile unitTile = board.tileMap[(int) (bullet.getPosition().x / Board::TILE_SIZE)].at(
                 (int) (bullet.getPosition().y / Board::TILE_SIZE));
@@ -242,9 +235,6 @@ std::vector<sf::Packet> actionHandler::Shoot(
                     }
                 }
             }
-        }
-        for (const auto& packet : packetList) {
-            actionLog.push_back(packet);
         }
     }
     return packetList;
@@ -279,6 +269,7 @@ void actionHandler::victory(std::vector<unitBase>& units, Network* network, Matc
                 }
             }
         } else {
+            std::lock_guard lock(network->clientsMutex);
             if (!playerMap[player] && network->clients.at(player - 1)->status != Client::defeat) {
                 network->clients.at(player - 1)->status = Client::defeat;
                 network->clients.at(player - 1)->alive  = false;
@@ -321,6 +312,7 @@ void actionHandler::victory(std::vector<unitBase>& units, Network* network, Matc
         matchState.titleColor  = sf::Color::Red;
 
         winner--;
+        std::lock_guard lock(network->clientsMutex);
         network->clients.at(winner)->status = Client::victory;
         winnerPacket << FUNCTION_END_OF_GAME << Client::victory;
         (void) network->clients.at(winner)->socket.send(winnerPacket);
@@ -357,7 +349,6 @@ std::vector<sf::Packet> actionHandler::weaponSwap(unitBase* unit, weaponBase::we
         unit->spendAP(2);
         sf::Packet packet;
         packet << FUNCTION_WEAPONSWAP << unit->id << unit->player << static_cast<int>(type);
-        actionLog.push_back(packet);
         return std::vector{packet};
     }
     return {};
@@ -377,7 +368,7 @@ void actionHandler::sendUnit(unitBase unit, ISession* session, unitBase::unitCla
 }
 
 void actionHandler::nextTurn(int player, Network& network, std::vector<unitBase>* unitList, MatchState& matchState) {
-    actionLog.clear();
+    std::lock_guard lock(network.clientsMutex);
     std::cout << "Input player: " << player << std::endl;
     if (player != 0) {
         network.clients.at(player - 1)->status = network.clients.at(player - 1)->opponentsTurn;

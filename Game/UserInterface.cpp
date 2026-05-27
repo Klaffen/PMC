@@ -67,7 +67,7 @@ userInterface::userInterface(sf::RenderWindow& window, Network* network, MatchSt
     titleText->setStyle(sf::Text::Style::Bold);
 }
 
-void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& gameBoard) {
+void userInterface::process(sf::Event event, sf::RenderWindow& window, Board& gameBoard) {
     if (!matchState->turn) {
         return;
     }
@@ -231,8 +231,8 @@ void userInterface::proccess(sf::Event event, sf::RenderWindow& window, Board& g
             case move:
                 {
                     Tile* tile    = input::getMouseOverTile(gameBoard.tileMap, window);
-                    const float x = tile->getPosition().x / 32;
-                    const float y = tile->getPosition().y / 32;
+                    const float x = tile->getPosition().x / Board::TILE_SIZE;
+                    const float y = tile->getPosition().y / Board::TILE_SIZE;
                     if (network->isHost()) {
                         auto packets = actionHandler::Move(units->at(selectedUnitID), x, y, gameBoard.tileMap);
                         for (auto& p : packets) network->sendPacket(p);
