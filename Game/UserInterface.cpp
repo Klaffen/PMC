@@ -10,7 +10,8 @@
 #include "Pathfinding/Pathfinding.h"
 #include <stdexcept>
 
-userInterface::userInterface(sf::RenderWindow& window, Network* network, MatchState* matchState, std::vector<unitBase>* units) {
+userInterface::userInterface(
+    sf::RenderWindow& window, Network* network, MatchState* matchState, std::vector<unitBase>* units) {
     this->network    = network;
     this->matchState = matchState;
     view             = window.getView();
@@ -50,13 +51,13 @@ userInterface::userInterface(sf::RenderWindow& window, Network* network, MatchSt
     healthBar.setFillColor(sf::Color::Green);
     healthBar.setOutlineColor(sf::Color::White);
     healthBar.setOutlineThickness(-1);
-    healthBar.setSize(sf::Vector2f(6.4, 6.4));
+    healthBar.setSize(sf::Vector2f(Board::TILE_SIZE, Board::TILE_SIZE / 5));
 
     if (!font.openFromFile("Data/Fonts/neuropol.ttf")) {
         throw std::runtime_error("Could not load font: Data/Fonts/neuropol.ttf");
     }
     actionPoints.emplace(font);
-    actionPoints->setCharacterSize(16);
+    actionPoints->setCharacterSize(8);
     actionPoints->setOutlineThickness(1);
     actionPoints->setOutlineColor(sf::Color::White);
 
@@ -172,7 +173,6 @@ void userInterface::process(sf::Event event, sf::RenderWindow& window, Board& ga
 
         else if (highlighted == end || keyCode == sf::Keyboard::Key::P) {
             for (auto& unit : *units) {
-                unit.restoreAP();
                 unit.turn = false;
             }
             if (selectedUnitID != -1) {
@@ -184,10 +184,12 @@ void userInterface::process(sf::Event event, sf::RenderWindow& window, Board& ga
             resetPath();
             endTurnButton->setTextColor(sf::Color::White);
 
-            std::lock_guard lock(network->clientsMutex);
-            if (!network->isHost() || !network->clients.empty()) {
-                matchState->titleString = "Opponent's turn";
-                matchState->titleColor  = sf::Color::Blue;
+            {
+                std::lock_guard lock(network->clientsMutex);
+                if (!network->isHost() || !network->clients.empty()) {
+                    matchState->titleString = "Opponent's turn";
+                    matchState->titleColor  = sf::Color::Blue;
+                }
             }
 
             if (!network->isHost()) {
@@ -235,7 +237,9 @@ void userInterface::process(sf::Event event, sf::RenderWindow& window, Board& ga
                     const float y = tile->getPosition().y / Board::TILE_SIZE;
                     if (network->isHost()) {
                         auto packets = actionHandler::Move(units->at(selectedUnitID), x, y, gameBoard.tileMap);
-                        for (auto& p : packets) network->sendPacket(p);
+                        for (auto& p : packets) {
+                            network->sendPacket(p);
+                        }
                     } else {
                         sf::Packet request;
                         auto& u = units->at(selectedUnitID);
@@ -249,9 +253,11 @@ void userInterface::process(sf::Event event, sf::RenderWindow& window, Board& ga
                 {
                     const sf::Vector2f target = input::getMouse(window);
                     if (network->isHost()) {
-                        auto packets = actionHandler::Shoot(units->at(selectedUnitID), target,
-                            *units, gameBoard, units->at(selectedUnitID).getWeapon()->type);
-                        for (auto& p : packets) network->sendPacket(p);
+                        auto packets = actionHandler::Shoot(units->at(selectedUnitID), target, *units, gameBoard,
+                            units->at(selectedUnitID).getWeapon()->type);
+                        for (auto& p : packets) {
+                            network->sendPacket(p);
+                        }
                         actionHandler::victory(*units, network, *matchState);
                     } else {
                         sf::Packet request;
@@ -267,9 +273,11 @@ void userInterface::process(sf::Event event, sf::RenderWindow& window, Board& ga
                 {
                     const sf::Vector2f target = input::getMouse(window);
                     if (network->isHost()) {
-                        auto packets = actionHandler::Shoot(units->at(selectedUnitID), target,
-                            *units, gameBoard, weaponBase::grenadeType);
-                        for (auto& p : packets) network->sendPacket(p);
+                        auto packets = actionHandler::Shoot(
+                            units->at(selectedUnitID), target, *units, gameBoard, weaponBase::grenadeType);
+                        for (auto& p : packets) {
+                            network->sendPacket(p);
+                        }
                         actionHandler::victory(*units, network, *matchState);
                     } else {
                         sf::Packet request;
@@ -317,33 +325,41 @@ void userInterface::draw(sf::RenderWindow& window) {
     }
 }
 
-void userInterface::displayStats(unitBase* unit, sf::RenderWindow& window) {
-    if (unit->health < 50) {
+void userInterface::displayStats(const unitBase* unit, sf::RenderWindow& window) {
+    drawHealthBar(unit, window);
+    drawActionPoints(unit, window);
+}
+
+void userInterface::drawHealthBar(const unitBase* unit, sf::RenderWindow& window) {
+    if (unit->health < unit->maxHealth / 4) {
         healthBar.setFillColor(sf::Color::Red);
+    } else if (unit->health < unit->maxHealth / 2) {
+        healthBar.setFillColor(sf::Color::Yellow);
     } else {
         healthBar.setFillColor(sf::Color::Green);
     }
 
-    for (int x = 0; x < unit->health; x += 15) {
-        healthBar.setPosition({unit->shape.getPosition().x - Board::TILE_SIZE / 2 + (float) (6.4 * x / 15),
-            unit->shape.getPosition().y - Board::TILE_SIZE / 2 - 6});
-        window.draw(healthBar);
-    }
+    healthBar.setPosition(
+        {unit->shape.getPosition().x - Board::TILE_SIZE / 2, unit->shape.getPosition().y - Board::TILE_SIZE / 2 - 6});
 
-    if (unit->actionPoints > 0) {
-        actionPoints->setFillColor(sf::Color::Cyan);
-    } else {
-        actionPoints->setFillColor(sf::Color::Red);
-    }
+    const float healthPercentage = static_cast<float>(unit->health) / unit->maxHealth;
+    healthBar.setSize(sf::Vector2f(Board::TILE_SIZE * healthPercentage, Board::TILE_SIZE / 5));
 
+    window.draw(healthBar);
+}
+
+void userInterface::drawActionPoints(const unitBase* unit, sf::RenderWindow& window) {
+    actionPoints->setFillColor(unit->actionPoints > 0 ? sf::Color::Cyan : sf::Color::Red);
     actionPoints->setPosition({unit->shape.getPosition().x - actionPoints->getLocalBounds().size.x / 2 + 1,
-        (unit->shape.getPosition().y - (Board::TILE_SIZE) -10)});
-    actionPoints->setString(std::to_string(unit->actionPoints));
+        unit->shape.getPosition().y - Board::TILE_SIZE - 4});
+
+    actionPoints->setString(std::to_string(unit->actionPoints) + " / " + std::to_string(unit->maxAP));
+
     window.draw(*actionPoints);
 }
 
 void userInterface::resetPath() {
-    for (auto tile : highlightedPath) {
+    for (const auto tile : highlightedPath) {
         tile->setNotHighlighted();
     }
     highlightedPath.clear();

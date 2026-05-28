@@ -149,18 +149,16 @@ void unitBase::hurt(int damage) {
         health = 0;
         alive  = false;
         shape.setFillColor(sf::Color(color.r, color.g, color.b, 255 * 0.10));
-    } else {
-        setColor(color);
     }
 }
 
 void unitBase::setColor(sf::Color colour) {
-    auto healthPercent = (health * 100) / (maxHealth * 100);
+    auto healthPercent = health / maxHealth;
 
     if (healthPercent < 15) {
         healthPercent = 15;
     }
-    shape.setFillColor(sf::Color(color.r, color.g, color.b, 255 * (healthPercent / 100)));
+    shape.setFillColor(sf::Color(color.r, color.g, color.b, 255 * healthPercent));
 }
 
 void unitBase::shoot(sf::RenderWindow& window, sf::Vector2f target) {
@@ -234,7 +232,7 @@ void unitBase::spendAP(int points) {
 }
 
 void unitBase::restoreAP() {
-    actionPoints = maxAP;
+    actionPoints = std::min(actionPoints + apPerTurn, maxAP);
     hasMoved     = true;
 }
 

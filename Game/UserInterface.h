@@ -77,7 +77,9 @@ private:
      * @param window Reference to the game window
      * @return Returns nothing
      */
-    void displayStats(unitBase* unit, sf::RenderWindow& window);
+    void displayStats(const unitBase* unit, sf::RenderWindow& window);
+    void drawHealthBar(const unitBase* unit, sf::RenderWindow& window);
+    void drawActionPoints(const unitBase* unit, sf::RenderWindow& window);
 };
 
 

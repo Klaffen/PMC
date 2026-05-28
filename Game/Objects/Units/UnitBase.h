@@ -60,6 +60,8 @@ public:
     std::queue<sf::Vector2i> path;
     std::map<int, int> movementMap;
     bool isMoving = false;
+    int maxAP;
+    int apPerTurn = 5;
 
 private:
     bool hasMoved = true;
@@ -67,7 +69,6 @@ private:
 protected:
     void updateVision(Board& board);
     int localPlayerNumber;
-    int maxAP;
     sf::Vector2i nextTile;
     void Animate(sf::Vector2f goal);
 };
