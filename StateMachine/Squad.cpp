@@ -427,6 +427,7 @@ std::vector<unitBase::unitClass> Squad::unitConversion(const std::vector<baseUni
     unitBase::unitClass convertedUnit;
     std::vector<unitBase::unitClass> convertedList;
     for (auto unit : units) {
+        convertedUnit.maxHealth    = unit.health;
         convertedUnit.health       = unit.health;
         convertedUnit.actionPoints = unit.actionPoints;
         convertedUnit.sightRange   = unit.vision;
@@ -455,4 +456,5 @@ void Squad::getSquad(const std::vector<unitBase::unitClass>& units) {
         addUnit(convertedUnit);
     }
 
+    recalcBuildPoints();
 }
