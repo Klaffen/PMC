@@ -105,39 +105,27 @@ void userInterface::process(sf::Event event, sf::RenderWindow& window, Board& ga
             }
         }
 
-        if (endTurnButton->getButtonGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window)))
-            && selected != end) {
+        if (endTurnButton->getButtonGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window)))) {
             endTurnButton->setTextColor(sf::Color::Yellow);
             highlighted = end;
 
-        } else if (moveButton->getButtonGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window)))
-                   && selected != move) {
+        } else if (moveButton->getButtonGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window)))) {
             moveButton->setTextColor(sf::Color::Yellow);
             highlighted = move;
 
-        } else if (shootButton->getButtonGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window)))
-                   && selected != shoot) {
+        } else if (shootButton->getButtonGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window)))) {
             shootButton->setTextColor(sf::Color::Yellow);
             highlighted = shoot;
 
-        } else if (grenadeButton->getButtonGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window)))
-                   && selected != grenade) {
+        } else if (grenadeButton->getButtonGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window)))) {
             grenadeButton->setTextColor(sf::Color::Yellow);
             highlighted = grenade;
 
         } else {
-            if (selected != end) {
-                endTurnButton->setTextColor(sf::Color::White);
-            }
-            if (selected != move) {
-                moveButton->setTextColor(sf::Color::White);
-            }
-            if (selected != shoot) {
-                shootButton->setTextColor(sf::Color::White);
-            }
-            if (selected != grenade) {
-                grenadeButton->setTextColor(sf::Color::White);
-            }
+            endTurnButton->setTextColor(sf::Color::White);
+            moveButton->setTextColor(selected == move ? sf::Color::Red : sf::Color::White);
+            shootButton->setTextColor(selected == shoot ? sf::Color::Red : sf::Color::White);
+            grenadeButton->setTextColor(selected == grenade ? sf::Color::Red : sf::Color::White);
 
             if (!found) {
                 highlighted      = nothing;

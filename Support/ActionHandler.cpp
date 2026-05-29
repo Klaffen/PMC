@@ -18,7 +18,7 @@ std::vector<sf::Packet> actionHandler::Move(
 
     std::vector<sf::Packet> packets;
     sf::Packet packet;
-    if (unit.actionPoints >= 1) {
+    if (unit.actionPoints >= 1 && unit.path.empty() && !unit.isMoving) {
         unit.move(sf::Vector2i(xPos, yPos), tileMap);
         packet << FUNCTION_MOVE << unit.id << unit.player << xPos << yPos;
         packets.push_back(packet);
