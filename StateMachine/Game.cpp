@@ -27,6 +27,14 @@ int Game::enter(sf::RenderWindow& window) {
 
     units = makeTemporaryUnitList();
 
+    for (const auto& unit : units) {
+        if (unit.player == matchState.playerNumber) {
+            view.setCenter(unit.shape.getPosition());
+            window.setView(view);
+            break;
+        }
+    }
+
     matchState.turn = network->isHost();
 
     process(window);

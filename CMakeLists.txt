@@ -56,7 +56,11 @@ add_custom_command(TARGET DAT220_project POST_BUILD
         "$<TARGET_FILE_DIR:DAT220_project>/SquadBuilder"
 )
 
-if(WIN32)
+if(MINGW)
+    target_link_options(DAT220_project PRIVATE -static)
+endif()
+
+if(WIN32 AND BUILD_SHARED_LIBS)
     add_custom_command(TARGET DAT220_project POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${sfml_BINARY_DIR}/bin"

@@ -69,9 +69,11 @@ void actionHandler::GetRemoteAction(
             unit = getUnit(unitID, playerID, unitList);
             if (unit != nullptr) {
                 const sf::Vector2f target = sf::Vector2f(xPos, yPos);
-                unit->getWeapon()->Shoot(unit->shape.getPosition(), target);
-                if (unit->getWeapon()->sound) {
-                    unit->getWeapon()->sound->play();
+                auto weapon = unit->getWeapon();
+                weapon->Shoot(unit->shape.getPosition(), target);
+                unit->spendAP(weapon->apCost);
+                if (weapon->sound) {
+                    weapon->sound->play();
                 }
             }
             break;
@@ -230,7 +232,7 @@ std::vector<sf::Packet> actionHandler::Shoot(
                         // Check if unit is dead after taking damage
                         testUnit.hurt(damage);
                         sf::Packet newPacket;
-                        newPacket << FUNCTION_HURT << testUnit.id << testUnit.player << damage;
+                        newPacket << FUNCTION_HURT << testUnit.id << testUnit.player << (int)damage;
                         packetList.push_back(newPacket);
                     }
                 }

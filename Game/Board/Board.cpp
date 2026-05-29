@@ -12,7 +12,7 @@ const float Board::TILE_SIZE = 32;
 
 void Board::init(sf::RenderWindow& window) {
 
-    mapSize = sf::Vector2i(1920, 1080);
+    mapSize = sf::Vector2i(960, 540);
 
     for (int i = 0; i < mapSize.x; i += (int) TILE_SIZE) {
         std::vector<Tile> tiles;
@@ -38,17 +38,7 @@ void Board::drawTiles(sf::RenderWindow& window) {
 
 void Board::drawObstacles(sf::RenderWindow& window) {
     for (auto& obstacle : level.obstacles) {
-
-        for (int i = 0; i < obstacle.getSize().x; ++i) {
-            for (int j = 0; j < obstacle.getSize().y; ++j) {
-                if (tileMap[getTileCoord(obstacle.getBaseRect().getPosition()).x + i]
-                           [getTileCoord(obstacle.getBaseRect().getPosition()).y + j]
-                               .isVisible) {
-                    obstacle.draw(window);
-                    break;
-                }
-            }
-        }
+        obstacle.draw(window);
     }
 }
 

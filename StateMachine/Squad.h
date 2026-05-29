@@ -13,7 +13,7 @@
 #define PRICE_HEALTH      20
 #define PRICE_ACTIONPOINT 10
 #define PRICE_UNIT        20
-#define MAX_BUILD_POINTS  400
+#define MAX_BUILD_POINTS  600
 
 struct baseUnit {
     int vision       = 1;

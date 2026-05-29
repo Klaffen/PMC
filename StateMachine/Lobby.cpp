@@ -120,7 +120,7 @@ void Lobby::lobbySetup(sf::RenderWindow& window) {
         while (const auto event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 window.close();
-                currentScreenState = screenState::TERMINATE;
+                currentScreenState = TERMINATE;
                 return;
             }
             if (const auto* textEntered = event->getIf<sf::Event::TextEntered>()) {

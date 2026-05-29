@@ -15,33 +15,15 @@ Level::Level() {
 
     Shape3D obstacle1({1, 1}, {27, 10}, 1);
     Shape3D obstacle2({1, 1}, {25, 12}, 1);
-    Shape3D obstacle3({1, 1}, {23, 14}, 1);
-    Shape3D obstacle4({1, 5}, {6, 2}, 1);
-    Shape3D obstacle5({1, 5}, {6, 10}, 1);
-    Shape3D obstacle6({1, 4}, {13, 4}, 1);
+    Shape3D obstacle4({1, 3}, {6, 2}, 1);
+    Shape3D obstacle6({1, 3}, {13, 4}, 1);
     Shape3D obstacle7({1, 3}, {13, 13}, 1);
-    Shape3D obstacle8({1, 1}, {16, 13}, 1);
-    Shape3D obstacle9({1, 1}, {18, 11}, 1);
-    Shape3D obstacle10({1, 1}, {20, 9}, 1);
-    Shape3D obstacle11({1, 1}, {22, 7}, 1);
-    Shape3D obstacle12({1, 1}, {24, 5}, 1);
-    Shape3D obstacle13({1, 1}, {26, 3}, 1);
-    Shape3D obstacle14({1, 1}, {28, 1}, 1);
 
     obstacles.push_back(obstacle1);
     obstacles.push_back(obstacle2);
-    obstacles.push_back(obstacle3);
     obstacles.push_back(obstacle4);
-    obstacles.push_back(obstacle5);
     obstacles.push_back(obstacle6);
     obstacles.push_back(obstacle7);
-    obstacles.push_back(obstacle8);
-    obstacles.push_back(obstacle9);
-    obstacles.push_back(obstacle10);
-    obstacles.push_back(obstacle11);
-    obstacles.push_back(obstacle12);
-    obstacles.push_back(obstacle13);
-    obstacles.push_back(obstacle14);
 
     reflectOverX();
     reflectOverY();
@@ -56,8 +38,8 @@ void Level::reflectOverY() {
         sf::Vector2f position = {obstacle.getBaseRect().getPosition().x / Board::TILE_SIZE,
             obstacle.getBaseRect().getPosition().y / Board::TILE_SIZE};
 
-        // 30 is the center tile
-        float newPositionX = 30 - position.x - size.x + 30;
+        // 15 is the center tile
+        float newPositionX = 15 - position.x - size.x + 15;
 
         Shape3D newObstacle({size}, {newPositionX, position.y}, 1);
         obstacles.push_back(newObstacle);
@@ -73,8 +55,8 @@ void Level::reflectOverX() {
         sf::Vector2f position = {obstacle.getBaseRect().getPosition().x / Board::TILE_SIZE,
             obstacle.getBaseRect().getPosition().y / Board::TILE_SIZE};
 
-        // 17 is the center tile
-        float newPositionY = 17 - position.y - size.y + 17;
+        // 8 is the center tile
+        float newPositionY = 8 - position.y - size.y + 8;
 
         Shape3D newObstacle({size}, {position.x, newPositionY}, 1);
         obstacles.push_back(newObstacle);
@@ -90,7 +72,7 @@ void Level::reflectOverXY() {
         sf::Vector2f position = {obstacle.getBaseRect().getPosition().x / Board::TILE_SIZE,
             obstacle.getBaseRect().getPosition().y / Board::TILE_SIZE};
 
-        sf::Vector2f newPosition = {30 - position.x - size.x + 30, 17 - position.y - size.y + 17};
+        sf::Vector2f newPosition = {15 - position.x - size.x + 15, 8 - position.y - size.y + 8};
 
         Shape3D newObstacle(size, newPosition, 1);
         obstacles.push_back(newObstacle);

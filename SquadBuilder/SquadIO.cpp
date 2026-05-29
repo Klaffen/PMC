@@ -85,9 +85,9 @@ std::vector<unitBase> squadIO::makeUnits(const std::string& fPath, int playerNum
 
 std::vector<unitBase::unitClass> squadIO::defaultUnitList() {
     unitBase::unitClass unit;
-    unit.sightRange   = 7;
-    unit.actionPoints = 11;
-    unit.maxHealth    = 120;
+    unit.sightRange   = 6;
+    unit.maxHealth    = 5;
+    unit.actionPoints = 10;
 
     unitBase::unitClass unit2 = unit;
 
